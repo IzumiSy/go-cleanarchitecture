@@ -6,7 +6,7 @@ import (
 )
 
 type GetTodosOutputPort interface {
-	Write(todos []models.Todo, err error)
+	Write(todos []models.Todo, result error)
 }
 
 type getTodosUsecase struct {
