@@ -1,7 +1,8 @@
 package presenters
 
 import (
-	"github.com/IzumiSy/go-cleanarchitecture/domains/models"
+	"go-cleanarchitecture/domains/models"
+
 	"github.com/labstack/echo"
 )
 
@@ -36,8 +37,8 @@ func (presenter *getTodosJsonPresenter) Write(todos []models.Todo, err error) {
 
 	for _, todo := range todos {
 		response.Todos = append(response.Todos, getTodosResponseItem{
-			Id:   todo.Id,
-			Name: todo.Name,
+			Id:   todo.Id(),
+			Name: todo.Name(),
 		})
 	}
 

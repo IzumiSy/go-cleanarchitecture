@@ -1,8 +1,8 @@
 package usecases
 
 import (
-	"github.com/IzumiSy/go-cleanarchitecture/dao"
-	"github.com/IzumiSy/go-cleanarchitecture/domains/models"
+	"go-cleanarchitecture/domains/models"
+	"go-cleanarchitecture/domains/repositories"
 )
 
 type GetTodosOutputPort interface {
@@ -11,10 +11,10 @@ type GetTodosOutputPort interface {
 
 type getTodosUsecase struct {
 	outputPort GetTodosOutputPort
-	todoDao    dao.TodoDao
+	todoDao    repositories.TodoRepository
 }
 
-func NewGetTodosUsecase(outputPort GetTodosOutputPort, todoDao dao.TodoDao) getTodosUsecase {
+func NewGetTodosUsecase(outputPort GetTodosOutputPort, todoDao repositories.TodoRepository) getTodosUsecase {
 	return getTodosUsecase{outputPort, todoDao}
 }
 

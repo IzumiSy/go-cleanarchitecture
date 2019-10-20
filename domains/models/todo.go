@@ -1,11 +1,19 @@
 package models
 
 type Todo struct {
-	Id   string
-	Name string
+	id   string
+	name string
 }
 
 // TODO needs a validation here
 func NewTodo(name string) Todo {
-	return Todo{Name: name}
+	return Todo{name: name}
+}
+
+func (todo Todo) Name() string {
+	return todo.name
+}
+
+func (todo Todo) Id() string {
+	return todo.id
 }

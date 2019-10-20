@@ -1,8 +1,8 @@
 package usecases
 
 import (
-	"github.com/IzumiSy/go-cleanarchitecture/dao"
-	"github.com/IzumiSy/go-cleanarchitecture/domains/models"
+	"go-cleanarchitecture/domains/models"
+	"go-cleanarchitecture/domains/repositories"
 )
 
 type CreateTodoOutputPort interface {
@@ -16,11 +16,11 @@ type CreateTodoParam struct {
 type createTodoUsecase struct {
 	params     CreateTodoParam
 	outputPort CreateTodoOutputPort
-	todoDao    dao.TodoDao
+	todoDao    repositories.TodoRepository
 }
 
 func NewCreateTodoUsecase(
-	params CreateTodoParam, outputPort CreateTodoOutputPort, todoDao dao.TodoDao,
+	params CreateTodoParam, outputPort CreateTodoOutputPort, todoDao repositories.TodoRepository,
 ) createTodoUsecase {
 	return createTodoUsecase{params, outputPort, todoDao}
 }

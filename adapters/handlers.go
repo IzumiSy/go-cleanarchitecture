@@ -1,9 +1,9 @@
 package adapters
 
 import (
-	"github.com/IzumiSy/go-cleanarchitecture/adapters/dao"
-	"github.com/IzumiSy/go-cleanarchitecture/adapters/presenters"
-	"github.com/IzumiSy/go-cleanarchitecture/domains/usecases"
+	"go-cleanarchitecture/adapters/dao"
+	"go-cleanarchitecture/adapters/presenters"
+	"go-cleanarchitecture/domains/usecases"
 	"github.com/labstack/echo"
 )
 

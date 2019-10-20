@@ -1,7 +1,8 @@
 package dao
 
 import (
-	"github.com/IzumiSy/go-cleanarchitecture/domains/models"
+	"go-cleanarchitecture/domains/models"
+
 	"github.com/jinzhu/gorm"
 )
 

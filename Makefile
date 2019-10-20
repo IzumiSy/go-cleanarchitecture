@@ -1,9 +1,13 @@
+.PHONY: reset migrate run
+
 run: main.go
 	go run main.go
 
-migrate: migration.go
-	go run migration.go
+migrate:
+	go run main.go --migrate
 
 reset:
 	rm -f go-cleanarchitecture.db
-	go run migration.go
+	make migrate
+
+
