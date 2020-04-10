@@ -2,6 +2,7 @@ package todo
 
 import (
 	"github.com/google/uuid"
+	"go-cleanarchitecture/domains/errors"
 )
 
 type Id struct {
@@ -12,13 +13,13 @@ type Id struct {
 	value uuid.UUID
 }
 
-func NewId(value string) (error, Id) {
+func NewId(value string) (Id, errors.Domain) {
 	id, err := uuid.FromBytes([]byte(value))
 	if err != nil {
-		return err, Id{}
+		return Id{}, errors.Invalid("Invalid value")
 	}
 
-	return nil, Id{id}
+	return Id{id}, errors.None
 }
 
 // IDを内部の依存した実装のデータとして取得する

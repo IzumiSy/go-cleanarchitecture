@@ -1,6 +1,7 @@
 package domains
 
 import (
+	"go-cleanarchitecture/domains/errors"
 	"go-cleanarchitecture/domains/models"
 	"go-cleanarchitecture/domains/models/todo"
 )
@@ -9,11 +10,11 @@ import (
 // domainsパッケージ直下にリポジトリを一つのファイルとして書いていくスタイルとした。
 
 type TodoRepository interface {
-	Get(id todo.Id) (error, models.Todo)
-	GetByName(name todo.Name) (error, models.Todo)
-	Store(todo models.Todo) error
+	Get(id todo.Id) (models.Todo, errors.Domain)
+	GetByName(name todo.Name) (models.Todo, errors.Domain)
+	Store(todo models.Todo) errors.Domain
 }
 
 type TodosRepository interface {
-	Get() (error, models.Todos)
+	Get() (models.Todos, errors.Domain)
 }

@@ -2,6 +2,7 @@ package json
 
 import (
 	"go-cleanarchitecture/adapters/presenters"
+	"go-cleanarchitecture/domains/errors"
 	"go-cleanarchitecture/domains/models"
 )
 
@@ -14,18 +15,13 @@ type CreateTodoPresenter struct {
 }
 
 // エラーハンドリングはサボって全部500を返している
-func (presenter CreateTodoPresenter) Write(todo models.Todo, err error) {
-	if err != nil {
-		presenter.Presenter.Fail()
-		return
-	}
-
+func (presenter CreateTodoPresenter) Write(todo models.Todo) {
 	presenter.Presenter.Succeed(createTodoResponse{
 		Id: todo.Id().String(),
 	})
 }
 
-func (presenter CreateTodoPresenter) Raise(reason error) {
+func (presenter CreateTodoPresenter) Raise(reason errors.Domain) {
 	presenter.Presenter.Fail()
 }
 

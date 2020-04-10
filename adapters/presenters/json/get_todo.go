@@ -2,6 +2,7 @@ package json
 
 import (
 	"go-cleanarchitecture/adapters/presenters"
+	"go-cleanarchitecture/domains/errors"
 	"go-cleanarchitecture/domains/models"
 )
 
@@ -19,12 +20,7 @@ type GetTodosPresenter struct {
 }
 
 // エラーハンドリングはサボって全部500を返している
-func (presenter GetTodosPresenter) Write(todos models.Todos, err error) {
-	if err != nil {
-		presenter.Presenter.Fail()
-		return
-	}
-
+func (presenter GetTodosPresenter) Write(todos models.Todos) {
 	var response getTodosResponse
 
 	for _, todo := range todos.Value() {
@@ -37,7 +33,7 @@ func (presenter GetTodosPresenter) Write(todos models.Todos, err error) {
 	presenter.Presenter.Succeed(response)
 }
 
-func (presenter GetTodosPresenter) Raise(reason error) {
+func (presenter GetTodosPresenter) Raise(reason errors.Domain) {
 	presenter.Presenter.Fail()
 }
 

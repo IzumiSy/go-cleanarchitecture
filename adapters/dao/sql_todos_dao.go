@@ -1,6 +1,7 @@
 package dao
 
 import (
+	"go-cleanarchitecture/domains/errors"
 	"go-cleanarchitecture/domains/models"
 )
 
@@ -15,7 +16,7 @@ func (dao TodosDao) Close() {
 	dao.Close()
 }
 
-func (dao TodosDao) Get() (error, models.Todos) {
+func (dao TodosDao) Get() (models.Todos, errors.Domain) {
 	var todos []models.Todo
 
 	err := dao.
@@ -23,5 +24,5 @@ func (dao TodosDao) Get() (error, models.Todos) {
 		Find(&todos).
 		Error
 
-	return err, models.NewTodos(todos)
+	return models.NewTodos(todos), errors.External(err)
 }

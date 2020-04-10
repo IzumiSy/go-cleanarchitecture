@@ -6,8 +6,8 @@ import (
 )
 
 type GetTodosOutputPort interface {
-	OutputPort
-	Write(todos models.Todos, result error)
+	domains.OutputPort
+	Write(todos models.Todos)
 }
 
 type getTodosUsecase struct {
@@ -20,6 +20,11 @@ func NewGetTodosUsecase(outputPort GetTodosOutputPort, todosDao domains.TodosRep
 }
 
 func (usecase getTodosUsecase) Execute() {
-	err, todos := usecase.todosDao.Get()
-	usecase.outputPort.Write(todos, err)
+	todos, err := usecase.todosDao.Get()
+	if err.NotNil() {
+		usecase.outputPort.Raise(err)
+		return
+	}
+
+	usecase.outputPort.Write(todos)
 }

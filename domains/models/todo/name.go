@@ -1,7 +1,7 @@
 package todo
 
 import (
-	"errors"
+	"go-cleanarchitecture/domains/errors"
 	"unicode/utf8"
 )
 
@@ -14,15 +14,15 @@ type Name struct {
 	value string
 }
 
-func NewName(value string) (error, Name) {
+func NewName(value string) (Name, errors.Domain) {
 	empty := Name{}
 
 	if value == "" {
-		return errors.New("Name must not be empty"), empty
+		return empty, errors.Invalid("Name must not be empty")
 	} else if utf8.RuneCountInString(value) > 30 {
-		return errors.New("Name too long"), empty
+		return empty, errors.Invalid("Name too long")
 	} else {
-		return nil, Name{value}
+		return Name{value}, errors.None
 	}
 }
 

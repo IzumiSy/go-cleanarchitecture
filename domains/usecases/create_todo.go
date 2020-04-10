@@ -2,13 +2,14 @@ package usecases
 
 import (
 	"go-cleanarchitecture/domains"
+	"go-cleanarchitecture/domains/errors"
 	"go-cleanarchitecture/domains/models"
 	"go-cleanarchitecture/domains/models/todo"
 )
 
 type CreateTodoOutputPort interface {
-	OutputPort
-	Write(todo models.Todo, result error)
+	domains.OutputPort
+	Write(todo models.Todo)
 }
 
 type CreateTodoParam struct {
@@ -26,27 +27,39 @@ func NewCreateTodoUsecase(outputPort CreateTodoOutputPort, todoDao domains.TodoR
 }
 
 func (usecase createTodoUsecase) Execute(params CreateTodoParam) {
-	err, name := todo.NewName(params.Name)
-	if err != nil {
+	var (
+		NAME_INVALID = errors.Invalid("Name must not be duplicated")
+	)
+
+	name, err := todo.NewName(params.Name)
+	if err.NotNil() {
 		usecase.outputPort.Raise(err)
 		return
 	}
 
-	err, description := todo.NewDescription(params.Description)
-	if err != nil {
+	description, err := todo.NewDescription(params.Description)
+	if err.NotNil() {
 		usecase.outputPort.Raise(err)
 		return
 	}
 
-	err, currentTodo := usecase.todoDao.GetByName(name)
-	if err != nil {
+	currentTodo, err := usecase.todoDao.GetByName(name)
+	if err.NotNil() {
 		usecase.outputPort.Raise(err)
+		return
 	}
+
 	if currentTodo.Name() == name {
-		// validation error
+		usecase.outputPort.Raise(NAME_INVALID)
+		return
 	}
 
 	newTodo := models.NewTodo(name, description)
 	err = usecase.todoDao.Store(newTodo)
-	usecase.outputPort.Write(newTodo, err)
+	if err.NotNil() {
+		usecase.outputPort.Raise(err)
+		return
+	}
+
+	usecase.outputPort.Write(newTodo)
 }
