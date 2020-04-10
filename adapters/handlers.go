@@ -1,16 +1,22 @@
 package adapters
 
 import (
+	"github.com/labstack/echo"
 	"go-cleanarchitecture/adapters/dao"
 	"go-cleanarchitecture/adapters/presenters"
+	"go-cleanarchitecture/adapters/presenters/json"
 	"go-cleanarchitecture/domains/usecases"
-	"github.com/labstack/echo"
 )
 
 func getTodosHandler(ctx echo.Context) error {
-	jsonPresenter := presenters.NewGetTodosJsonPresenter(ctx)
-	sqlTodoDao := dao.NewSqlTodoDao()
-	usecase := usecases.NewGetTodosUsecase(jsonPresenter, sqlTodoDao)
-	usecase.Execute()
-	return jsonPresenter.Present()
+	presenter := json.GetTodosPresenter{presenters.NewPresenter(ctx)}
+	usecases.NewGetTodosUsecase(presenter, dao.NewSqlTodoDao()).Execute()
+	return presenter.Present()
+}
+
+func createTodoHandler(ctx echo.Context) error {
+	presenter := json.CreateTodoPresenter{presenters.NewPresenter(ctx)}
+	param := usecases.CreateTodoParam{"aaa", "bbb"} // todo
+	usecases.NewCreateTodoUsecase(presenter, dao.NewSqlTodoDao()).Execute(param)
+	return presenter.Present()
 }

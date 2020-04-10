@@ -12,6 +12,7 @@ func RunHTTPServer() {
 	e.Use(middleware.Recover())
 
 	e.GET("/todos", getTodosHandler)
+	e.POST("/todo", createTodoHandler)
 
 	e.Logger.Fatal(e.Start(":8080"))
 }

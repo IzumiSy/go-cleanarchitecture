@@ -1,19 +1,35 @@
 package models
 
+import (
+	"go-cleanarchitecture/domains/models/todo"
+)
+
 type Todo struct {
-	id   string
-	name string
+	// [TODOを表現するエンティティ]
+
+	id          todo.Id
+	name        todo.Name
+	description todo.Description
 }
 
-// TODO needs a validation here
-func NewTodo(name string) Todo {
-	return Todo{name: name}
+func NewTodo(name todo.Name, description todo.Description) Todo {
+	// IDは内部で生成するためこの関数では外部から入力を受け付けない
+
+	return Todo{
+		id:          todo.GenerateId(),
+		name:        name,
+		description: description,
+	}
 }
 
-func (todo Todo) Name() string {
+func (todo Todo) Id() todo.Id {
+	return todo.id
+}
+
+func (todo Todo) Name() todo.Name {
 	return todo.name
 }
 
-func (todo Todo) Id() string {
-	return todo.id
+func (todo Todo) Description() todo.Description {
+	return todo.description
 }

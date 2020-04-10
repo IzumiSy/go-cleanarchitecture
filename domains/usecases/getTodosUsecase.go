@@ -6,6 +6,7 @@ import (
 )
 
 type GetTodosOutputPort interface {
+	OutputPort
 	Write(todos []models.Todo, result error)
 }
 
