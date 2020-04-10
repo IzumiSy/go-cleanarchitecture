@@ -1,9 +1,9 @@
 package usecases
 
 import (
+	"go-cleanarchitecture/domains"
 	"go-cleanarchitecture/domains/models"
 	"go-cleanarchitecture/domains/models/todo"
-	"go-cleanarchitecture/domains/repositories"
 )
 
 type CreateTodoOutputPort interface {
@@ -18,10 +18,10 @@ type CreateTodoParam struct {
 
 type createTodoUsecase struct {
 	outputPort CreateTodoOutputPort
-	todoDao    repositories.TodoRepository
+	todoDao    domains.TodoRepository
 }
 
-func NewCreateTodoUsecase(outputPort CreateTodoOutputPort, todoDao repositories.TodoRepository) createTodoUsecase {
+func NewCreateTodoUsecase(outputPort CreateTodoOutputPort, todoDao domains.TodoRepository) createTodoUsecase {
 	return createTodoUsecase{outputPort, todoDao}
 }
 
@@ -38,7 +38,15 @@ func (usecase createTodoUsecase) Execute(params CreateTodoParam) {
 		return
 	}
 
+	err, currentTodo := usecase.todoDao.GetByName(name)
+	if err != nil {
+		usecase.outputPort.Raise(err)
+	}
+	if currentTodo.Name() == name {
+		// validation error
+	}
+
 	newTodo := models.NewTodo(name, description)
-	err = usecase.todoDao.CreateOne(newTodo)
+	err = usecase.todoDao.Store(newTodo)
 	usecase.outputPort.Write(newTodo, err)
 }

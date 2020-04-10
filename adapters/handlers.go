@@ -9,8 +9,14 @@ import (
 )
 
 func getTodosHandler(ctx echo.Context) error {
+	sqlDao, err := dao.NewSQLTodosDao()
+	if err != nil {
+		return err
+	}
+	defer sqlDao.Close()
+
 	presenter := json.GetTodosPresenter{presenters.NewPresenter(ctx)}
-	usecases.NewGetTodosUsecase(presenter, dao.NewSqlTodoDao()).Execute()
+	usecases.NewGetTodosUsecase(presenter, sqlDao).Execute()
 	return presenter.Present()
 }
 
@@ -26,9 +32,15 @@ func createTodoHandler(ctx echo.Context) error {
 		return err
 	}
 
+	sqlDao, err := dao.NewSQLTodoDao()
+	if err != nil {
+		return err
+	}
+	defer sqlDao.Close()
+
 	presenter := json.CreateTodoPresenter{presenters.NewPresenter(ctx)}
 	usecases.
-		NewCreateTodoUsecase(presenter, dao.NewSqlTodoDao()).
+		NewCreateTodoUsecase(presenter, sqlDao).
 		Execute(usecases.CreateTodoParam{
 			Name:        jsonParam.Name,
 			Description: jsonParam.Description,

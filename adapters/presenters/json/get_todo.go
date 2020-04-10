@@ -19,17 +19,15 @@ type GetTodosPresenter struct {
 }
 
 // エラーハンドリングはサボって全部500を返している
-func (presenter GetTodosPresenter) Write(todos []models.Todo, err error) {
+func (presenter GetTodosPresenter) Write(todos models.Todos, err error) {
 	if err != nil {
 		presenter.Presenter.Fail()
 		return
 	}
 
-	response := getTodosResponse{
-		Todos: []getTodosResponseItem{},
-	}
+	var response getTodosResponse
 
-	for _, todo := range todos {
+	for _, todo := range todos.Value() {
 		response.Todos = append(response.Todos, getTodosResponseItem{
 			Id:   todo.Id().String(),
 			Name: todo.Name().Value(),

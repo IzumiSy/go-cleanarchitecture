@@ -5,12 +5,19 @@ import (
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
 )
 
-func WithConnection(f func(conn *gorm.DB) error) error {
+type SQLDao struct {
+	conn *gorm.DB
+}
+
+func newSQLDao() (error, SQLDao) {
 	connection, err := gorm.Open("sqlite3", "go-cleanarchitecture.db")
 	if err != nil {
-		return err
+		return err, SQLDao{}
 	}
-	defer connection.Close()
 
-	return f(connection)
+	return err, SQLDao{connection}
+}
+
+func (dao SQLDao) Close() {
+	dao.conn.Close()
 }
