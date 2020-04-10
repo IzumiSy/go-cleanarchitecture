@@ -14,9 +14,24 @@ func getTodosHandler(ctx echo.Context) error {
 	return presenter.Present()
 }
 
+type jsonCreateTodoParam struct {
+	Name        string `json:"name"`
+	Description string `json:"description"`
+}
+
 func createTodoHandler(ctx echo.Context) error {
+	jsonParam := new(jsonCreateTodoParam)
+
+	if err := ctx.Bind(jsonParam); err != nil {
+		return err
+	}
+
 	presenter := json.CreateTodoPresenter{presenters.NewPresenter(ctx)}
-	param := usecases.CreateTodoParam{"aaa", "bbb"} // todo
-	usecases.NewCreateTodoUsecase(presenter, dao.NewSqlTodoDao()).Execute(param)
+	usecases.
+		NewCreateTodoUsecase(presenter, dao.NewSqlTodoDao()).
+		Execute(usecases.CreateTodoParam{
+			Name:        jsonParam.Name,
+			Description: jsonParam.Description,
+		})
 	return presenter.Present()
 }
