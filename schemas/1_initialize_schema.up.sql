@@ -1,5 +1,5 @@
 -- +migrate Up
-create table todos (id int, name string);
+create table todos (id string, name string, description string);
 
 -- +migrate Down
 drop table todos;

@@ -13,14 +13,19 @@ type GetTodosOutputPort interface {
 type getTodosUsecase struct {
 	outputPort GetTodosOutputPort
 	todosDao   domains.TodosRepository
+	logger     domains.Logger
 }
 
-func NewGetTodosUsecase(outputPort GetTodosOutputPort, todosDao domains.TodosRepository) getTodosUsecase {
-	return getTodosUsecase{outputPort, todosDao}
+func NewGetTodosUsecase(
+	outputPort GetTodosOutputPort,
+	todosDao domains.TodosRepository,
+	logger domains.Logger,
+) getTodosUsecase {
+	return getTodosUsecase{outputPort, todosDao, logger}
 }
 
 func (usecase getTodosUsecase) Execute() {
-	todos, err := usecase.todosDao.Get()
+	todos, err, _ := usecase.todosDao.Get()
 	if err.NotNil() {
 		usecase.outputPort.Raise(err)
 		return

@@ -3,6 +3,7 @@ package adapters
 import (
 	"github.com/labstack/echo"
 	"go-cleanarchitecture/adapters/dao"
+	"go-cleanarchitecture/adapters/loggers"
 	"go-cleanarchitecture/adapters/presenters"
 	"go-cleanarchitecture/adapters/presenters/json"
 	"go-cleanarchitecture/domains/usecases"
@@ -13,10 +14,15 @@ func getTodosHandler(ctx echo.Context) error {
 	if err != nil {
 		return err
 	}
-	defer sqlDao.Close()
+	// defer sqlDao.Close()
+
+	logger, err := loggers.NewZapLogger("config/zap.json")
+	if err != nil {
+		return err
+	}
 
 	presenter := json.GetTodosPresenter{presenters.NewPresenter(ctx)}
-	usecases.NewGetTodosUsecase(presenter, sqlDao).Execute()
+	usecases.NewGetTodosUsecase(presenter, sqlDao, logger).Execute()
 	return presenter.Present()
 }
 
@@ -36,11 +42,16 @@ func createTodoHandler(ctx echo.Context) error {
 	if err != nil {
 		return err
 	}
-	defer sqlDao.Close()
+	// defer sqlDao.Close()
+
+	logger, err := loggers.NewZapLogger("config/zap.json")
+	if err != nil {
+		return err
+	}
 
 	presenter := json.CreateTodoPresenter{presenters.NewPresenter(ctx)}
 	usecases.
-		NewCreateTodoUsecase(presenter, sqlDao).
+		NewCreateTodoUsecase(presenter, sqlDao, logger).
 		Execute(usecases.CreateTodoParam{
 			Name:        jsonParam.Name,
 			Description: jsonParam.Description,

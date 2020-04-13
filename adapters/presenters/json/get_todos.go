@@ -19,9 +19,11 @@ type GetTodosPresenter struct {
 	Presenter presenters.EchoPresenter
 }
 
-// エラーハンドリングはサボって全部500を返している
 func (presenter GetTodosPresenter) Write(todos models.Todos) {
-	var response getTodosResponse
+	// nilではなく空配列でレスポンスを返せるようにする
+	response := getTodosResponse{
+		Todos: []getTodosResponseItem{},
+	}
 
 	for _, todo := range todos.Value() {
 		response.Todos = append(response.Todos, getTodosResponseItem{
@@ -34,6 +36,7 @@ func (presenter GetTodosPresenter) Write(todos models.Todos) {
 }
 
 func (presenter GetTodosPresenter) Raise(reason errors.Domain) {
+	// エラーハンドリングはサボって全部500を返している
 	presenter.Presenter.Fail()
 }
 

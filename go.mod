@@ -17,6 +17,7 @@ require (
 	github.com/rubenv/sql-migrate v0.0.0-20180704111356-3f452fc0ebeb
 	github.com/valyala/bytebufferpool v1.0.0
 	github.com/valyala/fasttemplate v0.0.0-20170224212429-dcecefd839c4
+	go.uber.org/zap v1.14.1
 	golang.org/x/crypto v0.0.0-20190621222207-cc06ce4a13d4
 	golang.org/x/sys v0.0.0-20190515120540-06a5c4944438
 	golang.org/x/xerrors v0.0.0-20191204190536-9bdfabe68543

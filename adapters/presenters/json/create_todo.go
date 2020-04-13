@@ -14,7 +14,6 @@ type CreateTodoPresenter struct {
 	Presenter presenters.EchoPresenter
 }
 
-// エラーハンドリングはサボって全部500を返している
 func (presenter CreateTodoPresenter) Write(todo models.Todo) {
 	presenter.Presenter.Succeed(createTodoResponse{
 		Id: todo.Id().String(),
@@ -22,6 +21,7 @@ func (presenter CreateTodoPresenter) Write(todo models.Todo) {
 }
 
 func (presenter CreateTodoPresenter) Raise(reason errors.Domain) {
+	// エラーハンドリングはサボって全部500を返している
 	presenter.Presenter.Fail()
 }
 
