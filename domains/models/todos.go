@@ -1,6 +1,8 @@
 package models
 
 type Todos struct {
+	// [TODOの集合を表現するファーストクラス・コレクション]
+
 	value []Todo
 }
 

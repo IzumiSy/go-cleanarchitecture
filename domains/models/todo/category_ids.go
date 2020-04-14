@@ -26,3 +26,7 @@ func NewCategoryIds(categoryIds []category.Id) (CategoryIds, errors.Domain) {
 func EmptyCategoryIds() CategoryIds {
 	return CategoryIds{}
 }
+
+func (categoryIds CategoryIds) Value() []category.Id {
+	return categoryIds.value
+}
