@@ -1,4 +1,4 @@
-package todo
+package category
 
 import (
 	"go-cleanarchitecture/domains/errors"

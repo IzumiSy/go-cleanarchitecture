@@ -10,6 +10,7 @@ type Todo struct {
 	id          todo.Id
 	name        todo.Name
 	description todo.Description
+	categoryIds todo.CategoryIds
 }
 
 // アプリケーション上における新規のTODOを作成する関数
@@ -19,6 +20,7 @@ func NewTodo(name todo.Name, description todo.Description) Todo {
 		id:          todo.GenerateId(),
 		name:        name,
 		description: description,
+		categoryIds: todo.EmptyCategoryIds(),
 	}
 }
 
@@ -42,4 +44,8 @@ func (todo Todo) Name() todo.Name {
 
 func (todo Todo) Description() todo.Description {
 	return todo.description
+}
+
+func (todo Todo) UpdateCategoryIds(categoryIds todo.CategoryIds) {
+	todo.categoryIds = categoryIds
 }

@@ -1,4 +1,4 @@
-package todo
+package category
 
 import (
 	"go-cleanarchitecture/domains/errors"
@@ -6,10 +6,10 @@ import (
 )
 
 type Name struct {
-	// [TODOの名前を表現する値オブジェクト]
+	// [カテゴリの名前を表現する値オブジェクト]
 	// バリデーションルールは以下
 	// - 空ではないこと
-	// - 30文字以下であること
+	// - 20文字以下であること
 
 	value string
 }
@@ -19,7 +19,7 @@ func NewName(value string) (Name, errors.Domain) {
 
 	if value == "" {
 		return empty, errors.Invalid("Name must not be empty")
-	} else if utf8.RuneCountInString(value) > 30 {
+	} else if utf8.RuneCountInString(value) > 20 {
 		return empty, errors.Invalid("Name too long")
 	} else {
 		return Name{value}, errors.None
