@@ -25,7 +25,7 @@ func NewGetTodosUsecase(
 }
 
 func (usecase getTodosUsecase) Execute() {
-	todos, err, _ := usecase.todosDao.Get()
+	todos, err := usecase.todosDao.Get()
 	if err.NotNil() {
 		usecase.outputPort.Raise(err)
 		return

@@ -17,7 +17,11 @@ func (dao TodosDao) Close() {
 	dao.Close()
 }
 
-func (dao TodosDao) Get() (models.Todos, errors.Domain, bool) {
+func (dao TodosDao) GetByIds(ids []todo.Id) (models.Todos, errors.Domain) {
+	return models.EmptyTodos(), errors.None // todo: あとで実装する
+}
+
+func (dao TodosDao) Get() (models.Todos, errors.Domain) {
 	var dtos []todoDto
 
 	query := dao.
@@ -28,9 +32,9 @@ func (dao TodosDao) Get() (models.Todos, errors.Domain, bool) {
 
 	if query.RecordNotFound() {
 		// リスト取得系操作なので空配列の戻り値が正しいためtrueを返している
-		return empty, errors.None, true
+		return empty, errors.None
 	} else if query.Error != nil {
-		return empty, errors.External(query.Error), false
+		return empty, errors.External(query.Error)
 	}
 
 	todos := []models.Todo{}
@@ -43,5 +47,5 @@ func (dao TodosDao) Get() (models.Todos, errors.Domain, bool) {
 		todos = append(todos, models.BuildTodo(id, name, description))
 	}
 
-	return models.NewTodos(todos), errors.None, true
+	return models.NewTodos(todos), errors.None
 }
