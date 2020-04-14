@@ -5,6 +5,8 @@ import (
 	"go-cleanarchitecture/domains/models/entity"
 )
 
+// [TODOのIDを表現する値オブジェクト]
+
 type Id entity.Id
 
 func NewId(value string) (Id, errors.Domain) {
