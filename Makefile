@@ -10,4 +10,5 @@ reset:
 	rm -f go-cleanarchitecture.db
 	make migrate
 
-
+test:
+	go test -v ./...
