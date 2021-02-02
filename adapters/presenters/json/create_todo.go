@@ -4,6 +4,7 @@ import (
 	"go-cleanarchitecture/adapters/presenters"
 	"go-cleanarchitecture/domains/errors"
 	"go-cleanarchitecture/domains/models"
+	"go-cleanarchitecture/domains/usecases"
 )
 
 type createTodoResponse struct {
@@ -13,6 +14,8 @@ type createTodoResponse struct {
 type CreateTodoPresenter struct {
 	Presenter presenters.EchoPresenter
 }
+
+var _ usecases.CreateTodoOutputPort = CreateTodoPresenter{}
 
 func (presenter CreateTodoPresenter) Write(todo models.Todo) {
 	presenter.Presenter.Succeed(createTodoResponse{

@@ -1,12 +1,15 @@
 package loggers
 
 import (
+	"go-cleanarchitecture/domains"
 	"go.uber.org/zap"
 )
 
 type ZapLogger struct {
 	logger *zap.Logger
 }
+
+var _ domains.Logger = ZapLogger{}
 
 func NewZapLogger(configFilePath string) (ZapLogger, error) {
 	encoderConfig := zap.NewDevelopmentEncoderConfig()

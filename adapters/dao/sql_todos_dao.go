@@ -1,12 +1,15 @@
 package dao
 
 import (
+	"go-cleanarchitecture/domains"
 	"go-cleanarchitecture/domains/errors"
 	"go-cleanarchitecture/domains/models"
 	"go-cleanarchitecture/domains/models/todo"
 )
 
 type TodosDao SQLDao
+
+var _ domains.TodosRepository = TodosDao{}
 
 func NewSQLTodosDao() (TodosDao, error) {
 	err, dao := newSQLDao("todos")

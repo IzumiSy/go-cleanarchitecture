@@ -14,14 +14,14 @@ func getTodosHandler(ctx echo.Context) error {
 	if err != nil {
 		return err
 	}
-	// defer sqlDao.Close()
+	defer sqlDao.Close()
 
 	logger, err := loggers.NewZapLogger("config/zap.json")
 	if err != nil {
 		return err
 	}
 
-	presenter := json.GetTodosPresenter{presenters.NewPresenter(ctx)}
+	presenter := json.GetTodosPresenter{Presenter: presenters.NewPresenter(ctx)}
 	usecases.NewGetTodosUsecase(presenter, sqlDao, logger).Execute()
 	return presenter.Present()
 }
@@ -49,7 +49,7 @@ func createTodoHandler(ctx echo.Context) error {
 		return err
 	}
 
-	presenter := json.CreateTodoPresenter{presenters.NewPresenter(ctx)}
+	presenter := json.CreateTodoPresenter{Presenter: presenters.NewPresenter(ctx)}
 	usecases.
 		NewCreateTodoUsecase(presenter, sqlDao, logger).
 		Execute(usecases.CreateTodoParam{

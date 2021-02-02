@@ -4,6 +4,7 @@ import (
 	"go-cleanarchitecture/adapters/presenters"
 	"go-cleanarchitecture/domains/errors"
 	"go-cleanarchitecture/domains/models"
+	"go-cleanarchitecture/domains/usecases"
 )
 
 type getTodosResponse struct {
@@ -18,6 +19,8 @@ type getTodosResponseItem struct {
 type GetTodosPresenter struct {
 	Presenter presenters.EchoPresenter
 }
+
+var _ usecases.GetTodosOutputPort = GetTodosPresenter{}
 
 func (presenter GetTodosPresenter) Write(todos models.Todos) {
 	// nilではなく空配列でレスポンスを返せるようにする
