@@ -8,7 +8,7 @@ import (
 
 type MigratorDriver struct{}
 
-func (driver MigratorDriver) Run() {
+func (driver MigratorDriver) Run(_ Options) {
 	migrations := &migrate.FileMigrationSource{Dir: "schemas"}
 
 	db, err := sql.Open("sqlite3", "go-cleanarchitecture.db")

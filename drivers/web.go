@@ -6,6 +6,6 @@ import (
 
 type HttpDriver struct{}
 
-func (driver HttpDriver) Run() {
+func (driver HttpDriver) Run(_ Options) {
 	adapters.RunHTTPServer()
 }

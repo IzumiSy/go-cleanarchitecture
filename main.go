@@ -8,7 +8,7 @@ import (
 )
 
 type Driver interface {
-	Run()
+	Run(options drivers.Options)
 }
 
 func main() {
@@ -26,5 +26,6 @@ func main() {
 		os.Exit(1)
 	}
 
-	driver.Run()
+	options := drivers.Options{}
+	driver.Run(options)
 }
