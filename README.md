@@ -1,7 +1,19 @@
 # go-cleanarchitecture
 
-## run
+## Build
 ```sh
-$ make migrate
-$ make run
+$ make build
 ```
+
+## Run
+```
+$ ./go-cleanarchitecture -help
+Usage of ./go-cleanarchitecture:
+  -http
+    	http server mode
+  -migrate
+    	migration mode
+```
+
+## Architecture
+WIP
