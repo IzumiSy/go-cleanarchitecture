@@ -14,7 +14,7 @@ type AuthentcationDao SQLDao
 var _ domains.AuthenticationRepository = AuthentcationDao{}
 
 func NewSQLAuthenticationDao(tt txType) (AuthentcationDao, error) {
-	err, dao := newSQLDao("authentication", tt)
+	dao, err := newSQLDao("authentication", tt)
 	return AuthentcationDao(dao), err
 }
 
@@ -58,7 +58,13 @@ func (dao AuthentcationDao) GetByEmail(email authentication.Email) (models.Authe
 		Where("id = ?", authDto.UserID).
 		Find(&userDto)
 
-	// 永続化済みのデータの取り出しでバリデーションエラーはないはずなので無視する
+	if query.RecordNotFound() {
+		return empty, errors.None, false
+	} else if query.Error != nil {
+		return empty, errors.External(query.Error), false
+	}
+
+	// 永続化済みのデータの取り出しでバリデーションエラーはないはずなのでエラーは無視する
 	_email, _ := authentication.NewEmail(authDto.Email)
 	hash := authentication.NewHash(authDto.Hash)
 	createdAt := authentication.NewCreatedAt(authDto.CreatedAt)

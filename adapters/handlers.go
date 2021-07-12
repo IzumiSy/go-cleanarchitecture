@@ -44,6 +44,45 @@ func signupHandler(ctx echo.Context) error {
 	})
 }
 
+func authenticateHandler(ctx echo.Context) error {
+	jsonParam := new(struct {
+		Email    string `json:"email"`
+		Password string `json:"password"`
+	})
+
+	if err := ctx.Bind(jsonParam); err != nil {
+		return err
+	}
+
+	return dao.WithTx(func(tx dao.TxSQLDao) error {
+		authenticationDao, err := dao.NewSQLAuthenticationDao(dao.WITH_TX(tx))
+		if err != nil {
+			return err
+		}
+		// defer authenticationDao.Close()
+
+		sessionDao, err := dao.NewSQLSessionDao(dao.WITH_TX(tx))
+		if err != nil {
+			return err
+		}
+		// defer sessionDao.Close()
+
+		logger, err := loggers.NewZapLogger("config/zap.json")
+		if err != nil {
+			return err
+		}
+
+		presenter := json.AuthenticatePresenter{Presenter: presenters.NewPresenter(ctx)}
+		usecases.
+			NewAuthenticateUsecase(presenter, authenticationDao, sessionDao, logger).
+			Execute(usecases.AuthenticateParam{
+				Email:    jsonParam.Email,
+				Password: jsonParam.Password,
+			})
+		return presenter.Present()
+	})
+}
+
 func getTodosHandler(ctx echo.Context) error {
 	sqlDao, err := dao.NewSQLTodosDao(dao.WITHOUT_TX())
 	if err != nil {

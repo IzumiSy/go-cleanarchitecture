@@ -18,6 +18,15 @@ create table authentication (
     primary key (email)
 );
 
+create table session (
+    id string,
+    user_id string,
+    created_at timestamp,
+
+    foreign key (user_id) references user(id),
+    primary key (id)
+);
+
 create table user (
     id string,
     name string,

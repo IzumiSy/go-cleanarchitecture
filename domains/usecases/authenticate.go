@@ -24,7 +24,7 @@ type authenticateUsecase struct {
 	logger            domains.Logger
 }
 
-func AuthenticateUsecase(
+func NewAuthenticateUsecase(
 	outputPort AuthenticateOutputPort,
 	authenticationDao domains.AuthenticationRepository,
 	sessionDao domains.SessionRepository,

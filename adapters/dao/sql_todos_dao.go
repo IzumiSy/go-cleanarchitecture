@@ -13,7 +13,7 @@ type TodosDao SQLDao
 var _ domains.TodosRepository = TodosDao{}
 
 func NewSQLTodosDao(tt txType) (TodosDao, error) {
-	err, dao := newSQLDao("todo", tt)
+	dao, err := newSQLDao("todo", tt)
 	return TodosDao(dao), err
 }
 
@@ -36,7 +36,6 @@ func (dao TodosDao) GetByUserID(userId user.ID) (models.Todos, errors.Domain) {
 	empty := models.Todos{}
 
 	if query.RecordNotFound() {
-		// リスト取得系操作なので空配列の戻り値が正しいためtrueを返している
 		return empty, errors.None
 	} else if query.Error != nil {
 		return empty, errors.External(query.Error)
@@ -44,8 +43,7 @@ func (dao TodosDao) GetByUserID(userId user.ID) (models.Todos, errors.Domain) {
 
 	todos := []models.Todo{}
 	for _, dto := range dtos {
-		// すでに永続化されているtodo自体は作成時のバリデーションを経由しているため
-		// ここではバリデーションエラーはでないことを期待するためエラーは無視している。
+		// 永続化済みのデータの取り出しでバリデーションエラーはないはずなのでエラーは無視する
 		id, _ := todo.NewID(dto.ID)
 		name, _ := todo.NewName(dto.Name)
 		description, _ := todo.NewDescription(dto.Description)
