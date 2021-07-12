@@ -61,7 +61,7 @@ func (usecase signupUsecase) Execute(params SignupParam) {
 		return
 	}
 
-	err, userName := user.NewName(params.UserName)
+	userName, err := user.NewName(params.UserName)
 	if err.NotNil() {
 		usecase.logger.Warn(err.Error())
 		usecase.outputPort.Raise(err)
