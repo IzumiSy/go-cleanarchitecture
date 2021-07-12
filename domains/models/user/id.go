@@ -5,19 +5,21 @@ import (
 	"go-cleanarchitecture/domains/models/entity"
 )
 
-// [UserのIDを表現する値オブジェクト]
+type ID struct {
+	// UserのIDを表現する値オブジェクト
 
-type Id entity.Id
-
-func New(value string) (Id, errors.Domain) {
-	_id, err := entity.NewId(value)
-	return Id(_id), err
+	value entity.ID
 }
 
-func (id Id) String() string {
-	return id.String()
+func NewID(value string) (ID, errors.Domain) {
+	id, err := entity.NewID(value)
+	return ID{id}, err
 }
 
-func GenerateId() Id {
-	return Id(entity.GenerateId())
+func (id ID) String() string {
+	return id.value.String()
+}
+
+func GenerateUserID() ID {
+	return ID{entity.GenerateID()}
 }

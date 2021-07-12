@@ -5,28 +5,28 @@ import (
 	"go-cleanarchitecture/domains/models/category"
 )
 
-type CategoryIds struct {
+type CategoryIDs struct {
 	// [TODOにセットされるカテゴリの集合を表現する値オブジェクト]
 	// バリデーションルールは以下
 	// - セットできるカテゴリの上限は5個であること
 
-	value []category.Id
+	value []category.ID
 }
 
-func NewCategoryIds(categoryIds []category.Id) (CategoryIds, errors.Domain) {
-	empty := CategoryIds{}
+func NewCategoryIds(categoryIds []category.ID) (CategoryIDs, errors.Domain) {
+	empty := CategoryIDs{}
 
 	if len(categoryIds) > 5 {
 		return empty, errors.Invalid("Too many categories")
 	}
 
-	return CategoryIds{categoryIds}, errors.None
+	return CategoryIDs{categoryIds}, errors.None
 }
 
-func EmptyCategoryIds() CategoryIds {
-	return CategoryIds{}
+func EmptyCategoryIds() CategoryIDs {
+	return CategoryIDs{}
 }
 
-func (categoryIds CategoryIds) Value() []category.Id {
+func (categoryIds CategoryIDs) Value() []category.ID {
 	return categoryIds.value
 }

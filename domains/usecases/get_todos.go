@@ -30,14 +30,16 @@ func NewGetTodosUsecase(
 }
 
 func (usecase getTodosUsecase) Execute(params GetTodosParam) {
-	userID, err := user.New(params.UserID)
+	userID, err := user.NewID(params.UserID)
 	if err.NotNil() {
+		usecase.logger.Warn(err.Error())
 		usecase.outputPort.Raise(err)
 		return
 	}
 
 	todos, err := usecase.todosDao.GetByUserID(userID)
 	if err.NotNil() {
+		usecase.logger.Error(err.Error())
 		usecase.outputPort.Raise(err)
 		return
 	}

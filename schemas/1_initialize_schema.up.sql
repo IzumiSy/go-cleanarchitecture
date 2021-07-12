@@ -1,5 +1,10 @@
 -- +migrate Up
-create table todos (id string, name string, description string);
+create table todo (
+    id string,
+    name string,
+    description string,
+    user_id string
+);
 
 -- +migrate Down
-drop table todos;
+drop table todo;

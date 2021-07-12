@@ -14,7 +14,7 @@ import (
 // 存在チェックを忘れてしまう可能性があるのを防ぐため。
 
 type TodoRepository interface {
-	Get(id todo.Id) (models.Todo, errors.Domain, bool)
+	Get(id todo.ID) (models.Todo, errors.Domain, bool)
 	GetByName(name todo.Name) (models.Todo, errors.Domain, bool)
 	Store(todo models.Todo) errors.Domain
 }
@@ -23,11 +23,11 @@ type TodoRepository interface {
 // 集合に対するクエリなので戻り値に存在の有無を表すboolは持たない
 
 type TodosRepository interface {
-	GetByIDs(ids []todo.Id) (models.Todos, errors.Domain)
-	GetByUserID(userID user.Id) (models.Todos, errors.Domain)
+	GetByIDs(ids []todo.ID) (models.Todos, errors.Domain)
+	GetByUserID(userID user.ID) (models.Todos, errors.Domain)
 }
 
 type CategoriesRepository interface {
-	GetByIDs(ids []category.Id) ([]models.Category, errors.Domain)
-	GetByUserID(userId user.Id) ([]models.Category, errors.Domain)
+	GetByIDs(ids []category.ID) ([]models.Category, errors.Domain)
+	GetByUserID(userId user.ID) ([]models.Category, errors.Domain)
 }

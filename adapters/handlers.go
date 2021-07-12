@@ -14,7 +14,7 @@ func getTodosHandler(ctx echo.Context) error {
 	if err != nil {
 		return err
 	}
-	defer sqlDao.Close()
+	// defer sqlDao.Close()
 
 	logger, err := loggers.NewZapLogger("config/zap.json")
 	if err != nil {
@@ -25,7 +25,7 @@ func getTodosHandler(ctx echo.Context) error {
 	usecases.
 		NewGetTodosUsecase(presenter, sqlDao, logger).
 		Execute(usecases.GetTodosParam{
-			UserID: "user_id",
+			UserID: "d70f4845-b645-4271-bea9-3d5705e79e87",
 		})
 	return presenter.Present()
 }
@@ -45,13 +45,13 @@ func createTodoHandler(ctx echo.Context) error {
 		if err != nil {
 			return err
 		}
-		defer sqlTodoDao.Close()
+		// defer sqlTodoDao.Close()
 
 		sqlTodosDao, err := dao.NewSQLTodosDao(dao.WITH_TX(tx))
 		if err != nil {
 			return err
 		}
-		defer sqlTodosDao.Close()
+		// defer sqlTodosDao.Close()
 
 		logger, err := loggers.NewZapLogger("config/zap.json")
 		if err != nil {

@@ -18,7 +18,7 @@ type TxSQLDao struct {
 }
 
 type txType struct {
-	conn *TxSQLDao
+	dao *TxSQLDao
 }
 
 func WITHOUT_TX() txType {
@@ -30,9 +30,8 @@ func WITH_TX(tx TxSQLDao) txType {
 }
 
 func newSQLDao(tableName string, tt txType) (error, SQLDao) {
-	if tt.conn != nil {
-		tt.conn.value.Table(tableName)
-		return nil, tt.conn.value
+	if tt.dao != nil {
+		return nil, SQLDao{tt.dao.value.conn.LogMode(true).Table(tableName)}
 	}
 
 	connection, err := gorm.Open("sqlite3", "go-cleanarchitecture.db")
