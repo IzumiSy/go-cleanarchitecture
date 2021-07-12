@@ -7,26 +7,26 @@ import (
 type Todo struct {
 	// [TODOを表現するエンティティ]
 
-	id          todo.Id
+	id          todo.ID
 	name        todo.Name
 	description todo.Description
-	categoryIds todo.CategoryIds
+	categoryIDs todo.CategoryIDs
 }
 
 // アプリケーション上における新規のTODOを作成する関数
 // IDは内部で生成するためこの関数では外部から入力を受け付けない
 func NewTodo(name todo.Name, description todo.Description) Todo {
 	return Todo{
-		id:          todo.GenerateId(),
+		id:          todo.GenerateID(),
 		name:        name,
 		description: description,
-		categoryIds: todo.EmptyCategoryIds(),
+		categoryIDs: todo.EmptyCategoryIds(),
 	}
 }
 
 // repositoryやfactory経由の生成において使用する関数
 // 生成時のバリデーションをしないことに注意
-func BuildTodo(id todo.Id, name todo.Name, description todo.Description) Todo {
+func BuildTodo(id todo.ID, name todo.Name, description todo.Description) Todo {
 	return Todo{
 		id:          id,
 		name:        name,
@@ -34,7 +34,7 @@ func BuildTodo(id todo.Id, name todo.Name, description todo.Description) Todo {
 	}
 }
 
-func (todo Todo) Id() todo.Id {
+func (todo Todo) Id() todo.ID {
 	return todo.id
 }
 
@@ -46,6 +46,6 @@ func (todo Todo) Description() todo.Description {
 	return todo.description
 }
 
-func (todo Todo) UpdateCategoryIds(categoryIds todo.CategoryIds) {
-	todo.categoryIds = categoryIds
+func (todo Todo) UpdateCategoryIds(categoryIds todo.CategoryIDs) {
+	todo.categoryIDs = categoryIds
 }

@@ -1,11 +1,13 @@
 package entity
 
 import (
-	"github.com/google/uuid"
+	"fmt"
 	"go-cleanarchitecture/domains/errors"
+
+	"github.com/google/uuid"
 )
 
-type Id struct {
+type ID struct {
 	// [エンティティの識別子を表現する値オブジェクトの抽象]
 	// いま時点ではUUID型をラップしているが今後IDの実装が変わった際でも
 	// 変更範囲を個々だけの留めることができる。
@@ -13,20 +15,20 @@ type Id struct {
 	value uuid.UUID
 }
 
-func NewId(value string) (Id, errors.Domain) {
-	id, err := uuid.FromBytes([]byte(value))
+func NewID(value string) (ID, errors.Domain) {
+	id, err := uuid.Parse(value)
 	if err != nil {
-		return Id{}, errors.Invalid("Invalid value")
+		return ID{}, errors.Invalid(fmt.Sprintf("Invalid User ID: %s", err.Error()))
 	}
 
-	return Id{id}, errors.None
+	return ID{id}, errors.None
 }
 
-func (id Id) String() string {
+func (id ID) String() string {
 	return id.value.String()
 }
 
 // IDを生成する
-func GenerateId() Id {
-	return Id{uuid.New()}
+func GenerateID() ID {
+	return ID{uuid.New()}
 }

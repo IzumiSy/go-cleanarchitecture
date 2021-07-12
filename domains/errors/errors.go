@@ -41,6 +41,6 @@ func (e Domain) Is(other Domain) bool {
 	return xerrors.Is(e.err, other.err)
 }
 
-func (e Domain) Value() error {
-	return e.err
+func (e Domain) Error() string {
+	return e.err.Error()
 }

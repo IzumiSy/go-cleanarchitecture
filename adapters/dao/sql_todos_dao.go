@@ -13,7 +13,7 @@ type TodosDao SQLDao
 var _ domains.TodosRepository = TodosDao{}
 
 func NewSQLTodosDao(tt txType) (TodosDao, error) {
-	err, dao := newSQLDao(tt)
+	err, dao := newSQLDao("todo", tt)
 	return TodosDao(dao), err
 }
 
@@ -21,16 +21,15 @@ func (dao TodosDao) Close() {
 	dao.Close()
 }
 
-func (dao TodosDao) GetByIDs(ids []todo.Id) (models.Todos, errors.Domain) {
+func (dao TodosDao) GetByIDs(ids []todo.ID) (models.Todos, errors.Domain) {
 	return models.EmptyTodos(), errors.None // todo: あとで実装する
 }
 
-func (dao TodosDao) GetByUserID(userId user.Id) (models.Todos, errors.Domain) {
+func (dao TodosDao) GetByUserID(userId user.ID) (models.Todos, errors.Domain) {
 	var dtos []todoDto
 
 	query := dao.
 		conn.
-		Table("todo").
 		Where("user_id = ?", userId.String()).
 		Find(&dtos)
 
@@ -47,7 +46,7 @@ func (dao TodosDao) GetByUserID(userId user.Id) (models.Todos, errors.Domain) {
 	for _, dto := range dtos {
 		// すでに永続化されているtodo自体は作成時のバリデーションを経由しているため
 		// ここではバリデーションエラーはでないことを期待するためエラーは無視している。
-		id, _ := todo.NewId(dto.Id)
+		id, _ := todo.NewID(dto.ID)
 		name, _ := todo.NewName(dto.Name)
 		description, _ := todo.NewDescription(dto.Description)
 		todos = append(todos, models.BuildTodo(id, name, description))

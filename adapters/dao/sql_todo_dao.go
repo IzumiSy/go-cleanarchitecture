@@ -12,7 +12,7 @@ type TodoDao SQLDao
 var _ domains.TodoRepository = TodoDao{}
 
 func NewSQLTodoDao(tt txType) (TodoDao, error) {
-	err, dao := newSQLDao(tt)
+	err, dao := newSQLDao("todo", tt)
 	return TodoDao(dao), err
 }
 
@@ -21,17 +21,17 @@ func (dao TodoDao) Close() {
 }
 
 type todoDto struct {
-	Id          string `gorm:"id"`
+	ID          string `gorm:"id"`
 	Name        string `gorm:"name"`
 	Description string `gorm:"description"`
+	UserID      string `gorm:"user_id"`
 }
 
-func (dao TodoDao) Get(id todo.Id) (models.Todo, errors.Domain, bool) {
+func (dao TodoDao) Get(id todo.ID) (models.Todo, errors.Domain, bool) {
 	var todo models.Todo
 
 	query := dao.
 		conn.
-		Table("todo").
 		Find(&todo, id.String())
 
 	empty := models.Todo{}
@@ -52,7 +52,6 @@ func (dao TodoDao) GetByName(name todo.Name) (models.Todo, errors.Domain, bool) 
 
 	query := dao.
 		conn.
-		Table("todo").
 		Where("name = ?", name.Value()).
 		Find(&dto)
 
@@ -68,7 +67,7 @@ func (dao TodoDao) GetByName(name todo.Name) (models.Todo, errors.Domain, bool) 
 
 	// すでに永続化されているtodo自体は作成時のバリデーションを経由しているため
 	// ここではバリデーションエラーはでないことを期待するためエラーは無視している。
-	id, _ := todo.NewId(dto.Id)
+	id, _ := todo.NewID(dto.ID)
 	_name, _ := todo.NewName(dto.Name)
 	description, _ := todo.NewDescription(dto.Description)
 
@@ -77,16 +76,10 @@ func (dao TodoDao) GetByName(name todo.Name) (models.Todo, errors.Domain, bool) 
 
 func (dao TodoDao) Store(todo models.Todo) errors.Domain {
 	dto := todoDto{
-		Id:          todo.Id().String(),
+		ID:          todo.Id().String(),
 		Name:        todo.Name().Value(),
 		Description: todo.Description().Value(),
 	}
 
-	return errors.External(
-		dao.
-			conn.
-			Table("todo").
-			Create(&dto).
-			Error,
-	)
+	return errors.External(dao.conn.Create(&dto).Error)
 }

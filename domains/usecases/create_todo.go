@@ -47,18 +47,21 @@ func (usecase createTodoUsecase) Execute(params CreateTodoParam) {
 
 	name, err := todo.NewName(params.Name)
 	if err.NotNil() {
+		usecase.logger.Warn(err.Error())
 		usecase.outputPort.Raise(err)
 		return
 	}
 
 	description, err := todo.NewDescription(params.Description)
 	if err.NotNil() {
+		usecase.logger.Warn(err.Error())
 		usecase.outputPort.Raise(err)
 		return
 	}
 
 	currentTodo, err, exists := usecase.todoDao.GetByName(name)
 	if err.NotNil() {
+		usecase.logger.Error(err.Error())
 		usecase.outputPort.Raise(err)
 		return
 	}
@@ -70,8 +73,9 @@ func (usecase createTodoUsecase) Execute(params CreateTodoParam) {
 		}
 	}
 
-	userID, err := user.New("user_id")
+	userID, err := user.NewID("d70f4845-b645-4271-bea9-3d5705e79e87")
 	if err.NotNil() {
+		usecase.logger.Warn(err.Error())
 		usecase.outputPort.Raise(err)
 		return
 	}
@@ -83,8 +87,8 @@ func (usecase createTodoUsecase) Execute(params CreateTodoParam) {
 	}
 
 	newTodo := models.NewTodo(name, description)
-	err = usecase.todoDao.Store(newTodo)
-	if err.NotNil() {
+	if err = usecase.todoDao.Store(newTodo); err.NotNil() {
+		usecase.logger.Error(err.Error())
 		usecase.outputPort.Raise(err)
 		return
 	}

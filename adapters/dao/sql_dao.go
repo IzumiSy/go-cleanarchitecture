@@ -9,12 +9,16 @@ type SQLDao struct {
 	conn *gorm.DB
 }
 
+func (dao SQLDao) Table(name string) {
+	dao.conn.Table(name)
+}
+
 type TxSQLDao struct {
 	value SQLDao
 }
 
 type txType struct {
-	conn *TxSQLDao
+	dao *TxSQLDao
 }
 
 func WITHOUT_TX() txType {
@@ -25,9 +29,9 @@ func WITH_TX(tx TxSQLDao) txType {
 	return txType{&tx}
 }
 
-func newSQLDao(tt txType) (error, SQLDao) {
-	if tt.conn != nil {
-		return nil, tt.conn.value
+func newSQLDao(tableName string, tt txType) (error, SQLDao) {
+	if tt.dao != nil {
+		return nil, SQLDao{tt.dao.value.conn.LogMode(true).Table(tableName)}
 	}
 
 	connection, err := gorm.Open("sqlite3", "go-cleanarchitecture.db")
@@ -35,7 +39,7 @@ func newSQLDao(tt txType) (error, SQLDao) {
 		return err, SQLDao{}
 	}
 
-	return err, SQLDao{connection.LogMode(true)}
+	return err, SQLDao{connection.LogMode(true).Table(tableName)}
 }
 
 func (dao SQLDao) Close() {
@@ -50,10 +54,14 @@ func WithTx(runner func(tx TxSQLDao) error) error {
 
 	tx := conn.Begin()
 	if tx.Error != nil {
+		tx.Rollback()
 		return tx.Error
 	}
 
-	runner(TxSQLDao{SQLDao{tx.LogMode(true)}})
+	if err := runner(TxSQLDao{SQLDao{tx}}); err != nil {
+		tx.Rollback()
+		return err
+	}
 
 	return tx.Commit().Error
 }
