@@ -9,10 +9,6 @@ type SQLDao struct {
 	conn *gorm.DB
 }
 
-func (dao SQLDao) Table(name string) {
-	dao.conn.Table(name)
-}
-
 type TxSQLDao struct {
 	value SQLDao
 }
