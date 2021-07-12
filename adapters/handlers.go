@@ -9,6 +9,39 @@ import (
 	"go-cleanarchitecture/domains/usecases"
 )
 
+func signupHandler(ctx echo.Context) error {
+	jsonParam := new(struct {
+		Email    string `json:"email"`
+		Password string `json:"password"`
+	})
+
+	if err := ctx.Bind(jsonParam); err != nil {
+		return err
+	}
+
+	return dao.WithTx(func(tx dao.TxSQLDao) error {
+		authenticationDao, err := dao.NewSQLAuthenticationDao(dao.WITH_TX(tx))
+		if err != nil {
+			return err
+		}
+		defer authenticationDao.Close()
+
+		logger, err := loggers.NewZapLogger("config/zap.json")
+		if err != nil {
+			return err
+		}
+
+		presenter := json.SignupPresenter{Presenter: presenters.NewPresenter(ctx)}
+		usecases.
+			NewSignupUsecase(presenter, authenticationDao, logger).
+			Execute(usecases.SignupParam{
+				Email:    jsonParam.Email,
+				Password: jsonParam.Password,
+			})
+		return presenter.Present()
+	})
+}
+
 func getTodosHandler(ctx echo.Context) error {
 	sqlDao, err := dao.NewSQLTodosDao(dao.WITHOUT_TX())
 	if err != nil {

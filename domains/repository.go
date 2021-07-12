@@ -25,7 +25,7 @@ type TodoRepository interface {
 
 type AuthenticationRepository interface {
 	Store(auth models.Authentication) errors.Domain
-	GetByEmail(email authentication.Email) (models.Authentication, errors.Domain)
+	GetByEmail(email authentication.Email) (models.Authentication, errors.Domain, bool)
 }
 
 type TodosRepository interface {

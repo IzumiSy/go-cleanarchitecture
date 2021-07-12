@@ -13,10 +13,21 @@ type AuthenticateParam struct {
 }
 
 type authenticateUsecase struct {
-	outputPort AuthenticateOutputPort
-	logger     domains.Logger
+	outputPort        AuthenticateOutputPort
+	authenticationDao domains.AuthenticationRepository
+	logger            domains.Logger
+}
+
+func AuthenticateUsecase(
+	outputPort AuthenticateOutputPort,
+	authenticationDao domains.AuthenticationRepository,
+	logger domains.Logger,
+) authenticateUsecase {
+	return authenticateUsecase{outputPort, authenticationDao, logger}
 }
 
 func (usecase authenticateUsecase) Execute(params AuthenticateParam) {
-	// todo
+	// [ユーザーの認証を行うユースケース]
+	// "ログイン"でも命名はよかったが、今後外部APIとして認証を実装することを考えると
+	// あえて抽象化して"認証"と表現したくなったのでこの命名としている。
 }
