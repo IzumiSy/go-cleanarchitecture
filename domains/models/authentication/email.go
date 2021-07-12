@@ -14,11 +14,11 @@ type Email struct {
 func NewEmail(value string) (Email, errors.Domain) {
 	empty := Email{}
 
-	_, err := mail.ParseAddress(value)
+	email, err := mail.ParseAddress(value)
 	if err != nil {
 		return empty, errors.Invalid("Invalid email")
 	} else {
-		return Email{value}, errors.None
+		return Email{email.Address}, errors.None
 	}
 }
 
