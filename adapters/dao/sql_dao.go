@@ -9,6 +9,10 @@ type SQLDao struct {
 	conn *gorm.DB
 }
 
+func (dao SQLDao) Table(name string) {
+	dao.conn.Table(name)
+}
+
 type TxSQLDao struct {
 	value SQLDao
 }
@@ -25,8 +29,9 @@ func WITH_TX(tx TxSQLDao) txType {
 	return txType{&tx}
 }
 
-func newSQLDao(tt txType) (error, SQLDao) {
+func newSQLDao(tableName string, tt txType) (error, SQLDao) {
 	if tt.conn != nil {
+		tt.conn.value.Table(tableName)
 		return nil, tt.conn.value
 	}
 
@@ -35,7 +40,7 @@ func newSQLDao(tt txType) (error, SQLDao) {
 		return err, SQLDao{}
 	}
 
-	return err, SQLDao{connection.LogMode(true)}
+	return err, SQLDao{connection.LogMode(true).Table(tableName)}
 }
 
 func (dao SQLDao) Close() {

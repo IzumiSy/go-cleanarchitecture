@@ -13,7 +13,7 @@ type TodosDao SQLDao
 var _ domains.TodosRepository = TodosDao{}
 
 func NewSQLTodosDao(tt txType) (TodosDao, error) {
-	err, dao := newSQLDao(tt)
+	err, dao := newSQLDao("todo", tt)
 	return TodosDao(dao), err
 }
 
@@ -30,7 +30,6 @@ func (dao TodosDao) GetByUserID(userId user.Id) (models.Todos, errors.Domain) {
 
 	query := dao.
 		conn.
-		Table("todo").
 		Where("user_id = ?", userId.String()).
 		Find(&dtos)
 

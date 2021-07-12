@@ -11,8 +11,8 @@ type TodoDao SQLDao
 
 var _ domains.TodoRepository = TodoDao{}
 
-func NewSQLTodoDao(tt txType) (TodoDao, error) {
-	err, dao := newSQLDao(tt)
+func NewSQLTodoDao(name string, tt txType) (TodoDao, error) {
+	err, dao := newSQLDao("todo", tt)
 	return TodoDao(dao), err
 }
 
@@ -31,7 +31,6 @@ func (dao TodoDao) Get(id todo.Id) (models.Todo, errors.Domain, bool) {
 
 	query := dao.
 		conn.
-		Table("todo").
 		Find(&todo, id.String())
 
 	empty := models.Todo{}
@@ -52,7 +51,6 @@ func (dao TodoDao) GetByName(name todo.Name) (models.Todo, errors.Domain, bool) 
 
 	query := dao.
 		conn.
-		Table("todo").
 		Where("name = ?", name.Value()).
 		Find(&dto)
 
@@ -82,11 +80,5 @@ func (dao TodoDao) Store(todo models.Todo) errors.Domain {
 		Description: todo.Description().Value(),
 	}
 
-	return errors.External(
-		dao.
-			conn.
-			Table("todo").
-			Create(&dto).
-			Error,
-	)
+	return errors.External(dao.conn.Create(&dto).Error)
 }
