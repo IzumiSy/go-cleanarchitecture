@@ -2,6 +2,7 @@ package models
 
 import (
 	"go-cleanarchitecture/domains/models/authentication"
+	"go-cleanarchitecture/domains/models/user"
 )
 
 type Authentication struct {
@@ -12,12 +13,22 @@ type Authentication struct {
 	email     authentication.Email
 	hash      authentication.Hash
 	createdAt authentication.CreatedAt
+
+	// 認証情報には必ずユーザーが紐づくため
+	// Authentication集約としてUserを持つようにモデリングすることにした
+	user User
 }
 
-func NewAuthentication(email authentication.Email, hash authentication.Hash) Authentication {
+// ファクトリ関数としてUserエンティティも同時に生成する
+func NewAuthentication(
+	email authentication.Email,
+	hash authentication.Hash,
+	userName user.Name,
+) Authentication {
 	return Authentication{
 		email:     email,
 		hash:      hash,
+		user:      NewUser(userName),
 		createdAt: authentication.GenerateCreatedAt(),
 	}
 }
@@ -25,11 +36,13 @@ func NewAuthentication(email authentication.Email, hash authentication.Hash) Aut
 func BuildAuthentication(
 	email authentication.Email,
 	hash authentication.Hash,
+	user User,
 	createdAt authentication.CreatedAt,
 ) Authentication {
 	return Authentication{
 		email:     email,
 		hash:      hash,
+		user:      user,
 		createdAt: createdAt,
 	}
 }
@@ -44,4 +57,8 @@ func (auth Authentication) Hash() authentication.Hash {
 
 func (auth Authentication) CreatedAt() authentication.CreatedAt {
 	return auth.createdAt
+}
+
+func (auth Authentication) User() User {
+	return auth.user
 }

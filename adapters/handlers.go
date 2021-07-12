@@ -13,6 +13,7 @@ func signupHandler(ctx echo.Context) error {
 	jsonParam := new(struct {
 		Email    string `json:"email"`
 		Password string `json:"password"`
+		UserName string `json:"userName"`
 	})
 
 	if err := ctx.Bind(jsonParam); err != nil {
@@ -24,7 +25,7 @@ func signupHandler(ctx echo.Context) error {
 		if err != nil {
 			return err
 		}
-		defer authenticationDao.Close()
+		// defer authenticationDao.Close()
 
 		logger, err := loggers.NewZapLogger("config/zap.json")
 		if err != nil {
@@ -37,6 +38,7 @@ func signupHandler(ctx echo.Context) error {
 			Execute(usecases.SignupParam{
 				Email:    jsonParam.Email,
 				Password: jsonParam.Password,
+				UserName: jsonParam.UserName,
 			})
 		return presenter.Present()
 	})

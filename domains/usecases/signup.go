@@ -5,6 +5,7 @@ import (
 	"go-cleanarchitecture/domains/errors"
 	"go-cleanarchitecture/domains/models"
 	"go-cleanarchitecture/domains/models/authentication"
+	"go-cleanarchitecture/domains/models/user"
 )
 
 type SignupOutputPort interface {
@@ -15,6 +16,7 @@ type SignupOutputPort interface {
 type SignupParam struct {
 	Email    string
 	Password string
+	UserName string
 }
 
 type signupUsecase struct {
@@ -42,12 +44,14 @@ func (usecase signupUsecase) Execute(params SignupParam) {
 
 	email, err := authentication.NewEmail(params.Email)
 	if err.NotNil() {
+		usecase.logger.Warn(err.Error())
 		usecase.outputPort.Raise(err)
 		return
 	}
 
 	_, err, exists := usecase.authenticationDao.GetByEmail(email)
 	if err.NotNil() {
+		usecase.logger.Error(err.Error())
 		usecase.outputPort.Raise(err)
 		return
 	}
@@ -57,9 +61,17 @@ func (usecase signupUsecase) Execute(params SignupParam) {
 		return
 	}
 
+	err, userName := user.NewName(params.UserName)
+	if err.NotNil() {
+		usecase.logger.Warn(err.Error())
+		usecase.outputPort.Raise(err)
+		return
+	}
+
 	hash := authentication.NewHash(params.Password)
-	auth := models.NewAuthentication(email, hash)
+	auth := models.NewAuthentication(email, hash, userName)
 	if err = usecase.authenticationDao.Store(auth); err.NotNil() {
+		usecase.logger.Error(err.Error())
 		usecase.outputPort.Raise(err)
 		return
 	}

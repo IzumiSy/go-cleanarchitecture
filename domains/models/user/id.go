@@ -20,6 +20,6 @@ func (id ID) String() string {
 	return id.value.String()
 }
 
-func GenerateUserID() ID {
+func GenerateID() ID {
 	return ID{entity.GenerateID()}
 }
