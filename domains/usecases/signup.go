@@ -10,7 +10,7 @@ import (
 
 type SignupOutputPort interface {
 	domains.OutputPort
-	Write(todo models.Authentication)
+	Write(auth models.Authentication)
 }
 
 type SignupParam struct {
