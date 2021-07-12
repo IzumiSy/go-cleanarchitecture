@@ -5,6 +5,7 @@ import (
 	"go-cleanarchitecture/domains/errors"
 	"go-cleanarchitecture/domains/models"
 	"go-cleanarchitecture/domains/models/todo"
+	"go-cleanarchitecture/domains/models/user"
 )
 
 type TodosDao SQLDao
@@ -12,7 +13,7 @@ type TodosDao SQLDao
 var _ domains.TodosRepository = TodosDao{}
 
 func NewSQLTodosDao() (TodosDao, error) {
-	err, dao := newSQLDao("todos")
+	err, dao := newSQLDao()
 	return TodosDao(dao), err
 }
 
@@ -20,15 +21,17 @@ func (dao TodosDao) Close() {
 	dao.Close()
 }
 
-func (dao TodosDao) GetByIds(ids []todo.Id) (models.Todos, errors.Domain) {
+func (dao TodosDao) GetByIDs(ids []todo.Id) (models.Todos, errors.Domain) {
 	return models.EmptyTodos(), errors.None // todo: あとで実装する
 }
 
-func (dao TodosDao) Get() (models.Todos, errors.Domain) {
+func (dao TodosDao) GetByUserID(userId user.Id) (models.Todos, errors.Domain) {
 	var dtos []todoDto
 
 	query := dao.
 		conn.
+		Table("todo").
+		Where("user_id = ?", userId.String()).
 		Find(&dtos)
 
 	empty := models.Todos{}

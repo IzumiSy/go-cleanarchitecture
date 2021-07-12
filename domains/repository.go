@@ -5,6 +5,7 @@ import (
 	"go-cleanarchitecture/domains/models"
 	"go-cleanarchitecture/domains/models/category"
 	"go-cleanarchitecture/domains/models/todo"
+	"go-cleanarchitecture/domains/models/user"
 )
 
 // repositoriesみたいなネームスペースを切ってもせいぜいインタフェースしか置かれないので
@@ -22,11 +23,11 @@ type TodoRepository interface {
 // 集合に対するクエリなので戻り値に存在の有無を表すboolは持たない
 
 type TodosRepository interface {
-	GetByIds(ids []todo.Id) (models.Todos, errors.Domain)
-	Get() (models.Todos, errors.Domain)
+	GetByIDs(ids []todo.Id) (models.Todos, errors.Domain)
+	GetByUserID(userID user.Id) (models.Todos, errors.Domain)
 }
 
 type CategoriesRepository interface {
-	GetByIds(ids []category.Id) ([]models.Category, errors.Domain)
-	Get() ([]models.Category, errors.Domain)
+	GetByIDs(ids []category.Id) ([]models.Category, errors.Domain)
+	GetByUserID(userId user.Id) ([]models.Category, errors.Domain)
 }

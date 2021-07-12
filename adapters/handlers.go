@@ -22,39 +22,50 @@ func getTodosHandler(ctx echo.Context) error {
 	}
 
 	presenter := json.GetTodosPresenter{Presenter: presenters.NewPresenter(ctx)}
-	usecases.NewGetTodosUsecase(presenter, sqlDao, logger).Execute()
+	usecases.
+		NewGetTodosUsecase(presenter, sqlDao, logger).
+		Execute(usecases.GetTodosParam{
+			UserID: "user_id",
+		})
 	return presenter.Present()
 }
 
-type jsonCreateTodoParam struct {
-	Name        string `json:"name"`
-	Description string `json:"description"`
-}
-
 func createTodoHandler(ctx echo.Context) error {
-	jsonParam := new(jsonCreateTodoParam)
+	jsonParam := new(struct {
+		Name        string `json:"name"`
+		Description string `json:"description"`
+	})
 
 	if err := ctx.Bind(jsonParam); err != nil {
 		return err
 	}
 
-	sqlDao, err := dao.NewSQLTodoDao()
-	if err != nil {
-		return err
-	}
-	// defer sqlDao.Close()
+	return dao.WithTx(func(tx dao.SQLDao) error {
+		sqlTodoDao, err := dao.NewSQLTodoDao()
+		if err != nil {
+			return err
+		}
+		defer sqlTodoDao.Close()
 
-	logger, err := loggers.NewZapLogger("config/zap.json")
-	if err != nil {
-		return err
-	}
+		sqlTodosDao, err := dao.NewSQLTodosDao()
+		if err != nil {
+			return err
+		}
+		defer sqlTodosDao.Close()
 
-	presenter := json.CreateTodoPresenter{Presenter: presenters.NewPresenter(ctx)}
-	usecases.
-		NewCreateTodoUsecase(presenter, sqlDao, logger).
-		Execute(usecases.CreateTodoParam{
-			Name:        jsonParam.Name,
-			Description: jsonParam.Description,
-		})
-	return presenter.Present()
+		logger, err := loggers.NewZapLogger("config/zap.json")
+		if err != nil {
+			return err
+		}
+
+		presenter := json.CreateTodoPresenter{Presenter: presenters.NewPresenter(ctx)}
+		usecases.
+			NewCreateTodoUsecase(presenter, sqlTodoDao, sqlTodosDao, logger).
+			Execute(usecases.CreateTodoParam{
+				Name:        jsonParam.Name,
+				Description: jsonParam.Description,
+			})
+
+		return presenter.Present()
+	})
 }

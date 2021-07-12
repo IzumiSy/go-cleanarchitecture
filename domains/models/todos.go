@@ -14,6 +14,10 @@ func (todos Todos) Value() []Todo {
 	return todos.value
 }
 
+func (todos Todos) Size() int {
+	return len(todos.value)
+}
+
 func EmptyTodos() Todos {
 	return Todos{[]Todo{}}
 }
