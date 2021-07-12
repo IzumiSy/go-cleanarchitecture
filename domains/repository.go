@@ -5,6 +5,7 @@ import (
 	"go-cleanarchitecture/domains/models"
 	"go-cleanarchitecture/domains/models/authentication"
 	"go-cleanarchitecture/domains/models/category"
+	"go-cleanarchitecture/domains/models/session"
 	"go-cleanarchitecture/domains/models/todo"
 	"go-cleanarchitecture/domains/models/user"
 )
@@ -23,11 +24,6 @@ type TodoRepository interface {
 	Store(todo models.Todo) errors.Domain
 }
 
-type AuthenticationRepository interface {
-	Store(auth models.Authentication) errors.Domain
-	GetByEmail(email authentication.Email) (models.Authentication, errors.Domain, bool)
-}
-
 type TodosRepository interface {
 	GetByIDs(ids []todo.ID) (models.Todos, errors.Domain)
 	GetByUserID(userID user.ID) (models.Todos, errors.Domain)
@@ -36,4 +32,16 @@ type TodosRepository interface {
 type CategoriesRepository interface {
 	GetByIDs(ids []category.ID) ([]models.Category, errors.Domain)
 	GetByUserID(userId user.ID) ([]models.Category, errors.Domain)
+}
+
+// 認証系
+
+type AuthenticationRepository interface {
+	Store(auth models.Authentication) errors.Domain
+	GetByEmail(email authentication.Email) (models.Authentication, errors.Domain, bool)
+}
+
+type SessionRepository interface {
+	Store(session models.Session) errors.Domain
+	Get(id session.ID) (models.Session, errors.Domain, bool)
 }

@@ -9,7 +9,7 @@ import (
 
 type AuthenticateOutputPort interface {
 	domains.OutputPort
-	Write(auth models.Authentication)
+	Write(session models.Session)
 }
 
 type AuthenticateParam struct {
@@ -20,15 +20,17 @@ type AuthenticateParam struct {
 type authenticateUsecase struct {
 	outputPort        AuthenticateOutputPort
 	authenticationDao domains.AuthenticationRepository
+	sessionDao        domains.SessionRepository
 	logger            domains.Logger
 }
 
 func AuthenticateUsecase(
 	outputPort AuthenticateOutputPort,
 	authenticationDao domains.AuthenticationRepository,
+	sessionDao domains.SessionRepository,
 	logger domains.Logger,
 ) authenticateUsecase {
-	return authenticateUsecase{outputPort, authenticationDao, logger}
+	return authenticateUsecase{outputPort, authenticationDao, sessionDao, logger}
 }
 
 func (usecase authenticateUsecase) Execute(params AuthenticateParam) {
@@ -66,9 +68,12 @@ func (usecase authenticateUsecase) Execute(params AuthenticateParam) {
 		return
 	}
 
-	//
-	// TODO: ここで認証トークンを払いだす
-	//
+	session := models.NewSession(auth.User())
+	if err := usecase.sessionDao.Store(session); err.NotNil() {
+		usecase.logger.Error(err.Error())
+		usecase.outputPort.Raise(err)
+		return
+	}
 
-	usecase.outputPort.Write(auth)
+	usecase.outputPort.Write(session)
 }
