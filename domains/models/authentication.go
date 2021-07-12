@@ -2,10 +2,7 @@ package models
 
 import (
 	"go-cleanarchitecture/domains/models/authentication"
-	"time"
 )
-
-type createdAt time.Time
 
 type Authentication struct {
 	// ユーザーの認証情報を表現するエンティティ
@@ -14,13 +11,37 @@ type Authentication struct {
 
 	email     authentication.Email
 	hash      authentication.Hash
-	createdAt createdAt
+	createdAt authentication.CreatedAt
 }
 
 func NewAuthentication(email authentication.Email, hash authentication.Hash) Authentication {
 	return Authentication{
 		email:     email,
 		hash:      hash,
-		createdAt: createdAt(time.Now()),
+		createdAt: authentication.GenerateCreatedAt(),
 	}
+}
+
+func BuildAuthentication(
+	email authentication.Email,
+	hash authentication.Hash,
+	createdAt authentication.CreatedAt,
+) Authentication {
+	return Authentication{
+		email:     email,
+		hash:      hash,
+		createdAt: createdAt,
+	}
+}
+
+func (auth Authentication) Email() authentication.Email {
+	return auth.email
+}
+
+func (auth Authentication) Hash() authentication.Hash {
+	return auth.hash
+}
+
+func (auth Authentication) CreatedAt() authentication.CreatedAt {
+	return auth.createdAt
 }
