@@ -51,7 +51,6 @@ func WithTx(runner func(tx TxSQLDao) error) error {
 	if err != nil {
 		return err
 	}
-	conn.LogMode(true)
 
 	tx := conn.Begin()
 	if tx.Error != nil {
