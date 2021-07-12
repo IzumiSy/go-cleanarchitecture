@@ -1,10 +1,10 @@
 package usecases
 
 import (
-	"go-cleanarchitecture/testing/adapters/dao"
-	"go-cleanarchitecture/testing/adapters/loggers"
 	"go-cleanarchitecture/domains/errors"
 	"go-cleanarchitecture/domains/models"
+	"go-cleanarchitecture/testing/adapters/dao"
+	"go-cleanarchitecture/testing/adapters/loggers"
 	"testing"
 )
 
@@ -14,10 +14,11 @@ func (_ mockCreateTodoOutputPort) Raise(err errors.Domain) {}
 
 func (_ mockCreateTodoOutputPort) Write(todo models.Todo) {}
 
-func TestCreateTodoUseCase(t *testing.T) {
+func TestCreateTodoUsecase(t *testing.T) {
 	usecase := NewCreateTodoUsecase(
 		mockCreateTodoOutputPort{},
 		dao.MockTodoDao{},
+		dao.MockTodosDao{},
 		loggers.MockLogger{},
 	)
 
