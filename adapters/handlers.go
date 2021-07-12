@@ -10,7 +10,7 @@ import (
 )
 
 func getTodosHandler(ctx echo.Context) error {
-	sqlDao, err := dao.NewSQLTodosDao()
+	sqlDao, err := dao.NewSQLTodosDao(dao.WITHOUT_TX())
 	if err != nil {
 		return err
 	}
@@ -40,14 +40,14 @@ func createTodoHandler(ctx echo.Context) error {
 		return err
 	}
 
-	return dao.WithTx(func(tx dao.SQLDao) error {
-		sqlTodoDao, err := dao.NewSQLTodoDao()
+	return dao.WithTx(func(tx dao.TxSQLDao) error {
+		sqlTodoDao, err := dao.NewSQLTodoDao(dao.WITH_TX(tx))
 		if err != nil {
 			return err
 		}
 		defer sqlTodoDao.Close()
 
-		sqlTodosDao, err := dao.NewSQLTodosDao()
+		sqlTodosDao, err := dao.NewSQLTodosDao(dao.WITH_TX(tx))
 		if err != nil {
 			return err
 		}

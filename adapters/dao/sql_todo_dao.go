@@ -11,8 +11,8 @@ type TodoDao SQLDao
 
 var _ domains.TodoRepository = TodoDao{}
 
-func NewSQLTodoDao() (TodoDao, error) {
-	err, dao := newSQLDao()
+func NewSQLTodoDao(tt txType) (TodoDao, error) {
+	err, dao := newSQLDao(tt)
 	return TodoDao(dao), err
 }
 
