@@ -51,13 +51,18 @@ func WithTx(runner func(tx TxSQLDao) error) error {
 	if err != nil {
 		return err
 	}
+	conn.LogMode(true)
 
 	tx := conn.Begin()
 	if tx.Error != nil {
+		tx.Rollback()
 		return tx.Error
 	}
 
-	runner(TxSQLDao{SQLDao{tx.LogMode(true)}})
+	if err := runner(TxSQLDao{SQLDao{tx}}); err != nil {
+		tx.Rollback()
+		return err
+	}
 
 	return tx.Commit().Error
 }
