@@ -14,15 +14,15 @@ type Name struct {
 	value string
 }
 
-func NewName(value string) (errors.Domain, Name) {
+func NewName(value string) (Name, errors.Domain) {
 	empty := Name{}
 
 	if value == "" {
-		return errors.Invalid("Name must not be empty"), empty
+		return empty, errors.Invalid("Name must not be empty")
 	} else if utf8.RuneCountInString(value) > 20 {
-		return errors.Invalid("Name too long"), empty
+		return empty, errors.Invalid("Name too long")
 	} else {
-		return errors.None, Name{value}
+		return Name{value}, errors.None
 	}
 }
 
