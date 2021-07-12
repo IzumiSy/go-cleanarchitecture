@@ -90,17 +90,25 @@ func getTodosHandler(ctx echo.Context) error {
 	}
 	// defer sqlDao.Close()
 
+	sessionDao, err := dao.NewSQLSessionDao(dao.WITHOUT_TX())
+	if err != nil {
+		return err
+	}
+	// defer sessionDao.Close()
+
 	logger, err := loggers.NewZapLogger("config/zap.json")
 	if err != nil {
 		return err
 	}
 
 	presenter := json.GetTodosPresenter{Presenter: presenters.NewPresenter(ctx)}
-	usecases.
-		NewGetTodosUsecase(presenter, sqlDao, logger).
-		Execute(usecases.GetTodosParam{
-			UserID: "d70f4845-b645-4271-bea9-3d5705e79e87",
-		})
+	usecases.GetTodosUsecase{
+		OutputPort: presenter,
+		TodosDao:   sqlDao,
+		Logger:     logger,
+	}.Build().
+		Run(sessionDao, "d70f4845-b645-4271-bea9-3d5705e79e87")
+
 	return presenter.Present()
 }
 

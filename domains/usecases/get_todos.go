@@ -11,38 +11,21 @@ type GetTodosOutputPort interface {
 	Write(todos models.Todos)
 }
 
-type GetTodosParam struct {
-	UserID string
+type GetTodosUsecase struct {
+	OutputPort GetTodosOutputPort
+	TodosDao   domains.TodosRepository
+	Logger     domains.Logger
 }
 
-type getTodosUsecase struct {
-	outputPort GetTodosOutputPort
-	todosDao   domains.TodosRepository
-	logger     domains.Logger
-}
+func (uc GetTodosUsecase) Build() domains.AuthorizedUsecase {
+	return domains.NewAuthorizedUsecase(uc.OutputPort, func(currentUserID user.ID) {
+		todos, err := uc.TodosDao.GetByUserID(currentUserID)
+		if err.NotNil() {
+			uc.Logger.Error(err.Error())
+			uc.OutputPort.Raise(err)
+			return
+		}
 
-func NewGetTodosUsecase(
-	outputPort GetTodosOutputPort,
-	todosDao domains.TodosRepository,
-	logger domains.Logger,
-) getTodosUsecase {
-	return getTodosUsecase{outputPort, todosDao, logger}
-}
-
-func (usecase getTodosUsecase) Execute(params GetTodosParam) {
-	userID, err := user.NewID(params.UserID)
-	if err.NotNil() {
-		usecase.logger.Warn(err.Error())
-		usecase.outputPort.Raise(err)
-		return
-	}
-
-	todos, err := usecase.todosDao.GetByUserID(userID)
-	if err.NotNil() {
-		usecase.logger.Error(err.Error())
-		usecase.outputPort.Raise(err)
-		return
-	}
-
-	usecase.outputPort.Write(todos)
+		uc.OutputPort.Write(todos)
+	})
 }
