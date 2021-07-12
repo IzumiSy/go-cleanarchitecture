@@ -33,8 +33,8 @@ func AuthenticateUsecase(
 
 func (usecase authenticateUsecase) Execute(params AuthenticateParam) {
 	// [ユーザーの認証を行うユースケース]
-	// "ログイン"でも命名はよかったが、今後外部APIとして認証を実装することを考えると
-	// あえて抽象化して"認証"と表現したくなったのでこの命名としている。
+	// "ログイン"でも命名はよかったが、今後外部APIとして認証を実装したりする可能性を考えると
+	// 人間以外のアクタも考慮し抽象化して"認証"と表現したくなったのでこの命名としている。
 
 	var (
 		USER_NOT_FOUND   = errors.Invalid("User not found")
