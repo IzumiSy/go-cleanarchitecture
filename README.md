@@ -7,6 +7,7 @@ This exploration project includes:
 - Logging
 - Asynchronous Pub/Sub (WIP)
 - Type-safety (No `interface{}` as much as possible)
+- Multiple drivers (migration, web, CLI)
 
 ## Build
 ```sh
