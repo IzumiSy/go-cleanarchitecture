@@ -2,6 +2,7 @@ package adapters
 
 import (
 	"go-cleanarchitecture/adapters/dao"
+	"go-cleanarchitecture/domains"
 	"go-cleanarchitecture/domains/models"
 	"go-cleanarchitecture/domains/models/session"
 
@@ -14,6 +15,8 @@ import (
 type DBSessionAuthorizer struct {
 	Ctx echo.Context
 }
+
+var _ domains.Authorizer = DBSessionAuthorizer{}
 
 func (da DBSessionAuthorizer) Run() (models.Session, error) {
 	sessionDao, err := dao.NewSQLSessionDao(dao.WITHOUT_TX())
