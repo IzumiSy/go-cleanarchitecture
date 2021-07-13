@@ -1,5 +1,12 @@
 # go-cleanarchitecture
 
+This exploration project includes:
+
+- Authorization flow
+- Transaction
+- Logging
+- Asynchronous Pub/Sub (WIP)
+
 ## Build
 ```sh
 $ make build
