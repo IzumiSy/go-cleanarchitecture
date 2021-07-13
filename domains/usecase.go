@@ -2,7 +2,7 @@ package domains
 
 import (
 	"go-cleanarchitecture/domains/errors"
-	"go-cleanarchitecture/domains/models/session"
+	"go-cleanarchitecture/domains/models"
 	"go-cleanarchitecture/domains/models/user"
 )
 
@@ -17,25 +17,18 @@ type AuthorizedUsecase struct {
 	outputPort OutputPort
 }
 
-func (uc AuthorizedUsecase) Run(sessionDao SessionRepository, sessionID string) {
+type Authorizer interface {
+	Run() (models.Session, error)
+}
+
+func (uc AuthorizedUsecase) Run(authorizer Authorizer) {
 	var (
-		INVALID_SESSION_ID = errors.Invalid("Invalid session ID")
+		INVALID_AUTHORIZATION = errors.Invalid("Invalid authorization")
 	)
 
-	_sessionID, err := session.NewID(sessionID)
-	if err.NotNil() {
-		uc.outputPort.Raise(INVALID_SESSION_ID)
-		return
-	}
-
-	session, err, exists := sessionDao.Get(_sessionID)
-	if err.NotNil() {
-		uc.outputPort.Raise(INVALID_SESSION_ID)
-		return
-	}
-
-	if !exists {
-		uc.outputPort.Raise(INVALID_SESSION_ID)
+	session, err := authorizer.Run()
+	if err != nil {
+		uc.outputPort.Raise(INVALID_AUTHORIZATION)
 		return
 	}
 
