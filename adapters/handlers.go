@@ -1,13 +1,25 @@
 package adapters
 
 import (
-	"github.com/labstack/echo"
+	"errors"
 	"go-cleanarchitecture/adapters/dao"
 	"go-cleanarchitecture/adapters/loggers"
 	"go-cleanarchitecture/adapters/presenters"
 	"go-cleanarchitecture/adapters/presenters/json"
 	"go-cleanarchitecture/domains/usecases"
+	"strings"
+
+	"github.com/labstack/echo"
 )
+
+func extractBearerToken(ctx echo.Context) (string, error) {
+	bearerToken := ctx.Request().Header.Get("Authorization")
+	token := strings.Split(bearerToken, "Bearer ")
+	if len(token) == 2 {
+		return token[1], nil
+	}
+	return "", errors.New("Invalid authorization token")
+}
 
 func signupHandler(ctx echo.Context) error {
 	jsonParam := new(struct {
