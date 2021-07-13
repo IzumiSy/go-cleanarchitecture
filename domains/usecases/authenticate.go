@@ -17,63 +17,56 @@ type AuthenticateParam struct {
 	Password string
 }
 
-type authenticateUsecase struct {
-	outputPort        AuthenticateOutputPort
-	authenticationDao domains.AuthenticationRepository
-	sessionDao        domains.SessionRepository
-	logger            domains.Logger
+type AuthenticateUsecase struct {
+	OutputPort        AuthenticateOutputPort
+	AuthenticationDao domains.AuthenticationRepository
+	SessionDao        domains.SessionRepository
+	Logger            domains.Logger
 }
 
-func NewAuthenticateUsecase(
-	outputPort AuthenticateOutputPort,
-	authenticationDao domains.AuthenticationRepository,
-	sessionDao domains.SessionRepository,
-	logger domains.Logger,
-) authenticateUsecase {
-	return authenticateUsecase{outputPort, authenticationDao, sessionDao, logger}
-}
+func (uc AuthenticateUsecase) Build(params AuthenticateParam) domains.UnauthorizedUsecase {
+	return domains.NewUnauthorizedUsecase(func() {
+		// [ユーザーの認証を行うユースケース]
+		// "ログイン"でも命名はよかったが、今後外部APIとして認証を実装したりする可能性を考えると
+		// 人間以外のアクタも考慮し抽象化して"認証"と表現したくなったのでこの命名としている。
 
-func (usecase authenticateUsecase) Execute(params AuthenticateParam) {
-	// [ユーザーの認証を行うユースケース]
-	// "ログイン"でも命名はよかったが、今後外部APIとして認証を実装したりする可能性を考えると
-	// 人間以外のアクタも考慮し抽象化して"認証"と表現したくなったのでこの命名としている。
+		var (
+			USER_NOT_FOUND   = errors.Invalid("User not found")
+			INVALID_PASSWORD = errors.Invalid("Invalid password")
+		)
 
-	var (
-		USER_NOT_FOUND   = errors.Invalid("User not found")
-		INVALID_PASSWORD = errors.Invalid("Invalid password")
-	)
+		email, err := authentication.NewEmail(params.Email)
+		if err.NotNil() {
+			uc.Logger.Warn(err.Error())
+			uc.OutputPort.Raise(err)
+			return
+		}
 
-	email, err := authentication.NewEmail(params.Email)
-	if err.NotNil() {
-		usecase.logger.Warn(err.Error())
-		usecase.outputPort.Raise(err)
-		return
-	}
+		auth, err, exists := uc.AuthenticationDao.GetByEmail(email)
+		if err.NotNil() {
+			uc.Logger.Error(err.Error())
+			uc.OutputPort.Raise(err)
+			return
+		}
 
-	auth, err, exists := usecase.authenticationDao.GetByEmail(email)
-	if err.NotNil() {
-		usecase.logger.Error(err.Error())
-		usecase.outputPort.Raise(err)
-		return
-	}
+		if !exists {
+			uc.OutputPort.Raise(USER_NOT_FOUND)
+			return
+		}
 
-	if !exists {
-		usecase.outputPort.Raise(USER_NOT_FOUND)
-		return
-	}
+		loginHash := authentication.NewHash(params.Password)
+		if auth.Hash().Value() != loginHash.Value() {
+			uc.OutputPort.Raise(INVALID_PASSWORD)
+			return
+		}
 
-	loginHash := authentication.NewHash(params.Password)
-	if auth.Hash().Value() != loginHash.Value() {
-		usecase.outputPort.Raise(INVALID_PASSWORD)
-		return
-	}
+		session := models.NewSession(auth.User())
+		if err := uc.SessionDao.Store(session); err.NotNil() {
+			uc.Logger.Error(err.Error())
+			uc.OutputPort.Raise(err)
+			return
+		}
 
-	session := models.NewSession(auth.User())
-	if err := usecase.sessionDao.Store(session); err.NotNil() {
-		usecase.logger.Error(err.Error())
-		usecase.outputPort.Raise(err)
-		return
-	}
-
-	usecase.outputPort.Write(session)
+		uc.OutputPort.Write(session)
+	})
 }

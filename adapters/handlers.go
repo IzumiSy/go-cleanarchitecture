@@ -33,13 +33,15 @@ func signupHandler(ctx echo.Context) error {
 		}
 
 		presenter := json.SignupPresenter{Presenter: presenters.NewPresenter(ctx)}
-		usecases.
-			NewSignupUsecase(presenter, authenticationDao, logger).
-			Execute(usecases.SignupParam{
-				Email:    jsonParam.Email,
-				Password: jsonParam.Password,
-				UserName: jsonParam.UserName,
-			})
+		usecases.SignupUsecase{
+			OutputPort:        presenter,
+			AuthenticationDao: authenticationDao,
+			Logger:            logger,
+		}.Build(usecases.SignupParam{
+			Email:    jsonParam.Email,
+			Password: jsonParam.Password,
+			UserName: jsonParam.UserName,
+		}).Run()
 		return presenter.Present()
 	})
 }
@@ -73,12 +75,15 @@ func authenticateHandler(ctx echo.Context) error {
 		}
 
 		presenter := json.AuthenticatePresenter{Presenter: presenters.NewPresenter(ctx)}
-		usecases.
-			NewAuthenticateUsecase(presenter, authenticationDao, sessionDao, logger).
-			Execute(usecases.AuthenticateParam{
-				Email:    jsonParam.Email,
-				Password: jsonParam.Password,
-			})
+		usecases.AuthenticateUsecase{
+			OutputPort:        presenter,
+			AuthenticationDao: authenticationDao,
+			SessionDao:        sessionDao,
+			Logger:            logger,
+		}.Build(usecases.AuthenticateParam{
+			Email:    jsonParam.Email,
+			Password: jsonParam.Password,
+		}).Run()
 		return presenter.Present()
 	})
 }
@@ -135,18 +140,27 @@ func createTodoHandler(ctx echo.Context) error {
 		}
 		// defer sqlTodosDao.Close()
 
+		sessionDao, err := dao.NewSQLSessionDao(dao.WITHOUT_TX())
+		if err != nil {
+			return err
+		}
+		// defer sessionDao.Close()
+
 		logger, err := loggers.NewZapLogger("config/zap.json")
 		if err != nil {
 			return err
 		}
 
 		presenter := json.CreateTodoPresenter{Presenter: presenters.NewPresenter(ctx)}
-		usecases.
-			NewCreateTodoUsecase(presenter, sqlTodoDao, sqlTodosDao, logger).
-			Execute(usecases.CreateTodoParam{
-				Name:        jsonParam.Name,
-				Description: jsonParam.Description,
-			})
+		usecases.CreateTodoUsecase{
+			OutputPort: presenter,
+			TodoDao:    sqlTodoDao,
+			TodosDao:   sqlTodosDao,
+			Logger:     logger,
+		}.Build(usecases.CreateTodoParam{
+			Name:        jsonParam.Name,
+			Description: jsonParam.Description,
+		}).Run(sessionDao, "d70f4845-b645-4271-bea9-3d5705e79e87")
 
 		return presenter.Present()
 	})

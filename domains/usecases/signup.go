@@ -19,62 +19,56 @@ type SignupParam struct {
 	UserName string
 }
 
-type signupUsecase struct {
-	outputPort        SignupOutputPort
-	authenticationDao domains.AuthenticationRepository
-	logger            domains.Logger
+type SignupUsecase struct {
+	OutputPort        SignupOutputPort
+	AuthenticationDao domains.AuthenticationRepository
+	Logger            domains.Logger
 }
 
-func NewSignupUsecase(
-	outputPort SignupOutputPort,
-	authenticationDao domains.AuthenticationRepository,
-	logger domains.Logger,
-) signupUsecase {
-	return signupUsecase{outputPort, authenticationDao, logger}
-}
+func (uc SignupUsecase) Build(params SignupParam) domains.UnauthorizedUsecase {
+	return domains.NewUnauthorizedUsecase(func() {
+		// [新規ユーザーのサインナップを行うユースケース]
+		// バリデーションルールは以下
+		// - すでに同じメールアドレスで登録されている場合にはサインナップ不可
 
-func (usecase signupUsecase) Execute(params SignupParam) {
-	// [新規ユーザーのサインナップを行うユースケース]
-	// バリデーションルールは以下
-	// - すでに同じメールアドレスで登録されている場合にはサインナップ不可
+		var (
+			EMAIL_INVALID = errors.Invalid("Email must not be duplicated")
+		)
 
-	var (
-		EMAIL_INVALID = errors.Invalid("Email must not be duplicated")
-	)
+		email, err := authentication.NewEmail(params.Email)
+		if err.NotNil() {
+			uc.Logger.Warn(err.Error())
+			uc.OutputPort.Raise(err)
+			return
+		}
 
-	email, err := authentication.NewEmail(params.Email)
-	if err.NotNil() {
-		usecase.logger.Warn(err.Error())
-		usecase.outputPort.Raise(err)
-		return
-	}
+		_, err, exists := uc.AuthenticationDao.GetByEmail(email)
+		if err.NotNil() {
+			uc.Logger.Error(err.Error())
+			uc.OutputPort.Raise(err)
+			return
+		}
 
-	_, err, exists := usecase.authenticationDao.GetByEmail(email)
-	if err.NotNil() {
-		usecase.logger.Error(err.Error())
-		usecase.outputPort.Raise(err)
-		return
-	}
+		if exists {
+			uc.OutputPort.Raise(EMAIL_INVALID)
+			return
+		}
 
-	if exists {
-		usecase.outputPort.Raise(EMAIL_INVALID)
-		return
-	}
+		userName, err := user.NewName(params.UserName)
+		if err.NotNil() {
+			uc.Logger.Warn(err.Error())
+			uc.OutputPort.Raise(err)
+			return
+		}
 
-	userName, err := user.NewName(params.UserName)
-	if err.NotNil() {
-		usecase.logger.Warn(err.Error())
-		usecase.outputPort.Raise(err)
-		return
-	}
+		hash := authentication.NewHash(params.Password)
+		auth := models.NewAuthentication(email, hash, userName)
+		if err = uc.AuthenticationDao.Store(auth); err.NotNil() {
+			uc.Logger.Error(err.Error())
+			uc.OutputPort.Raise(err)
+			return
+		}
 
-	hash := authentication.NewHash(params.Password)
-	auth := models.NewAuthentication(email, hash, userName)
-	if err = usecase.authenticationDao.Store(auth); err.NotNil() {
-		usecase.logger.Error(err.Error())
-		usecase.outputPort.Raise(err)
-		return
-	}
-
-	usecase.outputPort.Write(auth)
+		uc.OutputPort.Write(auth)
+	})
 }
