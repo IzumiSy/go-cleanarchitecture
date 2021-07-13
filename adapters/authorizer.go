@@ -27,9 +27,9 @@ func (da DBSessionAuthorizer) Run() (models.Session, error) {
 		return models.Session{}, err
 	}
 
-	sessionID, err := session.NewID(token)
-	if err != nil {
-		return models.Session{}, err
+	sessionID, sErr := session.NewID(token)
+	if sErr.NotNil() {
+		return models.Session{}, sErr
 	}
 
 	session, sErr, exists := sessionDao.Get(sessionID)

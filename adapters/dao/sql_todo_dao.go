@@ -32,7 +32,7 @@ func (dao TodoDao) Get(id todo.ID) (models.Todo, errors.Domain, bool) {
 
 	query := dao.
 		conn.
-		Find(&dto, id.String())
+		First(&dto, "id = ?", id.String())
 
 	empty := models.Todo{}
 

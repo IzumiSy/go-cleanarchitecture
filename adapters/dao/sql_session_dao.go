@@ -33,7 +33,7 @@ func (dao SessionDao) Get(id session.ID) (models.Session, errors.Domain, bool) {
 
 	query := dao.
 		conn.
-		Find(&sessionDto, id.String())
+		First(&sessionDto, "id = ?", id.String())
 
 	empty := models.Session{}
 
