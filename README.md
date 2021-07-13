@@ -6,6 +6,7 @@ This exploration project includes:
 - Transaction
 - Logging
 - Asynchronous Pub/Sub (WIP)
+- Type-safety (No `interface{}` as much as possible)
 
 ## Build
 ```sh
