@@ -1,4 +1,4 @@
-package user
+package session
 
 import (
 	"go-cleanarchitecture/domains/errors"
@@ -6,7 +6,7 @@ import (
 )
 
 type ID struct {
-	// UserのIDを表現する値オブジェクト
+	// TODOのIDを表現する値オブジェクト
 
 	value entity.ID
 }

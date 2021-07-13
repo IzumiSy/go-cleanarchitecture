@@ -9,10 +9,6 @@ type SQLDao struct {
 	conn *gorm.DB
 }
 
-func (dao SQLDao) Table(name string) {
-	dao.conn.Table(name)
-}
-
 type TxSQLDao struct {
 	value SQLDao
 }
@@ -29,17 +25,17 @@ func WITH_TX(tx TxSQLDao) txType {
 	return txType{&tx}
 }
 
-func newSQLDao(tableName string, tt txType) (error, SQLDao) {
+func newSQLDao(tableName string, tt txType) (SQLDao, error) {
 	if tt.dao != nil {
-		return nil, SQLDao{tt.dao.value.conn.LogMode(true).Table(tableName)}
+		return SQLDao{tt.dao.value.conn.LogMode(true).Table(tableName)}, nil
 	}
 
 	connection, err := gorm.Open("sqlite3", "go-cleanarchitecture.db")
 	if err != nil {
-		return err, SQLDao{}
+		return SQLDao{}, err
 	}
 
-	return err, SQLDao{connection.LogMode(true).Table(tableName)}
+	return SQLDao{connection.LogMode(true).Table(tableName)}, nil
 }
 
 func (dao SQLDao) Close() {

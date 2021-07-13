@@ -12,7 +12,7 @@ type TodoDao SQLDao
 var _ domains.TodoRepository = TodoDao{}
 
 func NewSQLTodoDao(tt txType) (TodoDao, error) {
-	err, dao := newSQLDao("todo", tt)
+	dao, err := newSQLDao("todo", tt)
 	return TodoDao(dao), err
 }
 
@@ -28,23 +28,24 @@ type todoDto struct {
 }
 
 func (dao TodoDao) Get(id todo.ID) (models.Todo, errors.Domain, bool) {
-	var todo models.Todo
+	var dto todoDto
 
 	query := dao.
 		conn.
-		Find(&todo, id.String())
+		First(&dto, "id = ?", id.String())
 
 	empty := models.Todo{}
 
-	// Errorよりも先にRecordNotFoundをチェックしないと
-	// レコードが存在しないというErrorとしてハンドリングされてしまう
 	if query.RecordNotFound() {
 		return empty, errors.None, false
 	} else if query.Error != nil {
-		return empty, errors.External(query.Error), true
+		return empty, errors.External(query.Error), false
 	}
 
-	return todo, errors.None, true
+	_id, _ := todo.NewID(dto.ID)
+	name, _ := todo.NewName(dto.Name)
+	description, _ := todo.NewDescription(dto.Description)
+	return models.BuildTodo(_id, name, description), errors.None, true
 }
 
 func (dao TodoDao) GetByName(name todo.Name) (models.Todo, errors.Domain, bool) {
@@ -57,20 +58,15 @@ func (dao TodoDao) GetByName(name todo.Name) (models.Todo, errors.Domain, bool) 
 
 	empty := models.Todo{}
 
-	// Errorよりも先にRecordNotFoundをチェックしないと
-	// レコードが存在しないというErrorとしてハンドリングされてしまう
 	if query.RecordNotFound() {
 		return empty, errors.None, false
 	} else if query.Error != nil {
 		return empty, errors.External(query.Error), false
 	}
 
-	// すでに永続化されているtodo自体は作成時のバリデーションを経由しているため
-	// ここではバリデーションエラーはでないことを期待するためエラーは無視している。
 	id, _ := todo.NewID(dto.ID)
 	_name, _ := todo.NewName(dto.Name)
 	description, _ := todo.NewDescription(dto.Description)
-
 	return models.BuildTodo(id, _name, description), errors.None, true
 }
 

@@ -1,13 +1,93 @@
 package adapters
 
 import (
-	"github.com/labstack/echo"
 	"go-cleanarchitecture/adapters/dao"
 	"go-cleanarchitecture/adapters/loggers"
 	"go-cleanarchitecture/adapters/presenters"
 	"go-cleanarchitecture/adapters/presenters/json"
 	"go-cleanarchitecture/domains/usecases"
+
+	"github.com/labstack/echo"
 )
+
+func signupHandler(ctx echo.Context) error {
+	jsonParam := new(struct {
+		Email    string `json:"email"`
+		Password string `json:"password"`
+		UserName string `json:"userName"`
+	})
+
+	if err := ctx.Bind(jsonParam); err != nil {
+		return err
+	}
+
+	return dao.WithTx(func(tx dao.TxSQLDao) error {
+		authenticationDao, err := dao.NewSQLAuthenticationDao(dao.WITH_TX(tx))
+		if err != nil {
+			return err
+		}
+		// defer authenticationDao.Close()
+
+		logger, err := loggers.NewZapLogger("config/zap.json")
+		if err != nil {
+			return err
+		}
+
+		presenter := json.SignupPresenter{Presenter: presenters.NewPresenter(ctx)}
+		usecases.SignupUsecase{
+			OutputPort:        presenter,
+			AuthenticationDao: authenticationDao,
+			Logger:            logger,
+		}.Build(usecases.SignupParam{
+			Email:    jsonParam.Email,
+			Password: jsonParam.Password,
+			UserName: jsonParam.UserName,
+		}).Run()
+		return presenter.Present()
+	})
+}
+
+func authenticateHandler(ctx echo.Context) error {
+	jsonParam := new(struct {
+		Email    string `json:"email"`
+		Password string `json:"password"`
+	})
+
+	if err := ctx.Bind(jsonParam); err != nil {
+		return err
+	}
+
+	return dao.WithTx(func(tx dao.TxSQLDao) error {
+		authenticationDao, err := dao.NewSQLAuthenticationDao(dao.WITH_TX(tx))
+		if err != nil {
+			return err
+		}
+		// defer authenticationDao.Close()
+
+		sessionDao, err := dao.NewSQLSessionDao(dao.WITH_TX(tx))
+		if err != nil {
+			return err
+		}
+		// defer sessionDao.Close()
+
+		logger, err := loggers.NewZapLogger("config/zap.json")
+		if err != nil {
+			return err
+		}
+
+		presenter := json.AuthenticatePresenter{Presenter: presenters.NewPresenter(ctx)}
+		usecases.AuthenticateUsecase{
+			OutputPort:        presenter,
+			AuthenticationDao: authenticationDao,
+			SessionDao:        sessionDao,
+			Logger:            logger,
+		}.Build(usecases.AuthenticateParam{
+			Email:    jsonParam.Email,
+			Password: jsonParam.Password,
+		}).Run()
+		return presenter.Present()
+	})
+}
 
 func getTodosHandler(ctx echo.Context) error {
 	sqlDao, err := dao.NewSQLTodosDao(dao.WITHOUT_TX())
@@ -22,11 +102,12 @@ func getTodosHandler(ctx echo.Context) error {
 	}
 
 	presenter := json.GetTodosPresenter{Presenter: presenters.NewPresenter(ctx)}
-	usecases.
-		NewGetTodosUsecase(presenter, sqlDao, logger).
-		Execute(usecases.GetTodosParam{
-			UserID: "d70f4845-b645-4271-bea9-3d5705e79e87",
-		})
+	usecases.GetTodosUsecase{
+		OutputPort: presenter,
+		TodosDao:   sqlDao,
+		Logger:     logger,
+	}.Build().Run(DBSessionAuthorizer{ctx})
+
 	return presenter.Present()
 }
 
@@ -59,12 +140,15 @@ func createTodoHandler(ctx echo.Context) error {
 		}
 
 		presenter := json.CreateTodoPresenter{Presenter: presenters.NewPresenter(ctx)}
-		usecases.
-			NewCreateTodoUsecase(presenter, sqlTodoDao, sqlTodosDao, logger).
-			Execute(usecases.CreateTodoParam{
-				Name:        jsonParam.Name,
-				Description: jsonParam.Description,
-			})
+		usecases.CreateTodoUsecase{
+			OutputPort: presenter,
+			TodoDao:    sqlTodoDao,
+			TodosDao:   sqlTodosDao,
+			Logger:     logger,
+		}.Build(usecases.CreateTodoParam{
+			Name:        jsonParam.Name,
+			Description: jsonParam.Description,
+		}).Run(DBSessionAuthorizer{ctx})
 
 		return presenter.Present()
 	})
