@@ -1,25 +1,14 @@
 package adapters
 
 import (
-	"errors"
 	"go-cleanarchitecture/adapters/dao"
 	"go-cleanarchitecture/adapters/loggers"
 	"go-cleanarchitecture/adapters/presenters"
 	"go-cleanarchitecture/adapters/presenters/json"
 	"go-cleanarchitecture/domains/usecases"
-	"strings"
 
 	"github.com/labstack/echo"
 )
-
-func extractBearerToken(ctx echo.Context) (string, error) {
-	bearerToken := ctx.Request().Header.Get("Authorization")
-	token := strings.Split(bearerToken, "Bearer ")
-	if len(token) == 2 {
-		return token[1], nil
-	}
-	return "", errors.New("Invalid authorization token")
-}
 
 func signupHandler(ctx echo.Context) error {
 	jsonParam := new(struct {
@@ -107,12 +96,6 @@ func getTodosHandler(ctx echo.Context) error {
 	}
 	// defer sqlDao.Close()
 
-	sessionDao, err := dao.NewSQLSessionDao(dao.WITHOUT_TX())
-	if err != nil {
-		return err
-	}
-	// defer sessionDao.Close()
-
 	logger, err := loggers.NewZapLogger("config/zap.json")
 	if err != nil {
 		return err
@@ -123,8 +106,7 @@ func getTodosHandler(ctx echo.Context) error {
 		OutputPort: presenter,
 		TodosDao:   sqlDao,
 		Logger:     logger,
-	}.Build().
-		Run(sessionDao, "d70f4845-b645-4271-bea9-3d5705e79e87")
+	}.Build().Run(DBSessionAuthorizer{ctx})
 
 	return presenter.Present()
 }
@@ -152,12 +134,6 @@ func createTodoHandler(ctx echo.Context) error {
 		}
 		// defer sqlTodosDao.Close()
 
-		sessionDao, err := dao.NewSQLSessionDao(dao.WITHOUT_TX())
-		if err != nil {
-			return err
-		}
-		// defer sessionDao.Close()
-
 		logger, err := loggers.NewZapLogger("config/zap.json")
 		if err != nil {
 			return err
@@ -172,7 +148,7 @@ func createTodoHandler(ctx echo.Context) error {
 		}.Build(usecases.CreateTodoParam{
 			Name:        jsonParam.Name,
 			Description: jsonParam.Description,
-		}).Run(sessionDao, "d70f4845-b645-4271-bea9-3d5705e79e87")
+		}).Run(DBSessionAuthorizer{ctx})
 
 		return presenter.Present()
 	})
