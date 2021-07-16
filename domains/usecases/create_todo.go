@@ -65,14 +65,7 @@ func (uc CreateTodoUsecase) Build(params CreateTodoParam) domains.AuthorizedUsec
 			}
 		}
 
-		userID, err := user.NewID("d70f4845-b645-4271-bea9-3d5705e79e87")
-		if err.NotNil() {
-			uc.Logger.Warn(err.Error())
-			uc.OutputPort.Raise(err)
-			return
-		}
-
-		todos, err := uc.TodosDao.GetByUserID(userID)
+		todos, err := uc.TodosDao.GetByUserID(currentUserID)
 		if todos.Size() > 100 {
 			uc.OutputPort.Raise(MAXIMUM_TODOS_REACHED)
 			return
