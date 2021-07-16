@@ -11,7 +11,7 @@ type MockTodoDao struct{}
 
 var _ domains.TodoRepository = MockTodoDao{}
 
-func (_ MockTodoDao) Get(id todo.Id) (models.Todo, errors.Domain, bool) {
+func (_ MockTodoDao) Get(id todo.ID) (models.Todo, errors.Domain, bool) {
 	return models.Todo{}, errors.Domain{}, true
 }
 
@@ -20,5 +20,5 @@ func (_ MockTodoDao) GetByName(name todo.Name) (models.Todo, errors.Domain, bool
 }
 
 func (_ MockTodoDao) Store(todo models.Todo) errors.Domain {
-    return errors.Domain{}
+	return errors.Domain{}
 }

@@ -12,10 +12,10 @@ type MockTodosDao struct{}
 
 var _ domains.TodosRepository = MockTodosDao{}
 
-func (_ MockTodosDao) GetByIDs(ids []todo.Id) (models.Todos, errors.Domain) {
+func (_ MockTodosDao) GetByIDs(ids []todo.ID) (models.Todos, errors.Domain) {
 	return models.Todos{}, errors.Domain{}
 }
 
-func (_ MockTodosDao) GetByUserID(userId user.Id) (models.Todos, errors.Domain) {
+func (_ MockTodosDao) GetByUserID(userId user.ID) (models.Todos, errors.Domain) {
 	return models.Todos{}, errors.Domain{}
 }
