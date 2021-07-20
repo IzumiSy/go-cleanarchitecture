@@ -26,9 +26,9 @@ func (dao SessionDao) Close() {
 }
 
 type SessionDto struct {
-	ID        string    `gorm:"id"`
-	UserID    string    `gorm:"user_id"`
-	CreatedAt time.Time `gorm:"created_at"`
+	ID        string    `gorm:"column:id"`
+	UserID    string    `gorm:"column:user_id;not null;unique"`
+	CreatedAt time.Time `gorm:"column:created_at;not null"`
 }
 
 func (SessionDto) TableName() string {

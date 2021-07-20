@@ -26,10 +26,10 @@ func (dao AuthentcationDao) Close() {
 }
 
 type AuthenticationDto struct {
-	Email     string    `gorm:"email,primaryKey,uniqueIndex"`
-	Hash      string    `gorm:"hash"`
-	UserID    string    `gorm:"user_id"`
-	CreatedAt time.Time `gorm:"created_at"`
+	Email     string    `gorm:"column:email;primaryKey"`
+	UserID    string    `gorm:"column:user_id;not null;unique"`
+	Hash      string    `gorm:"column:hash;not null"`
+	CreatedAt time.Time `gorm:"column:created_at;not null"`
 }
 
 func (AuthenticationDto) TableName() string {
@@ -37,8 +37,8 @@ func (AuthenticationDto) TableName() string {
 }
 
 type UserDto struct {
-	ID   string `gorm:"id"`
-	Name string `gorm:"name"`
+	ID   string `gorm:"column:id"`
+	Name string `gorm:"column:name;not null"`
 }
 
 func (UserDto) TableName() string {

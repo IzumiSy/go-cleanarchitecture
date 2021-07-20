@@ -24,10 +24,10 @@ func (dao TodoDao) Close() {
 }
 
 type TodoDto struct {
-	ID          string `gorm:"id"`
-	Name        string `gorm:"name"`
-	Description string `gorm:"description"`
-	UserID      string `gorm:"user_id"`
+	ID          string `gorm:"column:id"`
+	UserID      string `gorm:"column:user_id;not null;unique"`
+	Name        string `gorm:"column:name;not null"`
+	Description string `gorm:"column:description;not null"`
 }
 
 func (TodoDto) TableName() string {
