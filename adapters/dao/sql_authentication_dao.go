@@ -94,7 +94,7 @@ func (dao AuthentcationDao) Store(auth models.Authentication) errors.Domain {
 		UserID:    user.ID().String(),
 		CreatedAt: auth.CreatedAt().Value(),
 	}
-	if err := dao.conn.Create(&authDto).Error; err != nil {
+	if err := dao.conn.Create(&authDto).Error; err != nil && err != gorm.ErrRecordNotFound {
 		return errors.External(err)
 	}
 
@@ -102,7 +102,9 @@ func (dao AuthentcationDao) Store(auth models.Authentication) errors.Domain {
 		ID:   user.ID().String(),
 		Name: user.Name().Value(),
 	}
-	if err := dao.conn.Table("user").Create(&userDto).Error; err != nil {
+	if err := dao.conn.Table("user").Create(&userDto).Error; err == gorm.ErrRecordNotFound {
+		return errors.None
+	} else if err != nil {
 		return errors.External(err)
 	}
 
