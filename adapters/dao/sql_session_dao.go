@@ -24,14 +24,16 @@ func (dao SessionDao) Close() {
 	dao.Close()
 }
 
-type sessionDto struct {
+type SessionDto struct {
+	gorm.Model
+
 	ID        string    `gorm:"id"`
 	UserID    string    `gorm:"user_id"`
 	CreatedAt time.Time `gorm:"created_at"`
 }
 
 func (dao SessionDao) Get(id session.ID) (models.Session, errors.Domain, bool) {
-	var sessionDto sessionDto
+	var sessionDto SessionDto
 
 	query := dao.
 		conn.
@@ -54,7 +56,7 @@ func (dao SessionDao) Get(id session.ID) (models.Session, errors.Domain, bool) {
 }
 
 func (dao SessionDao) Store(session models.Session) errors.Domain {
-	dto := sessionDto{
+	dto := SessionDto{
 		ID:        session.ID().String(),
 		UserID:    session.UserID().String(),
 		CreatedAt: session.CreatedAt().Value(),

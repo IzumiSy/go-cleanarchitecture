@@ -24,20 +24,24 @@ func (dao AuthentcationDao) Close() {
 	dao.Close()
 }
 
-type authenticationDto struct {
+type AuthenticationDto struct {
+	gorm.Model
+
 	Email     string    `gorm:"email,primaryKey,uniqueIndex"`
 	Hash      string    `gorm:"hash"`
 	UserID    string    `gorm:"user_id"`
 	CreatedAt time.Time `gorm:"created_at"`
 }
 
-type userDto struct {
+type UserDto struct {
+	gorm.Model
+
 	ID   string `gorm:"id"`
 	Name string `gorm:"name"`
 }
 
 func (dao AuthentcationDao) GetByEmail(email authentication.Email) (models.Authentication, errors.Domain, bool) {
-	var authDto authenticationDto
+	var authDto AuthenticationDto
 
 	query := dao.
 		conn.
@@ -52,7 +56,7 @@ func (dao AuthentcationDao) GetByEmail(email authentication.Email) (models.Authe
 		return empty, errors.External(query.Error), false
 	}
 
-	var userDto userDto
+	var userDto UserDto
 
 	query = dao.
 		conn.
@@ -79,7 +83,7 @@ func (dao AuthentcationDao) GetByEmail(email authentication.Email) (models.Authe
 
 func (dao AuthentcationDao) Store(auth models.Authentication) errors.Domain {
 	user := auth.User()
-	authDto := authenticationDto{
+	authDto := AuthenticationDto{
 		Email:     auth.Email().Value(),
 		Hash:      auth.Hash().Value(),
 		UserID:    user.ID().String(),
@@ -89,7 +93,7 @@ func (dao AuthentcationDao) Store(auth models.Authentication) errors.Domain {
 		return errors.External(err)
 	}
 
-	userDto := userDto{
+	userDto := UserDto{
 		ID:   user.ID().String(),
 		Name: user.Name().Value(),
 	}

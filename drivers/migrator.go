@@ -1,25 +1,41 @@
 package drivers
 
 import (
-	"database/sql"
-	"fmt"
-	migrate "github.com/rubenv/sql-migrate"
+	"go-cleanarchitecture/adapters/dao"
+
+	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 )
 
-type MigratorDriver struct{}
+type MigratorDriver struct {
+	Mode string
+}
 
 func (driver MigratorDriver) Run() {
-	migrations := &migrate.FileMigrationSource{Dir: "schemas"}
-
-	db, err := sql.Open("sqlite3", "go-cleanarchitecture.db")
+	conn, err := gorm.Open(dao.CurrentDriver().Dialector(), &gorm.Config{})
+	conn.Logger = logger.Default.LogMode(logger.Info)
 	if err != nil {
 		panic(err.Error())
 	}
 
-	n, err := migrate.Exec(db, "sqlite3", migrations, migrate.Up)
-	if err != nil {
-		panic(err.Error())
+	switch driver.Mode {
+	case "down":
+		driver.Down(conn)
+	default:
+		driver.Up(conn)
 	}
+}
 
-	fmt.Printf("Applied %d migrations\n", n)
+func (driver MigratorDriver) Up(conn *gorm.DB) {
+	conn.Migrator().CreateTable(&dao.TodoDto{})
+	conn.Migrator().CreateTable(&dao.AuthenticationDto{})
+	conn.Migrator().CreateTable(&dao.SessionDto{})
+	conn.Migrator().CreateTable(&dao.UserDto{})
+}
+
+func (driver MigratorDriver) Down(conn *gorm.DB) {
+	conn.Migrator().DropTable(&dao.TodoDto{})
+	conn.Migrator().DropTable(&dao.AuthenticationDto{})
+	conn.Migrator().DropTable(&dao.SessionDto{})
+	conn.Migrator().DropTable(&dao.UserDto{})
 }

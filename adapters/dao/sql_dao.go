@@ -35,7 +35,7 @@ func newSQLDao(tableName string, tt txType) (SQLDao, error) {
 		return SQLDao{tt.dao.value.conn.Table(tableName)}, nil
 	}
 
-	connection, err := gorm.Open(currentDriver().Dialector(), &gorm.Config{})
+	connection, err := gorm.Open(CurrentDriver().Dialector(), &gorm.Config{})
 	if err != nil {
 		return SQLDao{}, err
 	}
@@ -45,7 +45,7 @@ func newSQLDao(tableName string, tt txType) (SQLDao, error) {
 }
 
 func WithTx(runner func(tx TxSQLDao) error) error {
-	conn, err := gorm.Open(currentDriver().Dialector(), &gorm.Config{})
+	conn, err := gorm.Open(CurrentDriver().Dialector(), &gorm.Config{})
 	if err != nil {
 		return err
 	}

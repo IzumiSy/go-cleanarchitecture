@@ -22,7 +22,9 @@ func (dao TodoDao) Close() {
 	dao.Close()
 }
 
-type todoDto struct {
+type TodoDto struct {
+	gorm.Model
+
 	ID          string `gorm:"id"`
 	Name        string `gorm:"name"`
 	Description string `gorm:"description"`
@@ -30,7 +32,7 @@ type todoDto struct {
 }
 
 func (dao TodoDao) Get(id todo.ID) (models.Todo, errors.Domain, bool) {
-	var dto todoDto
+	var dto TodoDto
 
 	query := dao.
 		conn.
@@ -51,7 +53,7 @@ func (dao TodoDao) Get(id todo.ID) (models.Todo, errors.Domain, bool) {
 }
 
 func (dao TodoDao) GetByName(name todo.Name) (models.Todo, errors.Domain, bool) {
-	var dto todoDto
+	var dto TodoDto
 
 	query := dao.
 		conn.
@@ -73,7 +75,7 @@ func (dao TodoDao) GetByName(name todo.Name) (models.Todo, errors.Domain, bool) 
 }
 
 func (dao TodoDao) Store(todo models.Todo) errors.Domain {
-	dto := todoDto{
+	dto := TodoDto{
 		ID:          todo.Id().String(),
 		Name:        todo.Name().Value(),
 		Description: todo.Description().Value(),

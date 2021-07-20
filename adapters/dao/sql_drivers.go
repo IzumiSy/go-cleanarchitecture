@@ -16,7 +16,7 @@ func (d driver) Dialector() gorm.Dialector {
 	return d.dialector
 }
 
-func currentDriver() driver {
+func CurrentDriver() driver {
 	switch os.Getenv("APP_ENV") {
 	case "production":
 		return ProdDriver

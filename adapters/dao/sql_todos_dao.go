@@ -28,7 +28,7 @@ func (dao TodosDao) GetByIDs(ids []todo.ID) (models.Todos, errors.Domain) {
 }
 
 func (dao TodosDao) GetByUserID(userId user.ID) (models.Todos, errors.Domain) {
-	var dtos []todoDto
+	var dtos []TodoDto
 
 	query := dao.
 		conn.
