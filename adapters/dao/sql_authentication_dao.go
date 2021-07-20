@@ -36,8 +36,9 @@ func (AuthenticationDto) TableName() string {
 }
 
 type UserDto struct {
-	ID   string `gorm:"id"`
-	Name string `gorm:"name"`
+	ID    string `gorm:"id"`
+	Name  string `gorm:"name"`
+	Email string `gorm:"email"`
 }
 
 func (UserDto) TableName() string {
