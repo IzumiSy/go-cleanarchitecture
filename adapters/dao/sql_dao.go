@@ -31,7 +31,7 @@ type driverLike interface {
 
 func newSQLDao(tableName string, tt txType) (SQLDao, error) {
 	if tt.dao != nil {
-		tt.dao.value.conn.Logger = logger.Default
+		tt.dao.value.conn.Logger = logger.Default.LogMode(logger.Info)
 		return SQLDao{tt.dao.value.conn.Table(tableName)}, nil
 	}
 
@@ -40,7 +40,7 @@ func newSQLDao(tableName string, tt txType) (SQLDao, error) {
 		return SQLDao{}, err
 	}
 
-	connection.Logger = logger.Default
+	connection.Logger = logger.Default.LogMode(logger.Info)
 	return SQLDao{connection.Table(tableName)}, nil
 }
 

@@ -51,7 +51,7 @@ func (dao AuthentcationDao) GetByEmail(email authentication.Email) (models.Authe
 	query := dao.
 		conn.
 		Where("email = ?", email.Value()).
-		Find(&authDto)
+		Take(&authDto)
 
 	empty := models.Authentication{}
 
@@ -67,7 +67,7 @@ func (dao AuthentcationDao) GetByEmail(email authentication.Email) (models.Authe
 		conn.
 		Table("user").
 		Where("id = ?", authDto.UserID).
-		Find(&userDto)
+		Take(&userDto)
 
 	if query.Error == gorm.ErrRecordNotFound {
 		return empty, errors.None, false
