@@ -26,5 +26,11 @@ Usage of ./go-cleanarchitecture:
     	migration mode
 ```
 
+## Run with Docker
+```sh
+$ docker-compose build
+$ docker-compose up
+```
+
 ## Architecture
 WIP
