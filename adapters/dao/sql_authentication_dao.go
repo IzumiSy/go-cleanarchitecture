@@ -25,12 +25,14 @@ func (dao AuthentcationDao) Close() {
 }
 
 type AuthenticationDto struct {
-	gorm.Model
-
 	Email     string    `gorm:"email,primaryKey,uniqueIndex"`
 	Hash      string    `gorm:"hash"`
 	UserID    string    `gorm:"user_id"`
 	CreatedAt time.Time `gorm:"created_at"`
+}
+
+func (AuthenticationDto) TableName() string {
+	return "authentication"
 }
 
 type UserDto struct {
@@ -38,6 +40,10 @@ type UserDto struct {
 
 	ID   string `gorm:"id"`
 	Name string `gorm:"name"`
+}
+
+func (UserDto) TableName() string {
+	return "user"
 }
 
 func (dao AuthentcationDao) GetByEmail(email authentication.Email) (models.Authentication, errors.Domain, bool) {

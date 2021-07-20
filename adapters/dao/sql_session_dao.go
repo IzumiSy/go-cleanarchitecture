@@ -25,11 +25,13 @@ func (dao SessionDao) Close() {
 }
 
 type SessionDto struct {
-	gorm.Model
-
 	ID        string    `gorm:"id"`
 	UserID    string    `gorm:"user_id"`
 	CreatedAt time.Time `gorm:"created_at"`
+}
+
+func (SessionDto) TableName() string {
+	return "session"
 }
 
 func (dao SessionDao) Get(id session.ID) (models.Session, errors.Domain, bool) {

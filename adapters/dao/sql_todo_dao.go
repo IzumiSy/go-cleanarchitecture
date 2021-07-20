@@ -23,12 +23,14 @@ func (dao TodoDao) Close() {
 }
 
 type TodoDto struct {
-	gorm.Model
-
 	ID          string `gorm:"id"`
 	Name        string `gorm:"name"`
 	Description string `gorm:"description"`
 	UserID      string `gorm:"user_id"`
+}
+
+func (TodoDto) TableName() string {
+	return "todo"
 }
 
 func (dao TodoDao) Get(id todo.ID) (models.Todo, errors.Domain, bool) {
