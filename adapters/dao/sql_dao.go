@@ -1,10 +1,6 @@
 package dao
 
 import (
-	"log"
-	"os"
-	"time"
-
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
 )
@@ -33,15 +29,7 @@ type driverLike interface {
 	Dialector() gorm.Dialector
 }
 
-var appLogger = logger.New(
-	log.New(os.Stdout, "\r\n", log.LstdFlags),
-	logger.Config{
-		SlowThreshold:             200 * time.Millisecond,
-		LogLevel:                  logger.Info,
-		IgnoreRecordNotFoundError: true,
-		Colorful:                  true,
-	},
-)
+var appLogger = logger.Default
 
 func newSQLDao(tableName string, tt txType) (SQLDao, error) {
 	if tt.dao != nil {
