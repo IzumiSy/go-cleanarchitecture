@@ -36,8 +36,6 @@ func (AuthenticationDto) TableName() string {
 }
 
 type UserDto struct {
-	gorm.Model
-
 	ID   string `gorm:"id"`
 	Name string `gorm:"name"`
 }
