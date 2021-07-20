@@ -1,7 +1,9 @@
 package drivers
 
 import (
+	"fmt"
 	"go-cleanarchitecture/adapters/dao"
+	"os"
 
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
@@ -21,8 +23,11 @@ func (driver MigratorDriver) Run() {
 	switch driver.Mode {
 	case "down":
 		driver.Down(conn)
-	default:
+	case "up":
 		driver.Up(conn)
+	default:
+		fmt.Println("Migration supports only `up` or `down`")
+		os.Exit(1)
 	}
 }
 
