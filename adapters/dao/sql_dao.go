@@ -33,7 +33,6 @@ var appLogger = logger.Default
 
 func newSQLDao(tableName string, tt txType) (SQLDao, error) {
 	if tt.dao != nil {
-		tt.dao.value.conn.Logger = appLogger
 		return SQLDao{tt.dao.value.conn.Table(tableName)}, nil
 	}
 
@@ -56,6 +55,7 @@ func WithTx(runner func(tx TxSQLDao) error) error {
 		return err
 	}
 
+	conn.Logger = appLogger
 	tx := conn.Begin()
 	if tx.Error != nil {
 		tx.Rollback()
