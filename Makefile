@@ -7,7 +7,7 @@ run: main.go
 	go run main.go
 
 migrate:
-	go run main.go --migrate
+	go run main.go --migrate=up
 
 reset:
 	rm -f go-cleanarchitecture.db

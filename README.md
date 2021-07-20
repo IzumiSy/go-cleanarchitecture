@@ -22,14 +22,14 @@ $ ./go-cleanarchitecture -help
 Usage of ./go-cleanarchitecture:
   -http
     	http server mode
-  -migrate
-    	migration mode
+  -migrate string
+    	migration mode (default "up")
 ```
 
 ## Run with Docker
 ```sh
-$ docker-compose build
-$ docker-compose up
+$ docker-compose up --build
+$ docker-compose run app make migrate
 ```
 
 ## Architecture
