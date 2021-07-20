@@ -29,7 +29,7 @@ type driverLike interface {
 	Dialector() gorm.Dialector
 }
 
-var appLogger = logger.Default
+var defaultLogger = logger.Default.LogMode(logger.Info)
 
 func newSQLDao(tableName string, tt txType) (SQLDao, error) {
 	if tt.dao != nil {
@@ -43,7 +43,7 @@ func newSQLDao(tableName string, tt txType) (SQLDao, error) {
 		return SQLDao{}, err
 	}
 
-	connection.Logger = appLogger
+	connection.Logger = defaultLogger
 	return SQLDao{connection.Table(tableName)}, nil
 }
 
@@ -55,7 +55,7 @@ func WithTx(runner func(tx TxSQLDao) error) error {
 		return err
 	}
 
-	conn.Logger = appLogger
+	conn.Logger = defaultLogger
 	tx := conn.Begin()
 	if tx.Error != nil {
 		tx.Rollback()

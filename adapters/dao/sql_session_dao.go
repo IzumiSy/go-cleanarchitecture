@@ -1,6 +1,7 @@
 package dao
 
 import (
+	"context"
 	"go-cleanarchitecture/domains"
 	"go-cleanarchitecture/domains/errors"
 	"go-cleanarchitecture/domains/models"
@@ -39,7 +40,8 @@ func (dao SessionDao) Get(id session.ID) (models.Session, errors.Domain, bool) {
 
 	query := dao.
 		conn.
-		First(&sessionDto, "id = ?", id.String())
+		WithContext(context.Background()).
+		Take(&sessionDto, "id = ?", id.String())
 
 	empty := models.Session{}
 
@@ -63,9 +65,12 @@ func (dao SessionDao) Store(session models.Session) errors.Domain {
 		UserID:    session.UserID().String(),
 		CreatedAt: session.CreatedAt().Value(),
 	}
-	if err := dao.conn.Create(&dto).Error; err != nil {
-		return errors.External(err)
-	}
 
-	return errors.None
+	return errors.External(
+		dao.
+			conn.
+			WithContext(context.Background()).
+			Create(&dto).
+			Error,
+	)
 }

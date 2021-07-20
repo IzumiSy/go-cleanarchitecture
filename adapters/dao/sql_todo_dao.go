@@ -1,6 +1,7 @@
 package dao
 
 import (
+	"context"
 	"go-cleanarchitecture/domains"
 	"go-cleanarchitecture/domains/errors"
 	"go-cleanarchitecture/domains/models"
@@ -38,7 +39,8 @@ func (dao TodoDao) Get(id todo.ID) (models.Todo, errors.Domain, bool) {
 
 	query := dao.
 		conn.
-		First(&dto, "id = ?", id.String())
+		WithContext(context.Background()).
+		Take(&dto, "id = ?", id.String())
 
 	empty := models.Todo{}
 
@@ -59,8 +61,9 @@ func (dao TodoDao) GetByName(name todo.Name) (models.Todo, errors.Domain, bool) 
 
 	query := dao.
 		conn.
+		WithContext(context.Background()).
 		Where("name = ?", name.Value()).
-		Find(&dto)
+		Take(&dto)
 
 	empty := models.Todo{}
 
@@ -83,5 +86,11 @@ func (dao TodoDao) Store(todo models.Todo) errors.Domain {
 		Description: todo.Description().Value(),
 	}
 
-	return errors.External(dao.conn.Create(&dto).Error)
+	return errors.External(
+		dao.
+			conn.
+			WithContext(context.Background()).
+			Create(&dto).
+			Error,
+	)
 }

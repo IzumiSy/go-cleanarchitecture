@@ -1,6 +1,7 @@
 package dao
 
 import (
+	"context"
 	"go-cleanarchitecture/domains"
 	"go-cleanarchitecture/domains/errors"
 	"go-cleanarchitecture/domains/models"
@@ -32,6 +33,7 @@ func (dao TodosDao) GetByUserID(userId user.ID) (models.Todos, errors.Domain) {
 
 	query := dao.
 		conn.
+		WithContext(context.Background()).
 		Where("user_id = ?", userId.String()).
 		Find(&dtos)
 
