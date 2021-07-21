@@ -14,7 +14,7 @@ type AuthentcationDao SQLDao
 var _ domains.AuthenticationRepository = AuthentcationDao{}
 
 func NewSQLAuthenticationDao(tt txType) (AuthentcationDao, error) {
-	dao, err := newSQLDao("authentication", tt)
+	dao, err := newSQLDao("authentication", tt, currentDriver())
 	return AuthentcationDao(dao), err
 }
 

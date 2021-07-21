@@ -14,7 +14,7 @@ type SessionDao SQLDao
 var _ domains.SessionRepository = SessionDao{}
 
 func NewSQLSessionDao(tt txType) (SessionDao, error) {
-	dao, err := newSQLDao("session", tt)
+	dao, err := newSQLDao("session", tt, currentDriver())
 	return SessionDao(dao), err
 }
 

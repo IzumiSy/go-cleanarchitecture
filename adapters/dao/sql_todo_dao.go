@@ -12,7 +12,7 @@ type TodoDao SQLDao
 var _ domains.TodoRepository = TodoDao{}
 
 func NewSQLTodoDao(tt txType) (TodoDao, error) {
-	dao, err := newSQLDao("todo", tt)
+	dao, err := newSQLDao("todo", tt, currentDriver())
 	return TodoDao(dao), err
 }
 

@@ -25,12 +25,17 @@ func WITH_TX(tx TxSQLDao) txType {
 	return txType{&tx}
 }
 
-func newSQLDao(tableName string, tt txType) (SQLDao, error) {
+type driverLike interface {
+	Dialect() string
+	DSN() string
+}
+
+func newSQLDao(tableName string, tt txType, driver driverLike) (SQLDao, error) {
 	if tt.dao != nil {
 		return SQLDao{tt.dao.value.conn.LogMode(true).Table(tableName)}, nil
 	}
 
-	connection, err := gorm.Open("sqlite3", "go-cleanarchitecture.db")
+	connection, err := gorm.Open(driver.Dialect(), driver.DSN())
 	if err != nil {
 		return SQLDao{}, err
 	}
