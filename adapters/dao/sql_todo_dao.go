@@ -5,6 +5,8 @@ import (
 	"go-cleanarchitecture/domains/errors"
 	"go-cleanarchitecture/domains/models"
 	"go-cleanarchitecture/domains/models/todo"
+
+	"gorm.io/gorm"
 )
 
 type TodoDao SQLDao
@@ -12,7 +14,7 @@ type TodoDao SQLDao
 var _ domains.TodoRepository = TodoDao{}
 
 func NewSQLTodoDao(tt txType) (TodoDao, error) {
-	dao, err := newSQLDao("todo", tt, currentDriver())
+	dao, err := newSQLDao("todo", tt)
 	return TodoDao(dao), err
 }
 
@@ -36,7 +38,7 @@ func (dao TodoDao) Get(id todo.ID) (models.Todo, errors.Domain, bool) {
 
 	empty := models.Todo{}
 
-	if query.RecordNotFound() {
+	if query.Error == gorm.ErrRecordNotFound {
 		return empty, errors.None, false
 	} else if query.Error != nil {
 		return empty, errors.External(query.Error), false
@@ -58,7 +60,7 @@ func (dao TodoDao) GetByName(name todo.Name) (models.Todo, errors.Domain, bool) 
 
 	empty := models.Todo{}
 
-	if query.RecordNotFound() {
+	if query.Error == gorm.ErrRecordNotFound {
 		return empty, errors.None, false
 	} else if query.Error != nil {
 		return empty, errors.External(query.Error), false

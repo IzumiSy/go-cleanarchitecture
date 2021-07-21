@@ -1,18 +1,19 @@
 package dao
 
-import "os"
+import (
+	"os"
+
+	"gorm.io/driver/mysql"
+	"gorm.io/driver/sqlite"
+	"gorm.io/gorm"
+)
 
 type driver struct {
-	dialect string
-	dsn     string
+	dialector gorm.Dialector
 }
 
-func (d driver) Dialect() string {
-	return d.dialect
-}
-
-func (d driver) DSN() string {
-	return d.dsn
+func (d driver) Dialector() gorm.Dialector {
+	return d.dialector
 }
 
 func currentDriver() driver {
@@ -25,11 +26,9 @@ func currentDriver() driver {
 }
 
 var DevDriver = driver{
-	dialect: "sqlite3",
-	dsn:     "go-cleanarchitecture.db",
+	dialector: sqlite.Open("go-cleanarchitecture.db"),
 }
 
 var ProdDriver = driver{
-	dialect: "mysql",
-	dsn:     "root:password@tcp(localhost:3306)/todoapp?charset=utf8mb4&parseTime=True&loc=Local",
+	dialector: mysql.Open("root:password@tcp(localhost:3306)/todoapp?charset=utf8mb4&parseTime=True&loc=Local"),
 }

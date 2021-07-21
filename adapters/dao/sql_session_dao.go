@@ -7,6 +7,8 @@ import (
 	"go-cleanarchitecture/domains/models/session"
 	"go-cleanarchitecture/domains/models/user"
 	"time"
+
+	"gorm.io/gorm"
 )
 
 type SessionDao SQLDao
@@ -14,7 +16,7 @@ type SessionDao SQLDao
 var _ domains.SessionRepository = SessionDao{}
 
 func NewSQLSessionDao(tt txType) (SessionDao, error) {
-	dao, err := newSQLDao("session", tt, currentDriver())
+	dao, err := newSQLDao("session", tt)
 	return SessionDao(dao), err
 }
 
@@ -37,7 +39,7 @@ func (dao SessionDao) Get(id session.ID) (models.Session, errors.Domain, bool) {
 
 	empty := models.Session{}
 
-	if query.RecordNotFound() {
+	if query.Error == gorm.ErrRecordNotFound {
 		return empty, errors.None, false
 	} else if query.Error != nil {
 		return empty, errors.External(query.Error), false

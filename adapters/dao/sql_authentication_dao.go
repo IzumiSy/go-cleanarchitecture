@@ -7,6 +7,8 @@ import (
 	"go-cleanarchitecture/domains/models/authentication"
 	"go-cleanarchitecture/domains/models/user"
 	"time"
+
+	"gorm.io/gorm"
 )
 
 type AuthentcationDao SQLDao
@@ -14,7 +16,7 @@ type AuthentcationDao SQLDao
 var _ domains.AuthenticationRepository = AuthentcationDao{}
 
 func NewSQLAuthenticationDao(tt txType) (AuthentcationDao, error) {
-	dao, err := newSQLDao("authentication", tt, currentDriver())
+	dao, err := newSQLDao("authentication", tt)
 	return AuthentcationDao(dao), err
 }
 
@@ -44,7 +46,7 @@ func (dao AuthentcationDao) GetByEmail(email authentication.Email) (models.Authe
 
 	empty := models.Authentication{}
 
-	if query.RecordNotFound() {
+	if query.Error == gorm.ErrRecordNotFound {
 		return empty, errors.None, false
 	} else if query.Error != nil {
 		return empty, errors.External(query.Error), false
@@ -58,7 +60,7 @@ func (dao AuthentcationDao) GetByEmail(email authentication.Email) (models.Authe
 		Where("id = ?", authDto.UserID).
 		Find(&userDto)
 
-	if query.RecordNotFound() {
+	if query.Error == gorm.ErrRecordNotFound {
 		return empty, errors.None, false
 	} else if query.Error != nil {
 		return empty, errors.External(query.Error), false

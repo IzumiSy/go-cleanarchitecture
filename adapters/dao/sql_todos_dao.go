@@ -6,6 +6,8 @@ import (
 	"go-cleanarchitecture/domains/models"
 	"go-cleanarchitecture/domains/models/todo"
 	"go-cleanarchitecture/domains/models/user"
+
+	"gorm.io/gorm"
 )
 
 type TodosDao SQLDao
@@ -13,7 +15,7 @@ type TodosDao SQLDao
 var _ domains.TodosRepository = TodosDao{}
 
 func NewSQLTodosDao(tt txType) (TodosDao, error) {
-	dao, err := newSQLDao("todo", tt, currentDriver())
+	dao, err := newSQLDao("todo", tt)
 	return TodosDao(dao), err
 }
 
@@ -35,7 +37,7 @@ func (dao TodosDao) GetByUserID(userId user.ID) (models.Todos, errors.Domain) {
 
 	empty := models.Todos{}
 
-	if query.RecordNotFound() {
+	if query.Error == gorm.ErrRecordNotFound {
 		return empty, errors.None
 	} else if query.Error != nil {
 		return empty, errors.External(query.Error)
