@@ -1,12 +1,15 @@
 package dao
 
 import (
+	"context"
 	"go-cleanarchitecture/domains"
 	"go-cleanarchitecture/domains/errors"
 	"go-cleanarchitecture/domains/models"
 	"go-cleanarchitecture/domains/models/authentication"
 	"go-cleanarchitecture/domains/models/user"
 	"time"
+
+	"gorm.io/gorm"
 )
 
 type AuthentcationDao SQLDao
@@ -22,43 +25,53 @@ func (dao AuthentcationDao) Close() {
 	dao.Close()
 }
 
-type authenticationDto struct {
-	Email     string    `gorm:"email,primaryKey,uniqueIndex"`
-	Hash      string    `gorm:"hash"`
-	UserID    string    `gorm:"user_id"`
-	CreatedAt time.Time `gorm:"created_at"`
+type AuthenticationDto struct {
+	Email     string    `gorm:"column:email;primaryKey"`
+	UserID    string    `gorm:"column:user_id;not null;unique"`
+	Hash      string    `gorm:"column:hash;not null"`
+	CreatedAt time.Time `gorm:"column:created_at;not null"`
 }
 
-type userDto struct {
-	ID   string `gorm:"id"`
-	Name string `gorm:"name"`
+func (AuthenticationDto) TableName() string {
+	return "authentication"
+}
+
+type UserDto struct {
+	ID   string `gorm:"column:id"`
+	Name string `gorm:"column:name;not null"`
+}
+
+func (UserDto) TableName() string {
+	return "user"
 }
 
 func (dao AuthentcationDao) GetByEmail(email authentication.Email) (models.Authentication, errors.Domain, bool) {
-	var authDto authenticationDto
+	var authDto AuthenticationDto
 
 	query := dao.
 		conn.
+		WithContext(context.Background()).
 		Where("email = ?", email.Value()).
-		Find(&authDto)
+		Take(&authDto)
 
 	empty := models.Authentication{}
 
-	if query.RecordNotFound() {
+	if query.Error == gorm.ErrRecordNotFound {
 		return empty, errors.None, false
 	} else if query.Error != nil {
 		return empty, errors.External(query.Error), false
 	}
 
-	var userDto userDto
+	var userDto UserDto
 
 	query = dao.
 		conn.
+		WithContext(context.Background()).
 		Table("user").
 		Where("id = ?", authDto.UserID).
-		Find(&userDto)
+		Take(&userDto)
 
-	if query.RecordNotFound() {
+	if query.Error == gorm.ErrRecordNotFound {
 		return empty, errors.None, false
 	} else if query.Error != nil {
 		return empty, errors.External(query.Error), false
@@ -77,21 +90,22 @@ func (dao AuthentcationDao) GetByEmail(email authentication.Email) (models.Authe
 
 func (dao AuthentcationDao) Store(auth models.Authentication) errors.Domain {
 	user := auth.User()
-	authDto := authenticationDto{
+	authDto := AuthenticationDto{
 		Email:     auth.Email().Value(),
 		Hash:      auth.Hash().Value(),
 		UserID:    user.ID().String(),
 		CreatedAt: auth.CreatedAt().Value(),
 	}
-	if err := dao.conn.Create(&authDto).Error; err != nil {
+
+	if err := dao.conn.WithContext(context.Background()).Create(&authDto).Error; err != nil {
 		return errors.External(err)
 	}
 
-	userDto := userDto{
+	userDto := UserDto{
 		ID:   user.ID().String(),
 		Name: user.Name().Value(),
 	}
-	if err := dao.conn.Table("user").Create(&userDto).Error; err != nil {
+	if err := dao.conn.WithContext(context.Background()).Table("user").Create(&userDto).Error; err != nil {
 		return errors.External(err)
 	}
 

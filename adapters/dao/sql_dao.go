@@ -1,8 +1,8 @@
 package dao
 
 import (
-	"github.com/jinzhu/gorm"
-	_ "github.com/jinzhu/gorm/dialects/sqlite"
+	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 )
 
 type SQLDao struct {
@@ -25,29 +25,37 @@ func WITH_TX(tx TxSQLDao) txType {
 	return txType{&tx}
 }
 
+type driverLike interface {
+	Dialector() gorm.Dialector
+}
+
+var defaultLogger = logger.Default.LogMode(logger.Info)
+
 func newSQLDao(tableName string, tt txType) (SQLDao, error) {
 	if tt.dao != nil {
-		return SQLDao{tt.dao.value.conn.LogMode(true).Table(tableName)}, nil
+		return SQLDao{tt.dao.value.conn.Table(tableName)}, nil
 	}
 
-	connection, err := gorm.Open("sqlite3", "go-cleanarchitecture.db")
+	connection, err := gorm.Open(CurrentDriver().Dialector(), &gorm.Config{
+		SkipDefaultTransaction: true,
+	})
 	if err != nil {
 		return SQLDao{}, err
 	}
 
-	return SQLDao{connection.LogMode(true).Table(tableName)}, nil
-}
-
-func (dao SQLDao) Close() {
-	dao.conn.Close()
+	connection.Logger = defaultLogger
+	return SQLDao{connection.Table(tableName)}, nil
 }
 
 func WithTx(runner func(tx TxSQLDao) error) error {
-	conn, err := gorm.Open("sqlite3", "go-cleanarchitecture.db")
+	conn, err := gorm.Open(CurrentDriver().Dialector(), &gorm.Config{
+		SkipDefaultTransaction: true,
+	})
 	if err != nil {
 		return err
 	}
 
+	conn.Logger = defaultLogger
 	tx := conn.Begin()
 	if tx.Error != nil {
 		tx.Rollback()

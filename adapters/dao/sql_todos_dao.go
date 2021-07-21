@@ -1,11 +1,14 @@
 package dao
 
 import (
+	"context"
 	"go-cleanarchitecture/domains"
 	"go-cleanarchitecture/domains/errors"
 	"go-cleanarchitecture/domains/models"
 	"go-cleanarchitecture/domains/models/todo"
 	"go-cleanarchitecture/domains/models/user"
+
+	"gorm.io/gorm"
 )
 
 type TodosDao SQLDao
@@ -26,16 +29,17 @@ func (dao TodosDao) GetByIDs(ids []todo.ID) (models.Todos, errors.Domain) {
 }
 
 func (dao TodosDao) GetByUserID(userId user.ID) (models.Todos, errors.Domain) {
-	var dtos []todoDto
+	var dtos []TodoDto
 
 	query := dao.
 		conn.
+		WithContext(context.Background()).
 		Where("user_id = ?", userId.String()).
 		Find(&dtos)
 
 	empty := models.Todos{}
 
-	if query.RecordNotFound() {
+	if query.Error == gorm.ErrRecordNotFound {
 		return empty, errors.None
 	} else if query.Error != nil {
 		return empty, errors.External(query.Error)
