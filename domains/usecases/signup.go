@@ -23,6 +23,7 @@ type SignupUsecase struct {
 	OutputPort        SignupOutputPort
 	AuthenticationDao domains.AuthenticationRepository
 	Logger            domains.Logger
+	Publisher         domains.EventPublisher
 }
 
 func (uc SignupUsecase) Build(params SignupParam) domains.UnauthorizedUsecase {

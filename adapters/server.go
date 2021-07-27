@@ -24,9 +24,9 @@ func RunHTTPServer() {
 	e.Use(middleware.Recover())
 
 	e.GET("/todos", getTodosHandler)
-	e.POST("/todo", createTodoHandler)
-	e.POST("/signup", signupHandler)
-	e.POST("/login", authenticateHandler)
+	e.POST("/todo", createTodoHandler(pa))
+	e.POST("/signup", signupHandler(pa))
+	e.POST("/login", authenticateHandler(pa))
 
 	e.Logger.Fatal(e.Start(":8080"))
 }

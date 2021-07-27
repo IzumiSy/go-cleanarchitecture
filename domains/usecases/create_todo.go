@@ -23,6 +23,7 @@ type CreateTodoUsecase struct {
 	TodoDao    domains.TodoRepository
 	TodosDao   domains.TodosRepository
 	Logger     domains.Logger
+	Publisher  domains.EventPublisher
 }
 
 func (uc CreateTodoUsecase) Build(params CreateTodoParam) domains.AuthorizedUsecase {
@@ -76,6 +77,11 @@ func (uc CreateTodoUsecase) Build(params CreateTodoParam) domains.AuthorizedUsec
 			uc.Logger.Error(err.Error())
 			uc.OutputPort.Raise(err)
 			return
+		}
+
+		event := domains.DomainEvent{
+			ID:     domains.TodoCreated,
+			Entity: newTodo,
 		}
 
 		uc.OutputPort.Write(newTodo)

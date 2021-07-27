@@ -21,6 +21,6 @@ type DomainEvent struct {
 	Entity Entity
 }
 
-type Pubsub interface {
+type EventPublisher interface {
 	Publish(event DomainEvent) error
 }

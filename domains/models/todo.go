@@ -34,7 +34,7 @@ func BuildTodo(id todo.ID, name todo.Name, description todo.Description) Todo {
 	}
 }
 
-func (todo Todo) Id() todo.ID {
+func (todo Todo) ID() todo.ID {
 	return todo.id
 }
 

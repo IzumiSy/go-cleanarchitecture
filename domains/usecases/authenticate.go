@@ -22,6 +22,7 @@ type AuthenticateUsecase struct {
 	AuthenticationDao domains.AuthenticationRepository
 	SessionDao        domains.SessionRepository
 	Logger            domains.Logger
+	Publisher         domains.EventPublisher
 }
 
 func (uc AuthenticateUsecase) Build(params AuthenticateParam) domains.UnauthorizedUsecase {
