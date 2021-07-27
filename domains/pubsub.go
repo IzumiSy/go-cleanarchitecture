@@ -1,24 +1,15 @@
 package domains
 
-import "fmt"
-
-type DomainEventID struct {
-	Name string
-}
-
-type Entity interface {
-	ID() fmt.Stringer
-}
+type DomainEventID string
 
 var (
-	UserSignedUp      DomainEventID = DomainEventID{"user_singed_up"}
-	UserAuthenticated DomainEventID = DomainEventID{"user_authenticated"}
-	TodoCreated       DomainEventID = DomainEventID{"todo_created"}
+	UserSignedUp      DomainEventID = DomainEventID("user_singed_up")
+	UserAuthenticated DomainEventID = DomainEventID("user_authenticated")
+	TodoCreated       DomainEventID = DomainEventID("todo_created")
 )
 
-type DomainEvent struct {
-	ID     DomainEventID
-	Entity Entity
+type DomainEvent interface {
+	ID() DomainEventID
 }
 
 type EventPublisher interface {

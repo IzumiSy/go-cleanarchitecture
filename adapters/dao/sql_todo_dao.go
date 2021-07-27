@@ -81,7 +81,7 @@ func (dao TodoDao) GetByName(name todo.Name) (models.Todo, errors.Domain, bool) 
 
 func (dao TodoDao) Store(todo models.Todo) errors.Domain {
 	dto := TodoDto{
-		ID:          todo.Id().String(),
+		ID:          todo.ID().String(),
 		Name:        todo.Name().Value(),
 		Description: todo.Description().Value(),
 	}

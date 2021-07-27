@@ -1,6 +1,7 @@
 package usecases
 
 import (
+	"fmt"
 	"go-cleanarchitecture/domains"
 	"go-cleanarchitecture/domains/errors"
 	"go-cleanarchitecture/domains/models"
@@ -79,11 +80,25 @@ func (uc CreateTodoUsecase) Build(params CreateTodoParam) domains.AuthorizedUsec
 			return
 		}
 
-		event := domains.DomainEvent{
-			ID:     domains.TodoCreated,
-			Entity: newTodo,
+		event := TodoCreatedEvent{
+			TodoID:      newTodo.ID().String(),
+			Name:        newTodo.Name().Value(),
+			Description: newTodo.Description().Value(),
+		}
+		if err := uc.Publisher.Publish(event); err != nil {
+			uc.Logger.Error(fmt.Sprintf("Failed publishing event: %s", err.Error()))
 		}
 
 		uc.OutputPort.Write(newTodo)
 	})
+}
+
+type TodoCreatedEvent struct {
+	TodoID      string
+	Name        string
+	Description string
+}
+
+func (TodoCreatedEvent) ID() domains.DomainEventID {
+	return domains.TodoCreated
 }

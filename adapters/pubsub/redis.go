@@ -28,11 +28,11 @@ func NewRedisAdapter() (error, RedisAdapter) {
 }
 
 func (adapter RedisAdapter) Publish(event domains.DomainEvent) error {
-	return adapter.conn.Send(event.ID.Name, event.Entity)
+	return adapter.conn.Send(string(event.ID()), event)
 }
 
 func (adapter RedisAdapter) RegisterSubscriber(eventID domains.DomainEventID, subscriber func(payload []byte) error) {
-	adapter.subscribers[eventID.Name] = subscriber
+	adapter.subscribers[string(eventID)] = subscriber
 }
 
 func (adapter RedisAdapter) Listen() {
