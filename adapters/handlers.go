@@ -155,3 +155,15 @@ func createTodoHandler(ctx echo.Context) error {
 		return presenter.Presenter.Result()
 	})
 }
+
+func signedUpHandler(payload []byte) error {
+	return nil
+}
+
+func userAuthenticatedHandler(payload []byte) error {
+	return nil
+}
+
+func todoCreatedHandler(payload []byte) error {
+	return nil
+}
