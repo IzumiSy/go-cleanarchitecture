@@ -38,7 +38,8 @@ func (adapter RedisAdapter) Publish(event domains.Event) errors.Domain {
 		return errors.Postconditional(err)
 	}
 
-	return errors.Postconditional(adapter.conn.Send(string(event.Name()), eventBytes))
+	_, err = adapter.conn.Do("PUBLISH", string(event.Name()), eventBytes)
+	return errors.Postconditional(err)
 }
 
 func (adapter RedisAdapter) RegisterSubscriber(eventID domains.EventName, subscriber func(payload []byte) error) {
