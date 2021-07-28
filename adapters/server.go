@@ -19,9 +19,9 @@ func RunHTTPServer() {
 		panic(err)
 	}
 
-	pa.RegisterSubscriber(domains.UserSignedUp, signedUpHandler)
-	pa.RegisterSubscriber(domains.UserAuthenticated, userAuthenticatedHandler)
-	pa.RegisterSubscriber(domains.TodoCreated, todoCreatedHandler)
+	pa.RegisterSubscriber(domains.UserSignedUp, signedUpHandler(logger))
+	pa.RegisterSubscriber(domains.UserAuthenticated, userAuthenticatedHandler(logger))
+	pa.RegisterSubscriber(domains.TodoCreated, todoCreatedHandler(logger))
 	go pa.Listen()
 
 	e := echo.New()
