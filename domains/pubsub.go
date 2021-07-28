@@ -9,7 +9,7 @@ var (
 )
 
 type DomainEvent interface {
-	ID() DomainEventID
+	Name() DomainEventID
 }
 
 type EventPublisher interface {

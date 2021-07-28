@@ -7,6 +7,7 @@ import (
 	"go-cleanarchitecture/domains/models"
 	"go-cleanarchitecture/domains/models/todo"
 	"go-cleanarchitecture/domains/models/user"
+	"time"
 )
 
 type CreateTodoOutputPort interface {
@@ -82,8 +83,9 @@ func (uc CreateTodoUsecase) Build(params CreateTodoParam) domains.AuthorizedUsec
 
 		event := TodoCreatedEvent{
 			TodoID:      newTodo.ID().String(),
-			Name:        newTodo.Name().Value(),
+			Name_:       newTodo.Name().Value(),
 			Description: newTodo.Description().Value(),
+			CreatedAt:   time.Now(),
 		}
 		if err := uc.Publisher.Publish(event); err != nil {
 			uc.Logger.Error(fmt.Sprintf("Failed publishing event: %s", err.Error()))
@@ -95,10 +97,11 @@ func (uc CreateTodoUsecase) Build(params CreateTodoParam) domains.AuthorizedUsec
 
 type TodoCreatedEvent struct {
 	TodoID      string
-	Name        string
+	Name_       string
 	Description string
+	CreatedAt   time.Time
 }
 
-func (TodoCreatedEvent) ID() domains.DomainEventID {
+func (TodoCreatedEvent) Name() domains.DomainEventID {
 	return domains.TodoCreated
 }

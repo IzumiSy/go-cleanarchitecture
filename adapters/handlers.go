@@ -167,15 +167,3 @@ func createTodoHandler(publisher domains.EventPublisher) Handler {
 		})
 	}
 }
-
-func signedUpHandler(payload []byte) error {
-	return nil
-}
-
-func userAuthenticatedHandler(payload []byte) error {
-	return nil
-}
-
-func todoCreatedHandler(payload []byte) error {
-	return nil
-}
