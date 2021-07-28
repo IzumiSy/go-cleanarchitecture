@@ -19,14 +19,19 @@ type RedisAdapter struct {
 }
 
 func NewRedisAdapter(logger domains.Logger) (error, RedisAdapter) {
-	conn, err := redis.Dial("tcp", "redis:6379")
+	pubConn, err := redis.Dial("tcp", "redis:6379")
+	if err != nil {
+		return err, RedisAdapter{}
+	}
+
+	subConn, err := redis.Dial("tcp", "redis:6379")
 	if err != nil {
 		return err, RedisAdapter{}
 	}
 
 	return nil, RedisAdapter{
-		conn:        conn,
-		psc:         redis.PubSubConn{Conn: conn},
+		conn:        pubConn,
+		psc:         redis.PubSubConn{Conn: subConn},
 		subscribers: map[string]Subscriber{},
 		logger:      logger,
 	}
@@ -59,7 +64,7 @@ func (adapter RedisAdapter) Listen() {
 	for {
 		switch n := adapter.psc.Receive().(type) {
 		case error:
-			adapter.logger.Error(fmt.Sprintf("Error listening subscribers: %s", n.Error()))
+			adapter.logger.Error(fmt.Sprintf("Error received: %s", n.Error()))
 			return
 		case redis.Message:
 			subscriber, ok := adapter.subscribers[n.Channel]
