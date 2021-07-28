@@ -17,22 +17,22 @@ type Domain struct {
 }
 
 func (e Domain) Unwrap() error {
-	return e.type_.err
+	return xerrors.New(e.type_.name)
 }
 
 func (e Domain) Error() string {
-	return fmt.Sprintf("%s: %s", e.type_.err.Error(), e.reason)
+	return fmt.Sprintf("%s: %s", e.type_.name, e.reason)
 }
 
 type ErrorType struct {
-	err error
+	name string
 }
 
 var (
 	None = Domain{}
 
-	PreconditionalError  ErrorType = ErrorType{xerrors.New("preconditional error")}
-	PostconditionalError ErrorType = ErrorType{xerrors.New("postconditional error")}
+	PreconditionalError  ErrorType = ErrorType{"preconditional error"}
+	PostconditionalError ErrorType = ErrorType{"postconditional error"}
 )
 
 func Preconditional(reason string) Domain {
@@ -62,5 +62,5 @@ func (e Domain) Is(other Domain) bool {
 }
 
 func (e Domain) IsType(type_ ErrorType) bool {
-	return xerrors.Is(e.type_.err, type_.err)
+	return e.type_ == type_
 }
