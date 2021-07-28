@@ -23,7 +23,7 @@ type Authorizer interface {
 
 func (uc AuthorizedUsecase) Run(authorizer Authorizer) {
 	var (
-		INVALID_AUTHORIZATION = errors.Invalid("Invalid authorization")
+		INVALID_AUTHORIZATION = errors.Preconditional("Invalid authorization")
 	)
 
 	session, err := authorizer.Run()

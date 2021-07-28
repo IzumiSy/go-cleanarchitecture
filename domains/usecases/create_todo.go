@@ -33,8 +33,8 @@ func (uc CreateTodoUsecase) Build(params CreateTodoParam) domains.AuthorizedUsec
 		// - 新しく作成できるTODOは100件まで
 
 		var (
-			NAME_INVALID          = errors.Invalid("Name must not be duplicated")
-			MAXIMUM_TODOS_REACHED = errors.Invalid("Maximum TODOs reached")
+			NAME_INVALID          = errors.Preconditional("Name must not be duplicated")
+			MAXIMUM_TODOS_REACHED = errors.Preconditional("Maximum TODOs reached")
 		)
 
 		name, err := todo.NewName(params.Name)

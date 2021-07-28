@@ -16,7 +16,7 @@ func NewEmail(value string) (Email, errors.Domain) {
 
 	email, err := mail.ParseAddress(value)
 	if err != nil {
-		return empty, errors.Invalid("Invalid email")
+		return empty, errors.Preconditional("Invalid email")
 	} else {
 		return Email{email.Address}, errors.None
 	}

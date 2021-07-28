@@ -47,7 +47,7 @@ func (dao TodoDao) Get(id todo.ID) (models.Todo, errors.Domain, bool) {
 	if query.Error == gorm.ErrRecordNotFound {
 		return empty, errors.None, false
 	} else if query.Error != nil {
-		return empty, errors.External(query.Error), false
+		return empty, errors.Postconditional(query.Error), false
 	}
 
 	_id, _ := todo.NewID(dto.ID)
@@ -70,7 +70,7 @@ func (dao TodoDao) GetByName(name todo.Name) (models.Todo, errors.Domain, bool) 
 	if query.Error == gorm.ErrRecordNotFound {
 		return empty, errors.None, false
 	} else if query.Error != nil {
-		return empty, errors.External(query.Error), false
+		return empty, errors.Postconditional(query.Error), false
 	}
 
 	id, _ := todo.NewID(dto.ID)
@@ -86,7 +86,7 @@ func (dao TodoDao) Store(todo models.Todo) errors.Domain {
 		Description: todo.Description().Value(),
 	}
 
-	return errors.External(
+	return errors.Postconditional(
 		dao.
 			conn.
 			WithContext(context.Background()).

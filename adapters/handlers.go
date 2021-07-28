@@ -43,7 +43,8 @@ func signupHandler(ctx echo.Context) error {
 			Password: jsonParam.Password,
 			UserName: jsonParam.UserName,
 		}).Run()
-		return presenter.Present()
+
+		return presenter.Presenter.Result()
 	})
 }
 
@@ -85,7 +86,8 @@ func authenticateHandler(ctx echo.Context) error {
 			Email:    jsonParam.Email,
 			Password: jsonParam.Password,
 		}).Run()
-		return presenter.Present()
+
+		return presenter.Presenter.Result()
 	})
 }
 
@@ -108,7 +110,7 @@ func getTodosHandler(ctx echo.Context) error {
 		Logger:     logger,
 	}.Build().Run(DBSessionAuthorizer{ctx})
 
-	return presenter.Present()
+	return presenter.Presenter.Result()
 }
 
 func createTodoHandler(ctx echo.Context) error {
@@ -150,6 +152,6 @@ func createTodoHandler(ctx echo.Context) error {
 			Description: jsonParam.Description,
 		}).Run(DBSessionAuthorizer{ctx})
 
-		return presenter.Present()
+		return presenter.Presenter.Result()
 	})
 }

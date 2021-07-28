@@ -24,10 +24,5 @@ func (presenter CreateTodoPresenter) Write(todo models.Todo) {
 }
 
 func (presenter CreateTodoPresenter) Raise(reason errors.Domain) {
-	// エラーハンドリングはサボって全部500を返している
-	presenter.Presenter.Fail()
-}
-
-func (presenter CreateTodoPresenter) Present() error {
-	return presenter.Presenter.Result()
+	presenter.Presenter.Fail(reason)
 }

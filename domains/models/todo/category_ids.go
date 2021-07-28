@@ -17,7 +17,7 @@ func NewCategoryIds(categoryIds []category.ID) (CategoryIDs, errors.Domain) {
 	empty := CategoryIDs{}
 
 	if len(categoryIds) > 5 {
-		return empty, errors.Invalid("Too many categories")
+		return empty, errors.Preconditional("Too many categories")
 	}
 
 	return CategoryIDs{categoryIds}, errors.None

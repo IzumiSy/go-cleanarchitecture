@@ -18,9 +18,9 @@ func NewDescription(value string) (Description, errors.Domain) {
 	empty := Description{}
 
 	if value == "" {
-		return empty, errors.Invalid("Description must not be empty")
+		return empty, errors.Preconditional("Description must not be empty")
 	} else if utf8.RuneCountInString(value) > 100 {
-		return empty, errors.Invalid("Description too long")
+		return empty, errors.Preconditional("Description too long")
 	} else {
 		return Description{value}, errors.None
 	}

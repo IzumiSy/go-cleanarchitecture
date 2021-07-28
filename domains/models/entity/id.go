@@ -18,7 +18,7 @@ type ID struct {
 func NewID(value string) (ID, errors.Domain) {
 	id, err := uuid.Parse(value)
 	if err != nil {
-		return ID{}, errors.Invalid(fmt.Sprintf("Invalid User ID: %s", err.Error()))
+		return ID{}, errors.Preconditional(fmt.Sprintf("Invalid User ID: %s", err.Error()))
 	}
 
 	return ID{id}, errors.None
