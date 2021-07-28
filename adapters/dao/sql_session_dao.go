@@ -48,7 +48,7 @@ func (dao SessionDao) Get(id session.ID) (models.Session, errors.Domain, bool) {
 	if query.Error == gorm.ErrRecordNotFound {
 		return empty, errors.None, false
 	} else if query.Error != nil {
-		return empty, errors.External(query.Error), false
+		return empty, errors.Postconditional(query.Error), false
 	}
 
 	// 永続化済みのデータの取り出しでバリデーションエラーはないはずなのでエラーは無視する
@@ -66,7 +66,7 @@ func (dao SessionDao) Store(session models.Session) errors.Domain {
 		CreatedAt: session.CreatedAt().Value(),
 	}
 
-	return errors.External(
+	return errors.Postconditional(
 		dao.
 			conn.
 			WithContext(context.Background()).

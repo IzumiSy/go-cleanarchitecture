@@ -26,10 +26,5 @@ func (presenter AuthenticatePresenter) Write(session models.Session) {
 }
 
 func (presenter AuthenticatePresenter) Raise(reason errors.Domain) {
-	// エラーハンドリングはサボって全部500を返している
-	presenter.Presenter.Fail()
-}
-
-func (presenter AuthenticatePresenter) Present() error {
-	return presenter.Presenter.Result()
+	presenter.Presenter.Fail(reason)
 }

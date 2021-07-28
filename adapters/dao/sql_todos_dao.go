@@ -42,7 +42,7 @@ func (dao TodosDao) GetByUserID(userId user.ID) (models.Todos, errors.Domain) {
 	if query.Error == gorm.ErrRecordNotFound {
 		return empty, errors.None
 	} else if query.Error != nil {
-		return empty, errors.External(query.Error)
+		return empty, errors.Postconditional(query.Error)
 	}
 
 	todos := []models.Todo{}

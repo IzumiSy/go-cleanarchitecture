@@ -32,7 +32,7 @@ func (uc SignupUsecase) Build(params SignupParam) domains.UnauthorizedUsecase {
 		// - すでに同じメールアドレスで登録されている場合にはサインナップ不可
 
 		var (
-			EMAIL_INVALID = errors.Invalid("Email must not be duplicated")
+			EMAIL_INVALID = errors.Preconditional("Email must not be duplicated")
 		)
 
 		email, err := authentication.NewEmail(params.Email)

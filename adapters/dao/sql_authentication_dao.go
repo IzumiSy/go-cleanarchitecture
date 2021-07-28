@@ -59,7 +59,7 @@ func (dao AuthentcationDao) GetByEmail(email authentication.Email) (models.Authe
 	if query.Error == gorm.ErrRecordNotFound {
 		return empty, errors.None, false
 	} else if query.Error != nil {
-		return empty, errors.External(query.Error), false
+		return empty, errors.Postconditional(query.Error), false
 	}
 
 	var userDto UserDto
@@ -74,7 +74,7 @@ func (dao AuthentcationDao) GetByEmail(email authentication.Email) (models.Authe
 	if query.Error == gorm.ErrRecordNotFound {
 		return empty, errors.None, false
 	} else if query.Error != nil {
-		return empty, errors.External(query.Error), false
+		return empty, errors.Postconditional(query.Error), false
 	}
 
 	// 永続化済みのデータの取り出しでバリデーションエラーはないはずなのでエラーは無視する
@@ -98,7 +98,7 @@ func (dao AuthentcationDao) Store(auth models.Authentication) errors.Domain {
 	}
 
 	if err := dao.conn.WithContext(context.Background()).Create(&authDto).Error; err != nil {
-		return errors.External(err)
+		return errors.Postconditional(err)
 	}
 
 	userDto := UserDto{
@@ -106,7 +106,7 @@ func (dao AuthentcationDao) Store(auth models.Authentication) errors.Domain {
 		Name: user.Name().Value(),
 	}
 	if err := dao.conn.WithContext(context.Background()).Table("user").Create(&userDto).Error; err != nil {
-		return errors.External(err)
+		return errors.Postconditional(err)
 	}
 
 	return errors.None

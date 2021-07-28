@@ -1,30 +1,39 @@
 package presenters
 
 import (
+	"go-cleanarchitecture/domains/errors"
+	"net/http"
+
 	"github.com/labstack/echo"
 )
 
 type Presenter interface {
-	Present() error
+	Result() error
 }
 
 type EchoPresenter struct {
-	ctx    echo.Context
-	result error
+	ctx echo.Context
+	err error
 }
 
 func NewPresenter(ctx echo.Context) EchoPresenter {
 	return EchoPresenter{ctx, nil}
 }
 
-func (presenter EchoPresenter) Fail() {
-	presenter.result = presenter.ctx.String(500, "Internal Server Error")
+func (presenter EchoPresenter) Fail(err errors.Domain) {
+	presenter.err = err
+
+	if err.IsType(errors.PreconditionalError) {
+		presenter.ctx.String(http.StatusBadRequest, "Bad Request")
+	} else {
+		presenter.ctx.String(http.StatusInternalServerError, "Internal Server Error")
+	}
 }
 
 func (presenter EchoPresenter) Succeed(value interface{}) {
-	presenter.result = presenter.ctx.JSON(200, value)
+	presenter.ctx.JSON(http.StatusOK, value)
 }
 
 func (presenter EchoPresenter) Result() error {
-	return presenter.result
+	return presenter.err
 }

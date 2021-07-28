@@ -24,10 +24,5 @@ func (presenter SignupPresenter) Write(auth models.Authentication) {
 }
 
 func (presenter SignupPresenter) Raise(reason errors.Domain) {
-	// エラーハンドリングはサボって全部500を返している
-	presenter.Presenter.Fail()
-}
-
-func (presenter SignupPresenter) Present() error {
-	return presenter.Presenter.Result()
+	presenter.Presenter.Fail(reason)
 }

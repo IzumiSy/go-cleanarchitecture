@@ -18,9 +18,9 @@ func NewName(value string) (Name, errors.Domain) {
 	empty := Name{}
 
 	if value == "" {
-		return empty, errors.Invalid("Name must not be empty")
+		return empty, errors.Preconditional("Name must not be empty")
 	} else if utf8.RuneCountInString(value) > 20 {
-		return empty, errors.Invalid("Name too long")
+		return empty, errors.Preconditional("Name too long")
 	} else {
 		return Name{value}, errors.None
 	}

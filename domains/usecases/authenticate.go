@@ -31,8 +31,8 @@ func (uc AuthenticateUsecase) Build(params AuthenticateParam) domains.Unauthoriz
 		// 人間以外のアクタも考慮し抽象化して"認証"と表現したくなったのでこの命名としている。
 
 		var (
-			USER_NOT_FOUND   = errors.Invalid("User not found")
-			INVALID_PASSWORD = errors.Invalid("Invalid password")
+			USER_NOT_FOUND   = errors.Preconditional("User not found")
+			INVALID_PASSWORD = errors.Preconditional("Invalid password")
 		)
 
 		email, err := authentication.NewEmail(params.Email)
