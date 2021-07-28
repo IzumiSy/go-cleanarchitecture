@@ -43,12 +43,18 @@ func (adapter RedisAdapter) Publish(event domains.Event) errors.Domain {
 
 func (adapter RedisAdapter) RegisterSubscriber(eventID domains.EventName, subscriber func(payload []byte) error) {
 	adapter.subscribers[string(eventID)] = subscriber
-	if err := adapter.psc.Subscribe(string(eventID)); err != nil {
-		adapter.logger.Error(fmt.Sprintf("Failed subscribing %s: %s", string(eventID), err.Error()))
-	}
 }
 
 func (adapter RedisAdapter) Listen() {
+	var channels []string
+	for c := range adapter.subscribers {
+		channels = append(channels, c)
+	}
+
+	if err := adapter.psc.Subscribe(redis.Args{}.AddFlat(channels)); err != nil {
+		adapter.logger.Error(fmt.Sprintf("Failed to start listening: %s", err.Error()))
+	}
+
 	for {
 		switch n := adapter.psc.Receive().(type) {
 		case error:

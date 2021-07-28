@@ -19,10 +19,10 @@ func RunHTTPServer() {
 		panic(err)
 	}
 
-	go pa.Listen()
 	pa.RegisterSubscriber(domains.UserSignedUp, signedUpHandler)
 	pa.RegisterSubscriber(domains.UserAuthenticated, userAuthenticatedHandler)
 	pa.RegisterSubscriber(domains.TodoCreated, todoCreatedHandler)
+	go pa.Listen()
 
 	e := echo.New()
 	e.Use(middleware.Logger())
