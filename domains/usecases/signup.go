@@ -79,10 +79,11 @@ func (uc SignupUsecase) Build(params SignupParam) domains.UnauthorizedUsecase {
 			Name_:     auth.User().Name().Value(),
 			CreatedAt: time.Now(),
 		}
-		if err := uc.Publisher.Publish(event); err != nil {
+		if err := uc.Publisher.Publish(event); err.NotNil() {
 			uc.Logger.Error(fmt.Sprintf("Failed publishing event: %s", err.Error()))
 		}
 
+		uc.Logger.Info(fmt.Sprintf("Event published: %s", event.ID()))
 		uc.OutputPort.Write(auth)
 	})
 }
@@ -94,6 +95,10 @@ type UserSignedUpEvent struct {
 	CreatedAt time.Time
 }
 
-func (UserSignedUpEvent) Name() domains.DomainEventID {
+func (UserSignedUpEvent) Name() domains.EventName {
 	return domains.UserSignedUp
+}
+
+func (UserSignedUpEvent) ID() domains.EventID {
+	return domains.NewEventID()
 }

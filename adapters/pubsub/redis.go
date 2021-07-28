@@ -3,6 +3,7 @@ package pubsub
 import (
 	"encoding/json"
 	"go-cleanarchitecture/domains"
+	"go-cleanarchitecture/domains/errors"
 
 	"github.com/gomodule/redigo/redis"
 )
@@ -28,16 +29,16 @@ func NewRedisAdapter() (error, RedisAdapter) {
 	}
 }
 
-func (adapter RedisAdapter) Publish(event domains.DomainEvent) error {
+func (adapter RedisAdapter) Publish(event domains.Event) errors.Domain {
 	eventBytes, err := json.Marshal(event)
 	if err != nil {
-		return err
+		return errors.Postconditional(err)
 	}
 
-	return adapter.conn.Send(string(event.Name()), eventBytes)
+	return errors.Postconditional(adapter.conn.Send(string(event.Name()), eventBytes))
 }
 
-func (adapter RedisAdapter) RegisterSubscriber(eventID domains.DomainEventID, subscriber func(payload []byte) error) {
+func (adapter RedisAdapter) RegisterSubscriber(eventID domains.EventName, subscriber func(payload []byte) error) {
 	adapter.subscribers[string(eventID)] = subscriber
 }
 

@@ -1,17 +1,30 @@
 package domains
 
-type DomainEventID string
+import (
+	"go-cleanarchitecture/domains/errors"
 
-var (
-	UserSignedUp      DomainEventID = DomainEventID("user_singed_up")
-	UserAuthenticated DomainEventID = DomainEventID("user_authenticated")
-	TodoCreated       DomainEventID = DomainEventID("todo_created")
+	"github.com/google/uuid"
 )
 
-type DomainEvent interface {
-	Name() DomainEventID
+type EventName string
+
+var (
+	UserSignedUp      EventName = EventName("user_singed_up")
+	UserAuthenticated EventName = EventName("user_authenticated")
+	TodoCreated       EventName = EventName("todo_created")
+)
+
+type EventID uuid.UUID
+
+func NewEventID() EventID {
+	return EventID(uuid.New())
+}
+
+type Event interface {
+	Name() EventName
+	ID() EventID
 }
 
 type EventPublisher interface {
-	Publish(event DomainEvent) error
+	Publish(event Event) errors.Domain
 }

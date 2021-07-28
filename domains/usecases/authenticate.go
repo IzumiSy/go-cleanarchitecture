@@ -75,10 +75,11 @@ func (uc AuthenticateUsecase) Build(params AuthenticateParam) domains.Unauthoriz
 			UserID:    auth.User().ID().String(),
 			CreatedAt: time.Now(),
 		}
-		if err := uc.Publisher.Publish(event); err != nil {
+		if err := uc.Publisher.Publish(event); err.NotNil() {
 			uc.Logger.Error(fmt.Sprintf("Failed publishing event: %s", err.Error()))
 		}
 
+		uc.Logger.Info(fmt.Sprintf("Event published: %s", event.ID()))
 		uc.OutputPort.Write(session)
 	})
 }
@@ -88,6 +89,10 @@ type UserAuthenticatedEvent struct {
 	CreatedAt time.Time
 }
 
-func (UserAuthenticatedEvent) Name() domains.DomainEventID {
+func (UserAuthenticatedEvent) Name() domains.EventName {
 	return domains.UserAuthenticated
+}
+
+func (UserAuthenticatedEvent) ID() domains.EventID {
+	return domains.NewEventID()
 }

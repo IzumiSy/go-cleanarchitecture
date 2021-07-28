@@ -87,10 +87,11 @@ func (uc CreateTodoUsecase) Build(params CreateTodoParam) domains.AuthorizedUsec
 			Description: newTodo.Description().Value(),
 			CreatedAt:   time.Now(),
 		}
-		if err := uc.Publisher.Publish(event); err != nil {
+		if err := uc.Publisher.Publish(event); err.NotNil() {
 			uc.Logger.Error(fmt.Sprintf("Failed publishing event: %s", err.Error()))
 		}
 
+		uc.Logger.Info(fmt.Sprintf("Event published: %s", event.ID()))
 		uc.OutputPort.Write(newTodo)
 	})
 }
@@ -102,6 +103,10 @@ type TodoCreatedEvent struct {
 	CreatedAt   time.Time
 }
 
-func (TodoCreatedEvent) Name() domains.DomainEventID {
+func (TodoCreatedEvent) Name() domains.EventName {
 	return domains.TodoCreated
+}
+
+func (TodoCreatedEvent) ID() domains.EventID {
+	return domains.NewEventID()
 }
