@@ -12,30 +12,32 @@ type Domain struct {
 	// ドメイン層におけるエラーを表現する型
 	// 基本的にはバリデーションエラーを実装するのに使う
 
-	err    ErrorType
+	type_  ErrorType
 	reason string
 }
 
 func (e Domain) Unwrap() error {
-	return e.err
+	return e.type_.err
 }
 
 func (e Domain) Error() string {
-	return fmt.Sprintf("%s: %s", e.err.Error(), e.reason)
+	return fmt.Sprintf("%s: %s", e.type_.err.Error(), e.reason)
 }
 
-type ErrorType error
+type ErrorType struct {
+	err error
+}
 
 var (
 	None = Domain{}
 
-	PreconditionalError  ErrorType = xerrors.New("preconditional error")
-	PostconditionalError ErrorType = xerrors.New("postconditional error")
+	PreconditionalError  ErrorType = ErrorType{xerrors.New("preconditional error")}
+	PostconditionalError ErrorType = ErrorType{xerrors.New("postconditional error")}
 )
 
 func Preconditional(reason string) Domain {
 	return Domain{
-		err:    PreconditionalError,
+		type_:  PreconditionalError,
 		reason: reason,
 	}
 }
@@ -46,7 +48,7 @@ func Postconditional(err error) Domain {
 	}
 
 	return Domain{
-		err:    PostconditionalError,
+		type_:  PostconditionalError,
 		reason: err.Error(),
 	}
 }
@@ -60,5 +62,5 @@ func (e Domain) Is(other Domain) bool {
 }
 
 func (e Domain) IsType(type_ ErrorType) bool {
-	return xerrors.Is(e.err, type_)
+	return xerrors.Is(e.type_.err, type_.err)
 }
