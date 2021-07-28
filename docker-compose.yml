@@ -21,3 +21,4 @@ services:
       - "6379:6379"
     volumes:
       - "./tmp/data/redis:/data"
+    command: --loglevel debug

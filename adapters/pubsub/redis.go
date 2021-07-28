@@ -2,6 +2,7 @@ package pubsub
 
 import (
 	"encoding/json"
+	"fmt"
 	"go-cleanarchitecture/domains"
 	"go-cleanarchitecture/domains/errors"
 
@@ -42,10 +43,11 @@ func (adapter RedisAdapter) RegisterSubscriber(eventID domains.EventName, subscr
 	adapter.subscribers[string(eventID)] = subscriber
 }
 
-func (adapter RedisAdapter) Listen() {
+func (adapter RedisAdapter) Listen(logger domains.Logger) {
 	for {
 		switch n := adapter.psc.Receive().(type) {
 		case error:
+			logger.Error(fmt.Sprintf("Error listening subscribers: %s", n.Error()))
 			return
 		case redis.Message:
 			subscriber, ok := adapter.subscribers[n.Channel]
@@ -53,7 +55,12 @@ func (adapter RedisAdapter) Listen() {
 				subscriber(n.Data)
 			}
 		case redis.Subscription:
-			// handling notification
+			switch n.Kind {
+			case "subscribe":
+				logger.Info(fmt.Sprintf("%s subscribed", n.Channel))
+			case "unsubscribed":
+				logger.Info(fmt.Sprintf("%s unsubscribed", n.Channel))
+			}
 		}
 	}
 }

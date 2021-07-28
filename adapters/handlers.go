@@ -2,7 +2,6 @@ package adapters
 
 import (
 	"go-cleanarchitecture/adapters/dao"
-	"go-cleanarchitecture/adapters/loggers"
 	"go-cleanarchitecture/adapters/presenters"
 	"go-cleanarchitecture/adapters/presenters/json"
 	"go-cleanarchitecture/domains"
@@ -13,7 +12,7 @@ import (
 
 type Handler = func(ctx echo.Context) error
 
-func signupHandler(publisher domains.EventPublisher) Handler {
+func signupHandler(publisher domains.EventPublisher, logger domains.Logger) Handler {
 	return func(ctx echo.Context) error {
 		jsonParam := new(struct {
 			Email    string `json:"email"`
@@ -32,11 +31,6 @@ func signupHandler(publisher domains.EventPublisher) Handler {
 			}
 			// defer authenticationDao.Close()
 
-			logger, err := loggers.NewZapLogger("config/zap.json")
-			if err != nil {
-				return err
-			}
-
 			presenter := json.SignupPresenter{Presenter: presenters.NewPresenter(ctx)}
 			usecases.SignupUsecase{
 				OutputPort:        presenter,
@@ -54,7 +48,7 @@ func signupHandler(publisher domains.EventPublisher) Handler {
 	}
 }
 
-func authenticateHandler(publisher domains.EventPublisher) Handler {
+func authenticateHandler(publisher domains.EventPublisher, logger domains.Logger) Handler {
 	return func(ctx echo.Context) error {
 		jsonParam := new(struct {
 			Email    string `json:"email"`
@@ -78,11 +72,6 @@ func authenticateHandler(publisher domains.EventPublisher) Handler {
 			}
 			// defer sessionDao.Close()
 
-			logger, err := loggers.NewZapLogger("config/zap.json")
-			if err != nil {
-				return err
-			}
-
 			presenter := json.AuthenticatePresenter{Presenter: presenters.NewPresenter(ctx)}
 			usecases.AuthenticateUsecase{
 				OutputPort:        presenter,
@@ -100,29 +89,26 @@ func authenticateHandler(publisher domains.EventPublisher) Handler {
 	}
 }
 
-func getTodosHandler(ctx echo.Context) error {
-	sqlDao, err := dao.NewSQLTodosDao(dao.WITHOUT_TX())
-	if err != nil {
-		return err
+func getTodosHandler(logger domains.Logger) Handler {
+	return func(ctx echo.Context) error {
+		sqlDao, err := dao.NewSQLTodosDao(dao.WITHOUT_TX())
+		if err != nil {
+			return err
+		}
+		// defer sqlDao.Close()
+
+		presenter := json.GetTodosPresenter{Presenter: presenters.NewPresenter(ctx)}
+		usecases.GetTodosUsecase{
+			OutputPort: presenter,
+			TodosDao:   sqlDao,
+			Logger:     logger,
+		}.Build().Run(DBSessionAuthorizer{ctx})
+
+		return presenter.Presenter.Result()
 	}
-	// defer sqlDao.Close()
-
-	logger, err := loggers.NewZapLogger("config/zap.json")
-	if err != nil {
-		return err
-	}
-
-	presenter := json.GetTodosPresenter{Presenter: presenters.NewPresenter(ctx)}
-	usecases.GetTodosUsecase{
-		OutputPort: presenter,
-		TodosDao:   sqlDao,
-		Logger:     logger,
-	}.Build().Run(DBSessionAuthorizer{ctx})
-
-	return presenter.Presenter.Result()
 }
 
-func createTodoHandler(publisher domains.EventPublisher) Handler {
+func createTodoHandler(publisher domains.EventPublisher, logger domains.Logger) Handler {
 	return func(ctx echo.Context) error {
 		jsonParam := new(struct {
 			Name        string `json:"name"`
@@ -145,11 +131,6 @@ func createTodoHandler(publisher domains.EventPublisher) Handler {
 				return err
 			}
 			// defer sqlTodosDao.Close()
-
-			logger, err := loggers.NewZapLogger("config/zap.json")
-			if err != nil {
-				return err
-			}
 
 			presenter := json.CreateTodoPresenter{Presenter: presenters.NewPresenter(ctx)}
 			usecases.CreateTodoUsecase{
