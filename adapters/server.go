@@ -14,15 +14,15 @@ func RunHTTPServer() {
 		panic(err)
 	}
 
-	err, pa := pubsub.NewRedisAdapter()
+	err, pa := pubsub.NewRedisAdapter(logger)
 	if err != nil {
 		panic(err)
 	}
 
+	go pa.Listen()
 	pa.RegisterSubscriber(domains.UserSignedUp, signedUpHandler)
 	pa.RegisterSubscriber(domains.UserAuthenticated, userAuthenticatedHandler)
 	pa.RegisterSubscriber(domains.TodoCreated, todoCreatedHandler)
-	go pa.Listen(logger)
 
 	e := echo.New()
 	e.Use(middleware.Logger())

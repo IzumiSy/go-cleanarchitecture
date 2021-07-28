@@ -14,10 +14,16 @@ var (
 	TodoCreated       EventName = EventName("todo_created")
 )
 
-type EventID uuid.UUID
+type EventID struct {
+	value uuid.UUID
+}
+
+func (e EventID) String() string {
+	return e.value.String()
+}
 
 func NewEventID() EventID {
-	return EventID(uuid.New())
+	return EventID{uuid.New()}
 }
 
 type Event interface {
