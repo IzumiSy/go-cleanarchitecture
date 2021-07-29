@@ -54,7 +54,7 @@ func (uc CreateTodoUsecase) Build(params CreateTodoParam) domains.AuthorizedUsec
 			return
 		}
 
-		currentTodo, err, exists := uc.TodoDao.GetByName(name)
+		currentTodo, err, exists := uc.TodoDao.GetByName(currentUserID, name)
 		if err.NotNil() {
 			uc.Logger.Error(err.Error())
 			uc.OutputPort.Raise(err)
@@ -63,6 +63,7 @@ func (uc CreateTodoUsecase) Build(params CreateTodoParam) domains.AuthorizedUsec
 
 		if exists {
 			if currentTodo.Name() == name {
+				uc.Logger.Warn(fmt.Sprintf("Validation failed: %s", NAME_INVALID.Error()))
 				uc.OutputPort.Raise(NAME_INVALID)
 				return
 			}
@@ -70,6 +71,7 @@ func (uc CreateTodoUsecase) Build(params CreateTodoParam) domains.AuthorizedUsec
 
 		todos, err := uc.TodosDao.GetByUserID(currentUserID)
 		if todos.Size() > 100 {
+			uc.Logger.Warn(fmt.Sprintf("Validation failed: %s", MAXIMUM_TODOS_REACHED.Error()))
 			uc.OutputPort.Raise(MAXIMUM_TODOS_REACHED)
 			return
 		}
@@ -80,6 +82,7 @@ func (uc CreateTodoUsecase) Build(params CreateTodoParam) domains.AuthorizedUsec
 			uc.OutputPort.Raise(err)
 			return
 		}
+		uc.Logger.Info(fmt.Sprintf("New todo stored: %s", newTodo.ID().String()))
 
 		event := TodoCreatedEvent{
 			TodoID:      newTodo.ID().String(),

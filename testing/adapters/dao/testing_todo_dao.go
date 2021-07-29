@@ -5,20 +5,27 @@ import (
 	"go-cleanarchitecture/domains/errors"
 	"go-cleanarchitecture/domains/models"
 	"go-cleanarchitecture/domains/models/todo"
+	"go-cleanarchitecture/domains/models/user"
 )
 
-type MockTodoDao struct{}
+type MockTodoDao struct {
+	GetResult       func() (models.Todo, errors.Domain, bool)
+	GetByNameResult func() (models.Todo, errors.Domain, bool)
+	StoreResult     func() errors.Domain
+}
 
 var _ domains.TodoRepository = MockTodoDao{}
 
-func (_ MockTodoDao) Get(id todo.ID) (models.Todo, errors.Domain, bool) {
-	return models.Todo{}, errors.Domain{}, true
+func (m MockTodoDao) Get(id todo.ID) (models.Todo, errors.Domain, bool) {
+	t, err, e := m.GetResult()
+	return t, err, e
 }
 
-func (_ MockTodoDao) GetByName(name todo.Name) (models.Todo, errors.Domain, bool) {
-	return models.Todo{}, errors.Domain{}, true
+func (m MockTodoDao) GetByName(userID user.ID, name todo.Name) (models.Todo, errors.Domain, bool) {
+	t, err, e := m.GetByNameResult()
+	return t, err, e
 }
 
-func (_ MockTodoDao) Store(todo models.Todo) errors.Domain {
-	return errors.Domain{}
+func (m MockTodoDao) Store(todo models.Todo) errors.Domain {
+	return m.StoreResult()
 }
