@@ -6,6 +6,7 @@ require (
 	github.com/IzumiSy/go-cleanarchitecture v0.0.0-20180824153858-8cea7019e196 // indirect
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible // indirect
 	github.com/gobuffalo/packr v1.30.1 // indirect
+	github.com/gomodule/redigo v1.8.5
 	github.com/google/uuid v1.1.1
 	github.com/jinzhu/gorm v1.9.1 // indirect
 	github.com/labstack/echo v3.3.5+incompatible

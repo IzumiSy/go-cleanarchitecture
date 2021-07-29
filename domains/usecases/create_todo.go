@@ -1,11 +1,13 @@
 package usecases
 
 import (
+	"fmt"
 	"go-cleanarchitecture/domains"
 	"go-cleanarchitecture/domains/errors"
 	"go-cleanarchitecture/domains/models"
 	"go-cleanarchitecture/domains/models/todo"
 	"go-cleanarchitecture/domains/models/user"
+	"time"
 )
 
 type CreateTodoOutputPort interface {
@@ -23,6 +25,7 @@ type CreateTodoUsecase struct {
 	TodoDao    domains.TodoRepository
 	TodosDao   domains.TodosRepository
 	Logger     domains.Logger
+	Publisher  domains.EventPublisher
 }
 
 func (uc CreateTodoUsecase) Build(params CreateTodoParam) domains.AuthorizedUsecase {
@@ -78,6 +81,32 @@ func (uc CreateTodoUsecase) Build(params CreateTodoParam) domains.AuthorizedUsec
 			return
 		}
 
+		event := TodoCreatedEvent{
+			TodoID:      newTodo.ID().String(),
+			Name_:       newTodo.Name().Value(),
+			Description: newTodo.Description().Value(),
+			CreatedAt:   time.Now(),
+		}
+		if err := uc.Publisher.Publish(event); err.NotNil() {
+			uc.Logger.Error(fmt.Sprintf("Failed publishing event: %s", err.Error()))
+		}
+
+		uc.Logger.Info(fmt.Sprintf("Event published: %s", event.ID()))
 		uc.OutputPort.Write(newTodo)
 	})
+}
+
+type TodoCreatedEvent struct {
+	TodoID      string
+	Name_       string
+	Description string
+	CreatedAt   time.Time
+}
+
+func (TodoCreatedEvent) Name() domains.EventName {
+	return domains.TodoCreated
+}
+
+func (TodoCreatedEvent) ID() domains.EventID {
+	return domains.NewEventID()
 }

@@ -8,7 +8,7 @@ import (
 )
 
 type createTodoResponse struct {
-	Id string `json:"id"`
+	ID string `json:"id"`
 }
 
 type CreateTodoPresenter struct {
@@ -19,7 +19,7 @@ var _ usecases.CreateTodoOutputPort = CreateTodoPresenter{}
 
 func (presenter CreateTodoPresenter) Write(todo models.Todo) {
 	presenter.Presenter.Succeed(createTodoResponse{
-		Id: todo.Id().String(),
+		ID: todo.ID().String(),
 	})
 }
 

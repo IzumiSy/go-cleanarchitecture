@@ -1,6 +1,9 @@
 package usecases
 
 import (
+	"fmt"
+	"time"
+
 	"go-cleanarchitecture/domains"
 	"go-cleanarchitecture/domains/errors"
 	"go-cleanarchitecture/domains/models"
@@ -23,6 +26,7 @@ type SignupUsecase struct {
 	OutputPort        SignupOutputPort
 	AuthenticationDao domains.AuthenticationRepository
 	Logger            domains.Logger
+	Publisher         domains.EventPublisher
 }
 
 func (uc SignupUsecase) Build(params SignupParam) domains.UnauthorizedUsecase {
@@ -69,6 +73,32 @@ func (uc SignupUsecase) Build(params SignupParam) domains.UnauthorizedUsecase {
 			return
 		}
 
+		event := UserSignedUpEvent{
+			UserID:    auth.User().ID().String(),
+			Email:     auth.Email().Value(),
+			Name_:     auth.User().Name().Value(),
+			CreatedAt: time.Now(),
+		}
+		if err := uc.Publisher.Publish(event); err.NotNil() {
+			uc.Logger.Error(fmt.Sprintf("Failed publishing event: %s", err.Error()))
+		}
+
+		uc.Logger.Info(fmt.Sprintf("Event published: %s", event.ID()))
 		uc.OutputPort.Write(auth)
 	})
+}
+
+type UserSignedUpEvent struct {
+	UserID    string
+	Email     string
+	Name_     string
+	CreatedAt time.Time
+}
+
+func (UserSignedUpEvent) Name() domains.EventName {
+	return domains.UserSignedUp
+}
+
+func (UserSignedUpEvent) ID() domains.EventID {
+	return domains.NewEventID()
 }

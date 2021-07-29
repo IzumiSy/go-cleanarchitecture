@@ -12,7 +12,7 @@ type getTodosResponse struct {
 }
 
 type getTodosResponseItem struct {
-	Id   string `json:"id"`
+	ID   string `json:"id"`
 	Name string `json:"name"`
 }
 
@@ -30,7 +30,7 @@ func (presenter GetTodosPresenter) Write(todos models.Todos) {
 
 	for _, todo := range todos.Value() {
 		response.Todos = append(response.Todos, getTodosResponseItem{
-			Id:   todo.Id().String(),
+			ID:   todo.ID().String(),
 			Name: todo.Name().Value(),
 		})
 	}
