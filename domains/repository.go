@@ -19,8 +19,8 @@ import (
 // 集合に対するクエリなので戻り値に存在の有無を表すboolは持たない
 
 type TodoRepository interface {
+	GetByName(userID user.ID, name todo.Name) (models.Todo, errors.Domain, bool)
 	Get(id todo.ID) (models.Todo, errors.Domain, bool)
-	GetByName(name todo.Name) (models.Todo, errors.Domain, bool)
 	Store(todo models.Todo) errors.Domain
 }
 
