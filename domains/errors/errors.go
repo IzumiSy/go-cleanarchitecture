@@ -10,7 +10,6 @@ var _ xerrors.Wrapper = Domain{}
 
 type Domain struct {
 	// ドメイン層におけるエラーを表現する型
-	// 基本的にはバリデーションエラーを実装するのに使う
 
 	type_  ErrorType
 	reason string
@@ -35,6 +34,8 @@ var (
 	PostconditionalError ErrorType = ErrorType{"postconditional error"}
 )
 
+// [事前条件違反]
+// 主にバリデーションエラーなどユースケースの実行条件を満たさないことを示す
 func Preconditional(reason string) Domain {
 	return Domain{
 		type_:  PreconditionalError,
@@ -42,6 +43,8 @@ func Preconditional(reason string) Domain {
 	}
 }
 
+// [事後条件違反]
+// ユースケースの実行は開始したが外部装置などの不具合でユースケース実行が行えないことを示す
 func Postconditional(err error) Domain {
 	if err == nil {
 		return None
@@ -57,7 +60,7 @@ func (e Domain) NotNil() bool {
 	return !e.Is(None)
 }
 
-func (e Domain) Is(other Domain) bool {
+func (e Domain) Is(other error) bool {
 	return xerrors.Is(e, other)
 }
 
