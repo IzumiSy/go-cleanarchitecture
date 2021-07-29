@@ -7,7 +7,7 @@ This exploration project includes:
 - Authorization flow
 - Transaction
 - Logging
-- Asynchronous Pub/Sub (WIP)
+- Asynchronous Pub/Sub (Redis, goroutine)
 - Type-safety (No `interface{}` as much as possible)
 - Multiple drivers (migration, web, CLI)
 
