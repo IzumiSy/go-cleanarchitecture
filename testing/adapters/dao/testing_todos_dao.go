@@ -8,14 +8,30 @@ import (
 	"go-cleanarchitecture/domains/models/user"
 )
 
-type MockTodosDao struct{}
-
-var _ domains.TodosRepository = MockTodosDao{}
-
-func (_ MockTodosDao) GetByIDs(ids []todo.ID) (models.Todos, errors.Domain) {
-	return models.Todos{}, errors.Domain{}
+type mockTodosDao struct {
+	GetByIDsResult    func() (models.Todos, errors.Domain)
+	GetByUserIDResult func() (models.Todos, errors.Domain)
 }
 
-func (_ MockTodosDao) GetByUserID(userId user.ID) (models.Todos, errors.Domain) {
-	return models.Todos{}, errors.Domain{}
+var _ domains.TodosRepository = mockTodosDao{}
+
+func NewMockTodosDao() mockTodosDao {
+	return mockTodosDao{
+		GetByIDsResult: func() (models.Todos, errors.Domain) {
+			return models.Todos{}, errors.None
+		},
+		GetByUserIDResult: func() (models.Todos, errors.Domain) {
+			return models.Todos{}, errors.None
+		},
+	}
+}
+
+func (m mockTodosDao) GetByIDs(ids []todo.ID) (models.Todos, errors.Domain) {
+	t, e := m.GetByIDsResult()
+	return t, e
+}
+
+func (m mockTodosDao) GetByUserID(userId user.ID) (models.Todos, errors.Domain) {
+	t, e := m.GetByUserIDResult()
+	return t, e
 }

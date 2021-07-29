@@ -17,7 +17,7 @@ func (_ mockGetTodosOutputPort) Write(todo models.Todos) {}
 func TestGetTodosUsecase(t *testing.T) {
 	usecase := GetTodosUsecase{
 		OutputPort: mockGetTodosOutputPort{},
-		TodosDao:   dao.MockTodosDao{},
+		TodosDao:   dao.NewMockTodosDao(),
 		Logger:     adapters.MockLogger{},
 	}
 

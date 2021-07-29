@@ -28,17 +28,17 @@ type CreateTodoUsecase struct {
 	Publisher  domains.EventPublisher
 }
 
+var (
+	uc_TODO_NAME_NOT_UNIQUE  = errors.Preconditional("Name must be unique")
+	uc_MAXIMUM_TODOS_REACHED = errors.Preconditional("Maximum TODOs reached")
+)
+
 func (uc CreateTodoUsecase) Build(params CreateTodoParam) domains.AuthorizedUsecase {
 	return domains.NewAuthorizedUsecase(uc.OutputPort, func(currentUserID user.ID) {
 		// [TODO作成を行うユースケース]
 		// バリデーションルールは以下
 		// - すでに同名のTODOが存在している場合にはTODOは作成できない
 		// - 新しく作成できるTODOは100件まで
-
-		var (
-			NAME_INVALID          = errors.Preconditional("Name must not be duplicated")
-			MAXIMUM_TODOS_REACHED = errors.Preconditional("Maximum TODOs reached")
-		)
 
 		name, err := todo.NewName(params.Name)
 		if err.NotNil() {
@@ -63,16 +63,16 @@ func (uc CreateTodoUsecase) Build(params CreateTodoParam) domains.AuthorizedUsec
 
 		if exists {
 			if currentTodo.Name() == name {
-				uc.Logger.Warn(fmt.Sprintf("Validation failed: %s", NAME_INVALID.Error()))
-				uc.OutputPort.Raise(NAME_INVALID)
+				uc.Logger.Warn(fmt.Sprintf("Validation failed: %s", uc_TODO_NAME_NOT_UNIQUE.Error()))
+				uc.OutputPort.Raise(uc_TODO_NAME_NOT_UNIQUE)
 				return
 			}
 		}
 
 		todos, err := uc.TodosDao.GetByUserID(currentUserID)
-		if todos.Size() > 100 {
-			uc.Logger.Warn(fmt.Sprintf("Validation failed: %s", MAXIMUM_TODOS_REACHED.Error()))
-			uc.OutputPort.Raise(MAXIMUM_TODOS_REACHED)
+		if todos.Size() <= 100 {
+			uc.Logger.Warn(fmt.Sprintf("Validation failed: %s", uc_MAXIMUM_TODOS_REACHED.Error()))
+			uc.OutputPort.Raise(uc_MAXIMUM_TODOS_REACHED)
 			return
 		}
 

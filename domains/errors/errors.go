@@ -23,6 +23,10 @@ func (e Domain) Error() string {
 	return fmt.Sprintf("%s: %s", e.type_.name, e.reason)
 }
 
+func (e Domain) Reason() string {
+	return e.reason
+}
+
 type ErrorType struct {
 	name string
 }
@@ -57,11 +61,11 @@ func Postconditional(err error) Domain {
 }
 
 func (e Domain) NotNil() bool {
-	return !e.Is(None)
+	return !xerrors.Is(e, None)
 }
 
-func (e Domain) Is(other error) bool {
-	return xerrors.Is(e, other)
+func (e Domain) Is(target error) bool {
+	return e.Error() == target.Error()
 }
 
 func (e Domain) IsType(type_ ErrorType) bool {
