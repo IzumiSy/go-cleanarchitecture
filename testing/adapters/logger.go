@@ -1,7 +1,7 @@
-package loggers
+package adapters
 
 import (
-    "go-cleanarchitecture/domains"
+	"go-cleanarchitecture/domains"
 )
 
 type MockLogger struct{}

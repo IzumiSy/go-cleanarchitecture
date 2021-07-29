@@ -5,7 +5,6 @@ import (
 	"go-cleanarchitecture/domains/models"
 	"go-cleanarchitecture/testing/adapters"
 	"go-cleanarchitecture/testing/adapters/dao"
-	"go-cleanarchitecture/testing/adapters/loggers"
 	"testing"
 )
 
@@ -20,7 +19,8 @@ func TestCreateTodoUsecase(t *testing.T) {
 		OutputPort: mockCreateTodoOutputPort{},
 		TodoDao:    dao.MockTodoDao{},
 		TodosDao:   dao.MockTodosDao{},
-		Logger:     loggers.MockLogger{},
+		Logger:     adapters.MockLogger{},
+		Publisher:  adapters.MockPublisher{},
 	}
 
 	usecase.
