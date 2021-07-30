@@ -1,7 +1,6 @@
 version: 2
 jobs:
-  build:
-    machine: true
+  unit_testing:
     docker:
       - image: circleci/golang:1.16
     environment:
@@ -10,6 +9,10 @@ jobs:
     steps:
       - checkout
       - run: make test
+  integration_testing:
+    machine: true
+    working_directory: /go/src/github.com/IzumiSy/go-cleanarchitecture
+    steps:
       - run:
           name: install docker-compose
           command: |
