@@ -24,7 +24,10 @@ jobs:
           command: |
             mkdir ~/tmp
             docker-compose up --build -d
-            docker run --network host -it -v $PWD:/api -w /api apiaryio/dredd dredd api-description.apib http://localhost:8080 --hookfiles=./dredd_hook.js
+            docker run --network host -it -v $PWD:/api -w /api apiaryio/dredd dredd \
+              ~/go/src/github.com/IzumiSy/go-cleanarchitecture/api-description.apib \
+              http://localhost:8080 \
+              --hookfiles=./dredd_hook.js
 
 workflows:
   unit_and_integration_testing:
