@@ -22,7 +22,8 @@ jobs:
           name: build and run dredd
           command: |
             mkdir tmp
-            docker-compose up --build -d
+            docker-compose up -d
+            docker-compose run app make migrate
             docker run --network host -it -v $PWD:/api -w /api apiaryio/dredd dredd \
               api-description.apib http://localhost:8080 --hookfiles=./dredd_hook.js
 
