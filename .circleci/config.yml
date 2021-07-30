@@ -10,6 +10,7 @@ jobs:
       - run: make test
   integration_testing:
     machine: true
+    working_directory: ~/todoapp
     steps:
       - run:
           name: install docker-compose
@@ -20,12 +21,11 @@ jobs:
       - run:
           name: build and run dredd
           command: |
-            mkdir ~/tmp
+            cd ~/todoapp
+            mkdir tmp
             docker-compose up --build -d
             docker run --network host -it -v $PWD:/api -w /api apiaryio/dredd dredd \
-              ~/go/src/github.com/IzumiSy/go-cleanarchitecture/api-description.apib \
-              http://localhost:8080 \
-              --hookfiles=./dredd_hook.js
+              api-description.apib http://localhost:8080 --hookfiles=./dredd_hook.js
 
 workflows:
   unit_and_integration_testing:
