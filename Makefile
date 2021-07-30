@@ -11,7 +11,7 @@ migrate:
 
 reset:
 	rm -f go-cleanarchitecture.db
-	make migrate
+	sudo rm -rf tmp/
 
 clean:
 	rm -rf go-cleanarchitecture

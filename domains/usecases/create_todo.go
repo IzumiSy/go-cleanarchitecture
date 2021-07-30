@@ -28,17 +28,17 @@ type CreateTodoUsecase struct {
 	Publisher  domains.EventPublisher
 }
 
+var (
+	uc_TODO_NAME_NOT_UNIQUE  = errors.Preconditional("Name must be unique")
+	uc_MAXIMUM_TODOS_REACHED = errors.Preconditional("Maximum TODOs reached")
+)
+
 func (uc CreateTodoUsecase) Build(params CreateTodoParam) domains.AuthorizedUsecase {
 	return domains.NewAuthorizedUsecase(uc.OutputPort, func(currentUserID user.ID) {
 		// [TODO作成を行うユースケース]
 		// バリデーションルールは以下
 		// - すでに同名のTODOが存在している場合にはTODOは作成できない
 		// - 新しく作成できるTODOは100件まで
-
-		var (
-			NAME_INVALID          = errors.Preconditional("Name must not be duplicated")
-			MAXIMUM_TODOS_REACHED = errors.Preconditional("Maximum TODOs reached")
-		)
 
 		name, err := todo.NewName(params.Name)
 		if err.NotNil() {
@@ -54,7 +54,7 @@ func (uc CreateTodoUsecase) Build(params CreateTodoParam) domains.AuthorizedUsec
 			return
 		}
 
-		currentTodo, err, exists := uc.TodoDao.GetByName(name)
+		currentTodo, err, exists := uc.TodoDao.GetByName(currentUserID, name)
 		if err.NotNil() {
 			uc.Logger.Error(err.Error())
 			uc.OutputPort.Raise(err)
@@ -63,14 +63,16 @@ func (uc CreateTodoUsecase) Build(params CreateTodoParam) domains.AuthorizedUsec
 
 		if exists {
 			if currentTodo.Name() == name {
-				uc.OutputPort.Raise(NAME_INVALID)
+				uc.Logger.Warn(fmt.Sprintf("Validation failed: %s", uc_TODO_NAME_NOT_UNIQUE.Error()))
+				uc.OutputPort.Raise(uc_TODO_NAME_NOT_UNIQUE)
 				return
 			}
 		}
 
 		todos, err := uc.TodosDao.GetByUserID(currentUserID)
-		if todos.Size() > 100 {
-			uc.OutputPort.Raise(MAXIMUM_TODOS_REACHED)
+		if todos.Size() <= 100 {
+			uc.Logger.Warn(fmt.Sprintf("Validation failed: %s", uc_MAXIMUM_TODOS_REACHED.Error()))
+			uc.OutputPort.Raise(uc_MAXIMUM_TODOS_REACHED)
 			return
 		}
 
@@ -80,6 +82,7 @@ func (uc CreateTodoUsecase) Build(params CreateTodoParam) domains.AuthorizedUsec
 			uc.OutputPort.Raise(err)
 			return
 		}
+		uc.Logger.Info(fmt.Sprintf("New todo stored: %s", newTodo.ID().String()))
 
 		event := TodoCreatedEvent{
 			TodoID:      newTodo.ID().String(),

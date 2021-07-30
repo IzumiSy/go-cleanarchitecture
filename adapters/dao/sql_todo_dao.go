@@ -6,6 +6,7 @@ import (
 	"go-cleanarchitecture/domains/errors"
 	"go-cleanarchitecture/domains/models"
 	"go-cleanarchitecture/domains/models/todo"
+	"go-cleanarchitecture/domains/models/user"
 
 	"gorm.io/gorm"
 )
@@ -56,12 +57,13 @@ func (dao TodoDao) Get(id todo.ID) (models.Todo, errors.Domain, bool) {
 	return models.BuildTodo(_id, name, description), errors.None, true
 }
 
-func (dao TodoDao) GetByName(name todo.Name) (models.Todo, errors.Domain, bool) {
+func (dao TodoDao) GetByName(userID user.ID, name todo.Name) (models.Todo, errors.Domain, bool) {
 	var dto TodoDto
 
 	query := dao.
 		conn.
 		WithContext(context.Background()).
+		Where("user_id = ?", userID.String()).
 		Where("name = ?", name.Value()).
 		Take(&dto)
 
