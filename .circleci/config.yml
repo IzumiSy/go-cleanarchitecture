@@ -10,7 +10,6 @@ jobs:
       - run: make test
   integration_testing:
     machine: true
-    working_directory: ~/todoapp
     steps:
       - run:
           name: install docker-compose
@@ -18,10 +17,10 @@ jobs:
             curl -L https://github.com/docker/compose/releases/download/1.19.0/docker-compose-`uname -s`-`uname -m` > ~/docker-compose
             chmod +x ~/docker-compose
             sudo mv ~/docker-compose /usr/local/bin/docker-compose
+      - checkout
       - run:
           name: build and run dredd
           command: |
-            cd ~/todoapp
             mkdir tmp
             docker-compose up --build -d
             docker run --network host -it -v $PWD:/api -w /api apiaryio/dredd dredd \
