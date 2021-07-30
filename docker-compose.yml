@@ -13,6 +13,8 @@ services:
       MYSQL_ROOT_USER: root
       MYSQL_ROOT_PASSWORD: password
       MYSQL_DATABASE: todoapp
+    ports:
+      - "3306:3306"
     volumes:
       - "./tmp/data/db:/var/lib/mysql"
   redis:
