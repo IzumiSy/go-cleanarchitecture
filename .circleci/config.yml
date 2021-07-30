@@ -5,13 +5,13 @@ jobs:
       - image: circleci/golang:1.16
     environment:
       GO111MODULE: "on"
-    working_directory: /go/src/github.com/IzumiSy/go-cleanarchitecture
+    working_directory: ~/go/src/github.com/IzumiSy/go-cleanarchitecture
     steps:
       - checkout
       - run: make test
   integration_testing:
     machine: true
-    working_directory: /go/src/github.com/IzumiSy/go-cleanarchitecture
+    working_directory: ~/go/src/github.com/IzumiSy/go-cleanarchitecture
     steps:
       - run:
           name: install docker-compose
