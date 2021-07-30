@@ -23,6 +23,7 @@ jobs:
           command: |
             mkdir tmp
             docker-compose up -d
+            sleep 15
             docker-compose run app make migrate
             docker run --network host -it -v $PWD:/api -w /api apiaryio/dredd dredd \
               api-description.apib http://localhost:8080 --hookfiles=./dredd_hook.js
