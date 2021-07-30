@@ -12,3 +12,27 @@ Creating a new user
         }
 
 + Response 200 (application/json; charset=UTF-8)
+
+# POST /login
+Logging in as an user
+
++ Request (application/json)
+
+        {
+          "email": "test@example.com",
+          "password": "password"
+        }
+
++ Response 200 (application/json; charset=UTF-8)
+
+# POST /todo
+Creates a new todo
+
++ Request (application/json)
+
+        {
+          "name": "new todo",
+          "description": "this is a new todo"
+        }
+
++ Response 200 (application/json; charset=UTF-8)
