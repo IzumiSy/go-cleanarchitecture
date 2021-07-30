@@ -1,6 +1,8 @@
 FORMAT: 1A
 
-# POST /signup
+# Todo API
+
+## POST /signup
 Creating a new user
 
 + Request (application/json)
@@ -13,8 +15,8 @@ Creating a new user
 
 + Response 200 (application/json; charset=UTF-8)
 
-# POST /login
-Logging in as an user
+## POST /login
+Logging in as the new user
 
 + Request (application/json)
 
@@ -25,7 +27,7 @@ Logging in as an user
 
 + Response 200 (application/json; charset=UTF-8)
 
-# POST /todo
+## POST /todo
 Creates a new todo
 
 + Request (application/json)
@@ -36,3 +38,19 @@ Creates a new todo
         }
 
 + Response 200 (application/json; charset=UTF-8)
+
+## GET /todos
+Gets todos created by the user
+
++ Request (application/json)
+
++ Response 200 (application/json; charset=UTF-8)
+
+        {
+          "todos": [
+            {
+              "id": "aaa",
+              "name": "new todo",
+              "description": "this is a new todo",
+          ]
+        }
