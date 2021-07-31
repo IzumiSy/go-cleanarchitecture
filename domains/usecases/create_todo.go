@@ -70,7 +70,7 @@ func (uc CreateTodoUsecase) Build(params CreateTodoParam) domains.AuthorizedUsec
 		}
 
 		todos, err := uc.TodosDao.GetByUserID(currentUserID)
-		if todos.Size() <= 100 {
+		if todos.Size() >= 100 {
 			uc.Logger.Warn(fmt.Sprintf("Validation failed: %s", uc_MAXIMUM_TODOS_REACHED.Error()))
 			uc.OutputPort.Raise(uc_MAXIMUM_TODOS_REACHED)
 			return
