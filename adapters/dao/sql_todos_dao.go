@@ -51,7 +51,8 @@ func (dao TodosDao) GetByUserID(userId user.ID) (models.Todos, errors.Domain) {
 		id, _ := todo.NewID(dto.ID)
 		name, _ := todo.NewName(dto.Name)
 		description, _ := todo.NewDescription(dto.Description)
-		todos = append(todos, models.BuildTodo(id, name, description))
+		userID, _ := user.NewID(dto.UserID)
+		todos = append(todos, models.BuildTodo(id, name, description, userID))
 	}
 
 	return models.NewTodos(todos), errors.None

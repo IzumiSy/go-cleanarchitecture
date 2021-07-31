@@ -76,7 +76,7 @@ func (uc CreateTodoUsecase) Build(params CreateTodoParam) domains.AuthorizedUsec
 			return
 		}
 
-		newTodo := models.NewTodo(name, description)
+		newTodo := models.NewTodo(name, description, currentUserID)
 		if err = uc.TodoDao.Store(newTodo); err.NotNil() {
 			uc.Logger.Error(err.Error())
 			uc.OutputPort.Raise(err)
