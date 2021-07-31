@@ -1,0 +1,57 @@
+FORMAT: 1A
+
+# Todo API
+
+## POST /signup
+Creating a new user
+
++ Request (application/json)
+
+        {
+          "email": "test@example.com",
+          "password": "password",
+          "userName": "test"
+        }
+
++ Response 200 (application/json; charset=UTF-8)
+
+## POST /login
+Logging in as the new user
+
++ Request (application/json)
+
+        {
+          "email": "test@example.com",
+          "password": "password"
+        }
+
++ Response 200 (application/json; charset=UTF-8)
+
+## POST /todo
+Creates a new todo
+
++ Request (application/json)
+
+        {
+          "name": "new todo",
+          "description": "this is a new todo"
+        }
+
++ Response 200 (application/json; charset=UTF-8)
+
+## GET /todos
+Gets todos created by the user
+
++ Request (application/json)
+
++ Response 200 (application/json; charset=UTF-8)
+
+        {
+          "todos": [
+            {
+              "id": "aaa",
+              "name": "new todo",
+              "description": "this is a new todo"
+            }
+          ]
+        }

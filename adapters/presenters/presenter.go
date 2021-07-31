@@ -24,9 +24,9 @@ func (presenter EchoPresenter) Fail(err errors.Domain) {
 	presenter.err = err
 
 	if err.IsType(errors.PreconditionalError) {
-		presenter.ctx.String(http.StatusBadRequest, "Bad Request")
+		presenter.ctx.String(http.StatusBadRequest, err.Reason())
 	} else {
-		presenter.ctx.String(http.StatusInternalServerError, "Internal Server Error")
+		presenter.ctx.String(http.StatusInternalServerError, err.Reason())
 	}
 }
 

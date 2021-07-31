@@ -54,7 +54,8 @@ func (dao TodoDao) Get(id todo.ID) (models.Todo, errors.Domain, bool) {
 	_id, _ := todo.NewID(dto.ID)
 	name, _ := todo.NewName(dto.Name)
 	description, _ := todo.NewDescription(dto.Description)
-	return models.BuildTodo(_id, name, description), errors.None, true
+	userID, _ := user.NewID(dto.UserID)
+	return models.BuildTodo(_id, name, description, userID), errors.None, true
 }
 
 func (dao TodoDao) GetByName(userID user.ID, name todo.Name) (models.Todo, errors.Domain, bool) {
@@ -78,12 +79,14 @@ func (dao TodoDao) GetByName(userID user.ID, name todo.Name) (models.Todo, error
 	id, _ := todo.NewID(dto.ID)
 	_name, _ := todo.NewName(dto.Name)
 	description, _ := todo.NewDescription(dto.Description)
-	return models.BuildTodo(id, _name, description), errors.None, true
+	userID, _ = user.NewID(dto.UserID)
+	return models.BuildTodo(id, _name, description, userID), errors.None, true
 }
 
 func (dao TodoDao) Store(todo models.Todo) errors.Domain {
 	dto := TodoDto{
 		ID:          todo.ID().String(),
+		UserID:      todo.UserID().String(),
 		Name:        todo.Name().Value(),
 		Description: todo.Description().Value(),
 	}

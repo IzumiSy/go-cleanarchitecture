@@ -5,10 +5,12 @@ import (
 	"go-cleanarchitecture/domains/errors"
 	"go-cleanarchitecture/domains/models"
 	"go-cleanarchitecture/domains/models/todo"
+	"go-cleanarchitecture/domains/models/user"
 	"go-cleanarchitecture/testing/adapters"
 	"go-cleanarchitecture/testing/adapters/dao"
-	"golang.org/x/xerrors"
 	"testing"
+
+	"golang.org/x/xerrors"
 )
 
 type mockCreateTodoOutputPort struct {
@@ -41,7 +43,8 @@ func TestCreateTodoUsecase(t *testing.T) {
 		todoDao.GetByNameResult = func() (models.Todo, errors.Domain, bool) {
 			name, _ := todo.NewName("testing todo")
 			description, _ := todo.NewDescription("this is a testing todo")
-			todo := models.NewTodo(name, description)
+			userID, _ := user.NewID("user_id")
+			todo := models.NewTodo(name, description, userID)
 			return todo, errors.None, true
 		}
 

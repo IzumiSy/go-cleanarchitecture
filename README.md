@@ -10,6 +10,8 @@ This exploration project includes:
 - Asynchronous Pub/Sub (Redis, goroutine)
 - Type-safety (No `interface{}` as much as possible)
 - Multiple drivers (migration, web, CLI)
+- Testing (unit-testing, integration-testing with dredd)
+- CI integration (CircleCI)
 
 ## Build
 ```sh

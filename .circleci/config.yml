@@ -1,11 +1,35 @@
-version: 2
+version: 2.1
 jobs:
-  build:
+  unit_testing:
     docker:
       - image: circleci/golang:1.16
     environment:
       GO111MODULE: "on"
-    working_directory: /go/src/github.com/IzumiSy/go-cleanarchitecture
     steps:
       - checkout
       - run: make test
+  integration_testing:
+    machine: true
+    steps:
+      - run:
+          name: install docker-compose
+          command: |
+            curl -L https://github.com/docker/compose/releases/download/1.19.0/docker-compose-`uname -s`-`uname -m` > ~/docker-compose
+            chmod +x ~/docker-compose
+            sudo mv ~/docker-compose /usr/local/bin/docker-compose
+      - checkout
+      - run:
+          name: build and run dredd
+          command: |
+            mkdir tmp
+            docker-compose up -d
+            sleep 15
+            docker-compose run app make migrate
+            docker run --network host -it -v $PWD:/api -w /api apiaryio/dredd dredd \
+              api-description.apib http://localhost:8080 --hookfiles=./dredd_hook.js
+
+workflows:
+  unit_and_integration_testing:
+    jobs:
+      - unit_testing
+      - integration_testing
