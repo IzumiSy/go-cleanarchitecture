@@ -31,7 +31,7 @@ func (presenter GetTodosPresenter) Write(todos models.Todos) {
 
 	for _, todo := range todos.Value() {
 		response.Todos = append(response.Todos, getTodosResponseItem{
-			ID:          todo.Id().String(),
+			ID:          todo.ID().String(),
 			Name:        todo.Name().Value(),
 			Description: todo.Description().Value(),
 		})
