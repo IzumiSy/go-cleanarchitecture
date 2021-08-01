@@ -71,6 +71,7 @@ func (uc AuthenticateUsecase) Build(params AuthenticateParam) domains.Unauthoriz
 			uc.OutputPort.Raise(err)
 			return
 		}
+		uc.Logger.Info(fmt.Sprintf("New session stored: %s", session.ID()))
 
 		event := UserAuthenticatedEvent{
 			UserID:    auth.User().ID().String(),
