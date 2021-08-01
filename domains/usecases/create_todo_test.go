@@ -15,20 +15,33 @@ import (
 )
 
 type mockCreateTodoOutputPort struct {
-	Result errors.Domain
+	Error  errors.Domain
+	Result models.Todo
 }
 
 func (m *mockCreateTodoOutputPort) Raise(err errors.Domain) {
-	m.Result = err
+	m.Error = err
 }
 
-func (_ *mockCreateTodoOutputPort) Write(todo models.Todo) {}
+func (m *mockCreateTodoOutputPort) Write(todo models.Todo) {
+	m.Result = todo
+}
+
+type mockCreateTodoPublisher struct {
+	event TodoCreatedEvent
+}
+
+func (p *mockCreateTodoPublisher) Publish(event domains.Event) errors.Domain {
+	p.event = event.(TodoCreatedEvent)
+	return errors.None
+}
 
 func TestCreateTodoUsecase(t *testing.T) {
 	newUsecase := func(
 		todoDao domains.TodoRepository,
 		todosDao domains.TodosRepository,
 		op *mockCreateTodoOutputPort,
+		p *mockCreateTodoPublisher,
 	) CreateTodoUsecase {
 		return CreateTodoUsecase{
 			Ctx:        context.Background(),
@@ -36,44 +49,79 @@ func TestCreateTodoUsecase(t *testing.T) {
 			TodoDao:    todoDao,
 			TodosDao:   todosDao,
 			Logger:     adapters.MockLogger{T: t},
-			Publisher:  adapters.MockPublisher{},
+			Publisher:  p,
 		}
 	}
 
-	t.Run(uc_TODO_NAME_NOT_UNIQUE.Reason(), func(t *testing.T) {
-		todoDao := dao.NewMockTodoDao()
-		todoDao.GetByNameResult = func() (models.Todo, errors.Domain, bool) {
-			name, _ := todo.NewName("testing todo")
-			description, _ := todo.NewDescription("this is a testing todo")
-			userID, _ := user.NewID("user_id")
-			todo := models.NewTodo(name, description, userID)
-			return todo, errors.None, true
-		}
+	t.Run("Validation", func(t *testing.T) {
+		t.Run(uc_TODO_NAME_NOT_UNIQUE.Reason(), func(t *testing.T) {
+			todoDao := dao.NewMockTodoDao()
+			todoDao.GetByNameResult = func() (models.Todo, errors.Domain, bool) {
+				name, _ := todo.NewName("testing todo")
+				description, _ := todo.NewDescription("this is a testing todo")
+				userID, _ := user.NewID("user_id")
+				todo := models.NewTodo(name, description, userID)
+				return todo, errors.None, true
+			}
 
-		op := &mockCreateTodoOutputPort{}
-		newUsecase(todoDao, dao.NewMockTodosDao(), op).
-			Build(CreateTodoParam{Name: "testing todo", Description: "this is a testing todo"}).
-			Run(adapters.MockAuthorizer{})
+			op := &mockCreateTodoOutputPort{}
+			p := &mockCreateTodoPublisher{}
+			newUsecase(todoDao, dao.NewMockTodosDao(), op, p).
+				Build(CreateTodoParam{Name: "testing todo", Description: "this is a testing todo"}).
+				Run(adapters.MockAuthorizer{})
 
-		if !xerrors.Is(op.Result, uc_TODO_NAME_NOT_UNIQUE) {
-			t.Errorf("Unexpected validation error (caught: %s)", op.Result.Error())
-		}
+			if !xerrors.Is(op.Error, uc_TODO_NAME_NOT_UNIQUE) {
+				t.Errorf("Unexpected validation error (caught: %s)", op.Error)
+			}
+
+			if p.event != (TodoCreatedEvent{}) {
+				t.Error("Error: event published")
+			}
+		})
+
+		t.Run(uc_MAXIMUM_TODOS_REACHED.Reason(), func(t *testing.T) {
+			todosDao := dao.NewMockTodosDao()
+			todosDao.GetByUserIDResult = func() (models.Todos, errors.Domain) {
+				todos := make([]models.Todo, 100)
+				return models.NewTodos(todos), errors.None
+			}
+
+			op := &mockCreateTodoOutputPort{}
+			p := &mockCreateTodoPublisher{}
+			newUsecase(dao.NewMockTodoDao(), todosDao, op, p).
+				Build(CreateTodoParam{Name: "testing todo", Description: "this is a testing todo"}).
+				Run(adapters.MockAuthorizer{})
+
+			if !xerrors.Is(op.Error, uc_MAXIMUM_TODOS_REACHED) {
+				t.Errorf("Unexpected validation error (caught: %s)", op.Error)
+			}
+
+			if p.event != (TodoCreatedEvent{}) {
+				t.Error("Error: event published")
+			}
+		})
 	})
 
-	t.Run(uc_MAXIMUM_TODOS_REACHED.Reason(), func(t *testing.T) {
-		todosDao := dao.NewMockTodosDao()
-		todosDao.GetByUserIDResult = func() (models.Todos, errors.Domain) {
-			todos := make([]models.Todo, 100)
-			return models.NewTodos(todos), errors.None
-		}
+	t.Run("Store", func(t *testing.T) {
+		name, _ := todo.NewName("testing todo")
+		description, _ := todo.NewDescription("this is a testing todo")
 
 		op := &mockCreateTodoOutputPort{}
-		newUsecase(dao.NewMockTodoDao(), todosDao, op).
-			Build(CreateTodoParam{Name: "testing todo", Description: "this is a testing todo"}).
+		p := &mockCreateTodoPublisher{}
+		newUsecase(dao.NewMockTodoDao(), dao.NewMockTodosDao(), op, p).
+			Build(CreateTodoParam{Name: name.Value(), Description: description.Value()}).
 			Run(adapters.MockAuthorizer{})
 
-		if !xerrors.Is(op.Result, uc_MAXIMUM_TODOS_REACHED) {
-			t.Errorf("Unexpected validation error (caught: %s)", op.Result.Error())
+		if !xerrors.Is(op.Error, errors.None) {
+			t.Errorf("Unexpected error raised: %s", op.Error)
+		}
+
+		if op.Result.Name() != name || op.Result.Description() != description {
+			t.Error("Error: invalid result")
+		}
+
+		if p.event == (TodoCreatedEvent{}) {
+			t.Error("Error: event not published")
 		}
 	})
 }
