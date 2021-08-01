@@ -73,6 +73,8 @@ func (uc SignupUsecase) Build(params SignupParam) domains.UnauthorizedUsecase {
 			uc.OutputPort.Raise(err)
 			return
 		}
+		uc.Logger.Info(fmt.Sprintf("New authentication created: %s", auth.Email().Value()))
+		uc.Logger.Info(fmt.Sprintf("Created UserID: %s", auth.User().ID()))
 
 		event := UserSignedUpEvent{
 			UserID:    auth.User().ID().String(),
