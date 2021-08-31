@@ -1,6 +1,8 @@
 package loggers
 
 import (
+	"context"
+	"fmt"
 	"go-cleanarchitecture/domains"
 	"go.uber.org/zap"
 )
@@ -30,18 +32,18 @@ func NewZapLogger(configFilePath string) (ZapLogger, error) {
 	return ZapLogger{logger}, nil
 }
 
-func (logger ZapLogger) Debug(msg string) {
-	logger.logger.Debug(msg)
+func (logger ZapLogger) Debugf(_ context.Context, msg string, a ...interface{}) {
+	logger.logger.Debug(fmt.Sprintf(msg, a...))
 }
 
-func (logger ZapLogger) Error(msg string) {
-	logger.logger.Error(msg)
+func (logger ZapLogger) Errorf(_ context.Context, msg string, a ...interface{}) {
+	logger.logger.Error(fmt.Sprintf(msg, a...))
 }
 
-func (logger ZapLogger) Info(msg string) {
-	logger.logger.Info(msg)
+func (logger ZapLogger) Infof(_ context.Context, msg string, a ...interface{}) {
+	logger.logger.Info(fmt.Sprintf(msg, a...))
 }
 
-func (logger ZapLogger) Warn(msg string) {
-	logger.logger.Warn(msg)
+func (logger ZapLogger) Warnf(_ context.Context, msg string, a ...interface{}) {
+	logger.logger.Warn(fmt.Sprintf(msg, a...))
 }
