@@ -59,6 +59,7 @@ func (adapter RedisAdapter) Listen() {
 
 	if err := adapter.psc.Subscribe(redis.Args{}.AddFlat(channels)...); err != nil {
 		adapter.logger.Error(fmt.Sprintf("Failed to start listening: %s", err.Error()))
+		return
 	}
 
 	for {
