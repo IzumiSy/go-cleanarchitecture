@@ -18,6 +18,8 @@ type RedisAdapter struct {
 	logger      domains.Logger
 }
 
+var _ domains.EventPublisher = RedisAdapter{}
+
 func NewRedisAdapter(logger domains.Logger) (error, RedisAdapter) {
 	pubConn, err := redis.Dial("tcp", "redis:6379")
 	if err != nil {
