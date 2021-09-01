@@ -12,14 +12,14 @@ import (
 type Handler = func(ctx echo.Context) error
 
 func signupHandler(publisher domains.EventPublisher, logger domains.Logger) Handler {
-	return func(ctx echo.Context) error {
+	return func(e echo.Context) error {
 		jsonParam := new(struct {
 			Email    string `json:"email"`
 			Password string `json:"password"`
 			UserName string `json:"userName"`
 		})
 
-		if err := ctx.Bind(jsonParam); err != nil {
+		if err := e.Bind(jsonParam); err != nil {
 			return err
 		}
 
@@ -30,9 +30,9 @@ func signupHandler(publisher domains.EventPublisher, logger domains.Logger) Hand
 			}
 			// defer authenticationDao.Close()
 
-			presenter := json.SignupPresenter{Presenter: presenters.NewPresenter(ctx)}
+			presenter := json.SignupPresenter{Presenter: presenters.NewPresenter(e)}
 			usecases.SignupUsecase{
-				Ctx:               ctx,
+				Ctx:               e.Request().Context(),
 				OutputPort:        presenter,
 				AuthenticationDao: authenticationDao,
 				Logger:            logger,
@@ -49,13 +49,13 @@ func signupHandler(publisher domains.EventPublisher, logger domains.Logger) Hand
 }
 
 func authenticateHandler(publisher domains.EventPublisher, logger domains.Logger) Handler {
-	return func(ctx echo.Context) error {
+	return func(e echo.Context) error {
 		jsonParam := new(struct {
 			Email    string `json:"email"`
 			Password string `json:"password"`
 		})
 
-		if err := ctx.Bind(jsonParam); err != nil {
+		if err := e.Bind(jsonParam); err != nil {
 			return err
 		}
 
@@ -72,9 +72,9 @@ func authenticateHandler(publisher domains.EventPublisher, logger domains.Logger
 			}
 			// defer sessionDao.Close()
 
-			presenter := json.AuthenticatePresenter{Presenter: presenters.NewPresenter(ctx)}
+			presenter := json.AuthenticatePresenter{Presenter: presenters.NewPresenter(e)}
 			usecases.AuthenticateUsecase{
-				Ctx:               ctx,
+				Ctx:               e.Request().Context(),
 				OutputPort:        presenter,
 				AuthenticationDao: authenticationDao,
 				SessionDao:        sessionDao,
@@ -91,33 +91,33 @@ func authenticateHandler(publisher domains.EventPublisher, logger domains.Logger
 }
 
 func getTodosHandler(logger domains.Logger) Handler {
-	return func(ctx echo.Context) error {
+	return func(e echo.Context) error {
 		sqlDao, err := dao.NewSQLTodosDao(dao.WITHOUT_TX())
 		if err != nil {
 			return err
 		}
 		// defer sqlDao.Close()
 
-		presenter := json.GetTodosPresenter{Presenter: presenters.NewPresenter(ctx)}
+		presenter := json.GetTodosPresenter{Presenter: presenters.NewPresenter(e)}
 		usecases.GetTodosUsecase{
-			Ctx:        ctx,
+			Ctx:        e.Request().Context(),
 			OutputPort: presenter,
 			TodosDao:   sqlDao,
 			Logger:     logger,
-		}.Build().Run(DBSessionAuthorizer{ctx})
+		}.Build().Run(DBSessionAuthorizer{e})
 
 		return presenter.Presenter.Result()
 	}
 }
 
 func createTodoHandler(publisher domains.EventPublisher, logger domains.Logger) Handler {
-	return func(ctx echo.Context) error {
+	return func(e echo.Context) error {
 		jsonParam := new(struct {
 			Name        string `json:"name"`
 			Description string `json:"description"`
 		})
 
-		if err := ctx.Bind(jsonParam); err != nil {
+		if err := e.Bind(jsonParam); err != nil {
 			return err
 		}
 
@@ -134,9 +134,9 @@ func createTodoHandler(publisher domains.EventPublisher, logger domains.Logger) 
 			}
 			// defer sqlTodosDao.Close()
 
-			presenter := json.CreateTodoPresenter{Presenter: presenters.NewPresenter(ctx)}
+			presenter := json.CreateTodoPresenter{Presenter: presenters.NewPresenter(e)}
 			usecases.CreateTodoUsecase{
-				Ctx:        ctx,
+				Ctx:        e.Request().Context(),
 				OutputPort: presenter,
 				TodoDao:    sqlTodoDao,
 				TodosDao:   sqlTodosDao,
@@ -145,7 +145,7 @@ func createTodoHandler(publisher domains.EventPublisher, logger domains.Logger) 
 			}.Build(usecases.CreateTodoParam{
 				Name:        jsonParam.Name,
 				Description: jsonParam.Description,
-			}).Run(DBSessionAuthorizer{ctx})
+			}).Run(DBSessionAuthorizer{e})
 
 			return presenter.Presenter.Result()
 		})
