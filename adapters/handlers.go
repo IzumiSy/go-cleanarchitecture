@@ -1,13 +1,12 @@
 package adapters
 
 import (
+	"github.com/labstack/echo/v4"
 	"go-cleanarchitecture/adapters/dao"
 	"go-cleanarchitecture/adapters/presenters"
 	"go-cleanarchitecture/adapters/presenters/json"
 	"go-cleanarchitecture/domains"
 	"go-cleanarchitecture/domains/usecases"
-
-	"github.com/labstack/echo"
 )
 
 type Handler = func(ctx echo.Context) error

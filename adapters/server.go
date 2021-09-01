@@ -2,12 +2,11 @@ package adapters
 
 import (
 	"context"
+	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 	"go-cleanarchitecture/adapters/loggers"
 	"go-cleanarchitecture/adapters/pubsub"
 	"go-cleanarchitecture/domains"
-
-	"github.com/labstack/echo"
-	"github.com/labstack/echo/middleware"
 )
 
 func RunHTTPServer(ctx context.Context) {
