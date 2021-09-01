@@ -33,6 +33,7 @@ func signupHandler(publisher domains.EventPublisher, logger domains.Logger) Hand
 
 			presenter := json.SignupPresenter{Presenter: presenters.NewPresenter(ctx)}
 			usecases.SignupUsecase{
+				Ctx:               ctx,
 				OutputPort:        presenter,
 				AuthenticationDao: authenticationDao,
 				Logger:            logger,
@@ -74,6 +75,7 @@ func authenticateHandler(publisher domains.EventPublisher, logger domains.Logger
 
 			presenter := json.AuthenticatePresenter{Presenter: presenters.NewPresenter(ctx)}
 			usecases.AuthenticateUsecase{
+				Ctx:               ctx,
 				OutputPort:        presenter,
 				AuthenticationDao: authenticationDao,
 				SessionDao:        sessionDao,
@@ -99,6 +101,7 @@ func getTodosHandler(logger domains.Logger) Handler {
 
 		presenter := json.GetTodosPresenter{Presenter: presenters.NewPresenter(ctx)}
 		usecases.GetTodosUsecase{
+			Ctx:        ctx,
 			OutputPort: presenter,
 			TodosDao:   sqlDao,
 			Logger:     logger,
@@ -134,6 +137,7 @@ func createTodoHandler(publisher domains.EventPublisher, logger domains.Logger) 
 
 			presenter := json.CreateTodoPresenter{Presenter: presenters.NewPresenter(ctx)}
 			usecases.CreateTodoUsecase{
+				Ctx:        ctx,
 				OutputPort: presenter,
 				TodoDao:    sqlTodoDao,
 				TodosDao:   sqlTodosDao,

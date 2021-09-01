@@ -1,8 +1,8 @@
 package pubsub
 
 import (
+	"context"
 	"encoding/json"
-	"fmt"
 	"go-cleanarchitecture/domains"
 	"go-cleanarchitecture/domains/errors"
 
@@ -51,21 +51,21 @@ func (adapter RedisAdapter) RegisterSubscriber(eventName domains.EventName, subs
 	adapter.subscribers[string(eventName)] = subscriber
 }
 
-func (adapter RedisAdapter) Listen() {
+func (adapter RedisAdapter) Listen(ctx context.Context) {
 	var channels []string
 	for c := range adapter.subscribers {
 		channels = append(channels, c)
 	}
 
 	if err := adapter.psc.Subscribe(redis.Args{}.AddFlat(channels)...); err != nil {
-		adapter.logger.Error(fmt.Sprintf("Failed to start listening: %s", err.Error()))
+		adapter.logger.Errorf(ctx, "Failed to start listening: %s", err.Error())
 		return
 	}
 
 	for {
 		switch n := adapter.psc.Receive().(type) {
 		case error:
-			adapter.logger.Error(fmt.Sprintf("Error received: %s", n.Error()))
+			adapter.logger.Errorf(ctx, "Error received: %s", n.Error())
 			return
 		case redis.Message:
 			subscriber, ok := adapter.subscribers[n.Channel]
@@ -75,9 +75,9 @@ func (adapter RedisAdapter) Listen() {
 		case redis.Subscription:
 			switch n.Kind {
 			case "subscribe":
-				adapter.logger.Info(fmt.Sprintf("%s subscribed", n.Channel))
+				adapter.logger.Infof(ctx, "%s subscribed", n.Channel)
 			case "unsubscribed":
-				adapter.logger.Info(fmt.Sprintf("%s unsubscribed", n.Channel))
+				adapter.logger.Infof(ctx, "%s unsubscribed", n.Channel)
 			}
 		}
 	}

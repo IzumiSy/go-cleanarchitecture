@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"flag"
 	"fmt"
 	drivers "go-cleanarchitecture/drivers"
@@ -8,7 +9,7 @@ import (
 )
 
 type Driver interface {
-	Run()
+	Run(ctx context.Context)
 }
 
 func main() {
@@ -26,5 +27,6 @@ func main() {
 		os.Exit(1)
 	}
 
-	driver.Run()
+	ctx := context.Background() // TODO: timeout required
+	driver.Run(ctx)
 }

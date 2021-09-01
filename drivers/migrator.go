@@ -1,6 +1,7 @@
 package drivers
 
 import (
+	"context"
 	"fmt"
 	"go-cleanarchitecture/adapters/dao"
 	"os"
@@ -13,7 +14,7 @@ type MigratorDriver struct {
 	Mode string
 }
 
-func (driver MigratorDriver) Run() {
+func (driver MigratorDriver) Run(ctx context.Context) {
 	conn, err := gorm.Open(dao.CurrentDriver().Dialector(), &gorm.Config{})
 	conn.Logger = logger.Default.LogMode(logger.Info)
 	if err != nil {

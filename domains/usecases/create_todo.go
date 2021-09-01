@@ -1,7 +1,7 @@
 package usecases
 
 import (
-	"fmt"
+	"context"
 	"go-cleanarchitecture/domains"
 	"go-cleanarchitecture/domains/errors"
 	"go-cleanarchitecture/domains/models"
@@ -21,6 +21,7 @@ type CreateTodoParam struct {
 }
 
 type CreateTodoUsecase struct {
+	Ctx        context.Context
 	OutputPort CreateTodoOutputPort
 	TodoDao    domains.TodoRepository
 	TodosDao   domains.TodosRepository
@@ -42,28 +43,28 @@ func (uc CreateTodoUsecase) Build(params CreateTodoParam) domains.AuthorizedUsec
 
 		name, err := todo.NewName(params.Name)
 		if err.NotNil() {
-			uc.Logger.Warn(err.Error())
+			uc.Logger.Warnf(uc.Ctx, err.Error())
 			uc.OutputPort.Raise(err)
 			return
 		}
 
 		description, err := todo.NewDescription(params.Description)
 		if err.NotNil() {
-			uc.Logger.Warn(err.Error())
+			uc.Logger.Warnf(uc.Ctx, err.Error())
 			uc.OutputPort.Raise(err)
 			return
 		}
 
 		currentTodo, err, exists := uc.TodoDao.GetByName(currentUserID, name)
 		if err.NotNil() {
-			uc.Logger.Error(err.Error())
+			uc.Logger.Errorf(uc.Ctx, err.Error())
 			uc.OutputPort.Raise(err)
 			return
 		}
 
 		if exists {
 			if currentTodo.Name() == name {
-				uc.Logger.Warn(fmt.Sprintf("Validation failed: %s", uc_TODO_NAME_NOT_UNIQUE.Error()))
+				uc.Logger.Warnf(uc.Ctx, "Validation failed: %s", uc_TODO_NAME_NOT_UNIQUE.Error())
 				uc.OutputPort.Raise(uc_TODO_NAME_NOT_UNIQUE)
 				return
 			}
@@ -71,18 +72,18 @@ func (uc CreateTodoUsecase) Build(params CreateTodoParam) domains.AuthorizedUsec
 
 		todos, err := uc.TodosDao.GetByUserID(currentUserID)
 		if todos.Size() >= 100 {
-			uc.Logger.Warn(fmt.Sprintf("Validation failed: %s", uc_MAXIMUM_TODOS_REACHED.Error()))
+			uc.Logger.Warnf(uc.Ctx, "Validation failed: %s", uc_MAXIMUM_TODOS_REACHED.Error())
 			uc.OutputPort.Raise(uc_MAXIMUM_TODOS_REACHED)
 			return
 		}
 
 		newTodo := models.NewTodo(name, description, currentUserID)
 		if err = uc.TodoDao.Store(newTodo); err.NotNil() {
-			uc.Logger.Error(err.Error())
+			uc.Logger.Errorf(uc.Ctx, err.Error())
 			uc.OutputPort.Raise(err)
 			return
 		}
-		uc.Logger.Info(fmt.Sprintf("New todo stored: %s", newTodo.ID().String()))
+		uc.Logger.Infof(uc.Ctx, "New todo stored: %s", newTodo.ID().String())
 
 		event := TodoCreatedEvent{
 			TodoID:      newTodo.ID().String(),
@@ -91,10 +92,10 @@ func (uc CreateTodoUsecase) Build(params CreateTodoParam) domains.AuthorizedUsec
 			CreatedAt:   time.Now(),
 		}
 		if err := uc.Publisher.Publish(event); err.NotNil() {
-			uc.Logger.Error(fmt.Sprintf("Failed publishing event: %s", err.Error()))
+			uc.Logger.Errorf(uc.Ctx, "Failed publishing event: %s", err.Error())
 		}
 
-		uc.Logger.Info(fmt.Sprintf("Event published: %s", event.ID()))
+		uc.Logger.Infof(uc.Ctx, "Event published: %s", event.ID())
 		uc.OutputPort.Write(newTodo)
 	})
 }

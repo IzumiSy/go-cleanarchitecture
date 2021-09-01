@@ -2,7 +2,7 @@ package domains
 
 import "context"
 
-// ロガー実装の抽象
+// ロガー実装のインターフェイス
 type Logger interface {
 	Debugf(ctx context.Context, msg string, a ...interface{})
 	Errorf(ctx context.Context, msg string, a ...interface{})

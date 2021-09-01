@@ -1,14 +1,16 @@
 package adapters
 
 import (
-	"github.com/labstack/echo"
-	"github.com/labstack/echo/middleware"
+	"context"
 	"go-cleanarchitecture/adapters/loggers"
 	"go-cleanarchitecture/adapters/pubsub"
 	"go-cleanarchitecture/domains"
+
+	"github.com/labstack/echo"
+	"github.com/labstack/echo/middleware"
 )
 
-func RunHTTPServer() {
+func RunHTTPServer(ctx context.Context) {
 	logger, err := loggers.NewZapLogger("config/zap.json")
 	if err != nil {
 		panic(err)
@@ -19,10 +21,10 @@ func RunHTTPServer() {
 		panic(err)
 	}
 
-	pa.RegisterSubscriber(domains.UserSignedUp, signedUpHandler(logger))
-	pa.RegisterSubscriber(domains.UserAuthenticated, userAuthenticatedHandler(logger))
-	pa.RegisterSubscriber(domains.TodoCreated, todoCreatedHandler(logger))
-	go pa.Listen()
+	pa.RegisterSubscriber(domains.UserSignedUp, signedUpHandler(ctx, logger))
+	pa.RegisterSubscriber(domains.UserAuthenticated, userAuthenticatedHandler(ctx, logger))
+	pa.RegisterSubscriber(domains.TodoCreated, todoCreatedHandler(ctx, logger))
+	go pa.Listen(ctx)
 
 	e := echo.New()
 	e.Use(middleware.Logger())
