@@ -4,7 +4,7 @@ import (
 	"context"
 	"flag"
 	"fmt"
-	drivers "go-cleanarchitecture/drivers"
+	adapters "go-cleanarchitecture/adapters"
 	"os"
 )
 
@@ -19,9 +19,9 @@ func main() {
 
 	var driver Driver
 	if migrationModePtr != nil && *migrationModePtr != "" {
-		driver = drivers.MigratorDriver{Mode: *migrationModePtr}
+		driver = adapters.MigratorDriver{Mode: *migrationModePtr}
 	} else if httpPtr != nil && *httpPtr {
-		driver = drivers.HttpDriver{}
+		driver = adapters.HttpDriver{}
 	} else {
 		fmt.Println("Error: Unsupported mode specified")
 		os.Exit(1)

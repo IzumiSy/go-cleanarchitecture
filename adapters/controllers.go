@@ -9,9 +9,9 @@ import (
 	"go-cleanarchitecture/domains/usecases"
 )
 
-type Handler = func(ctx echo.Context) error
+type Controller = func(ctx echo.Context) error
 
-func signupHandler(publisher domains.EventPublisher, logger domains.Logger) Handler {
+func signupController(publisher domains.EventPublisher, logger domains.Logger) Controller {
 	return func(e echo.Context) error {
 		jsonParam := new(struct {
 			Email    string `json:"email"`
@@ -48,7 +48,7 @@ func signupHandler(publisher domains.EventPublisher, logger domains.Logger) Hand
 	}
 }
 
-func authenticateHandler(publisher domains.EventPublisher, logger domains.Logger) Handler {
+func authenticateController(publisher domains.EventPublisher, logger domains.Logger) Controller {
 	return func(e echo.Context) error {
 		jsonParam := new(struct {
 			Email    string `json:"email"`
@@ -90,7 +90,7 @@ func authenticateHandler(publisher domains.EventPublisher, logger domains.Logger
 	}
 }
 
-func getTodosHandler(logger domains.Logger) Handler {
+func getTodosController(logger domains.Logger) Controller {
 	return func(e echo.Context) error {
 		sqlDao, err := dao.NewSQLTodosDao(dao.WITHOUT_TX())
 		if err != nil {
@@ -110,7 +110,7 @@ func getTodosHandler(logger domains.Logger) Handler {
 	}
 }
 
-func createTodoHandler(publisher domains.EventPublisher, logger domains.Logger) Handler {
+func createTodoController(publisher domains.EventPublisher, logger domains.Logger) Controller {
 	return func(e echo.Context) error {
 		jsonParam := new(struct {
 			Name        string `json:"name"`

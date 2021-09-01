@@ -9,7 +9,7 @@ import (
 
 type Subscriber = func(payload []byte) error
 
-func signedUpHandler(ctx context.Context, logger domains.Logger) Subscriber {
+func signedUpSubscriber(ctx context.Context, logger domains.Logger) Subscriber {
 	return func(payload []byte) error {
 		var event usecases.UserSignedUpEvent
 		if err := json.Unmarshal(payload, &event); err != nil {
@@ -21,7 +21,7 @@ func signedUpHandler(ctx context.Context, logger domains.Logger) Subscriber {
 	}
 }
 
-func userAuthenticatedHandler(ctx context.Context, logger domains.Logger) Subscriber {
+func userAuthenticatedSubscriber(ctx context.Context, logger domains.Logger) Subscriber {
 	return func(payload []byte) error {
 		var event usecases.UserAuthenticatedEvent
 		if err := json.Unmarshal(payload, &event); err != nil {
@@ -33,7 +33,7 @@ func userAuthenticatedHandler(ctx context.Context, logger domains.Logger) Subscr
 	}
 }
 
-func todoCreatedHandler(ctx context.Context, logger domains.Logger) Subscriber {
+func todoCreatedSubscriber(ctx context.Context, logger domains.Logger) Subscriber {
 	return func(payload []byte) error {
 		var event usecases.TodoCreatedEvent
 		if err := json.Unmarshal(payload, &event); err != nil {
