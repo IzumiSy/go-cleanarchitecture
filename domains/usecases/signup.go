@@ -82,11 +82,15 @@ func (uc SignupUsecase) Build(params SignupParam) domains.UnauthorizedUsecase {
 			Name_:     auth.User().Name().Value(),
 			CreatedAt: time.Now(),
 		}
+
+		// Eventのpublishに失敗しても意図的にエラーはレスポンスせずErrorのレポートのみとしておく
+		// 非同期処理のエラーは別途手動で復旧作業を行う
 		if err := uc.Publisher.Publish(event); err.NotNil() {
 			uc.Logger.Errorf(uc.Ctx, "Failed publishing event: %s", err.Error())
+		} else {
+			uc.Logger.Infof(uc.Ctx, "Event published: %s", event.ID())
 		}
 
-		uc.Logger.Infof(uc.Ctx, "Event published: %s", event.ID())
 		uc.OutputPort.Write(auth)
 	})
 }
