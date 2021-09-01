@@ -9,7 +9,7 @@ require (
 	github.com/gomodule/redigo v1.8.5
 	github.com/google/uuid v1.1.1
 	github.com/jinzhu/gorm v1.9.1 // indirect
-	github.com/labstack/echo v3.3.5+incompatible
+	github.com/labstack/echo v3.3.10+incompatible
 	github.com/labstack/gommon v0.2.2-0.20180613044413-d6898124de91 // indirect
 	github.com/mattn/go-colorable v0.0.9 // indirect
 	github.com/mattn/go-isatty v0.0.3 // indirect
