@@ -1,7 +1,7 @@
 package usecases
 
 import (
-	"fmt"
+	"context"
 	"time"
 
 	"go-cleanarchitecture/domains"
@@ -23,6 +23,7 @@ type SignupParam struct {
 }
 
 type SignupUsecase struct {
+	Ctx               context.Context
 	OutputPort        SignupOutputPort
 	AuthenticationDao domains.AuthenticationRepository
 	Logger            domains.Logger
@@ -41,14 +42,14 @@ func (uc SignupUsecase) Build(params SignupParam) domains.UnauthorizedUsecase {
 
 		email, err := authentication.NewEmail(params.Email)
 		if err.NotNil() {
-			uc.Logger.Warn(err.Error())
+			uc.Logger.Warnf(uc.Ctx, err.Error())
 			uc.OutputPort.Raise(err)
 			return
 		}
 
 		_, err, exists := uc.AuthenticationDao.GetByEmail(email)
 		if err.NotNil() {
-			uc.Logger.Error(err.Error())
+			uc.Logger.Errorf(uc.Ctx, err.Error())
 			uc.OutputPort.Raise(err)
 			return
 		}
@@ -60,7 +61,7 @@ func (uc SignupUsecase) Build(params SignupParam) domains.UnauthorizedUsecase {
 
 		userName, err := user.NewName(params.UserName)
 		if err.NotNil() {
-			uc.Logger.Warn(err.Error())
+			uc.Logger.Warnf(uc.Ctx, err.Error())
 			uc.OutputPort.Raise(err)
 			return
 		}
@@ -68,7 +69,7 @@ func (uc SignupUsecase) Build(params SignupParam) domains.UnauthorizedUsecase {
 		hash := authentication.NewHash(params.Password)
 		auth := models.NewAuthentication(email, hash, userName)
 		if err = uc.AuthenticationDao.Store(auth); err.NotNil() {
-			uc.Logger.Error(err.Error())
+			uc.Logger.Errorf(uc.Ctx, err.Error())
 			uc.OutputPort.Raise(err)
 			return
 		}
@@ -80,10 +81,10 @@ func (uc SignupUsecase) Build(params SignupParam) domains.UnauthorizedUsecase {
 			CreatedAt: time.Now(),
 		}
 		if err := uc.Publisher.Publish(event); err.NotNil() {
-			uc.Logger.Error(fmt.Sprintf("Failed publishing event: %s", err.Error()))
+			uc.Logger.Errorf(uc.Ctx, "Failed publishing event: %s", err.Error())
 		}
 
-		uc.Logger.Info(fmt.Sprintf("Event published: %s", event.ID()))
+		uc.Logger.Infof(uc.Ctx, "Event published: %s", event.ID())
 		uc.OutputPort.Write(auth)
 	})
 }

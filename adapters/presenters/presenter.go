@@ -1,10 +1,9 @@
 package presenters
 
 import (
+	"github.com/labstack/echo/v4"
 	"go-cleanarchitecture/domains/errors"
 	"net/http"
-
-	"github.com/labstack/echo"
 )
 
 type Presenter interface {

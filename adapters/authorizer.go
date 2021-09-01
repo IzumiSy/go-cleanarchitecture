@@ -1,15 +1,13 @@
 package adapters
 
 import (
+	"errors"
+	"github.com/labstack/echo/v4"
 	"go-cleanarchitecture/adapters/dao"
 	"go-cleanarchitecture/domains"
 	"go-cleanarchitecture/domains/models"
 	"go-cleanarchitecture/domains/models/session"
-
-	"errors"
 	"strings"
-
-	"github.com/labstack/echo"
 )
 
 type DBSessionAuthorizer struct {

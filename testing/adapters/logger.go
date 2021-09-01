@@ -1,6 +1,8 @@
 package adapters
 
 import (
+	"context"
+	"fmt"
 	"go-cleanarchitecture/domains"
 	"testing"
 )
@@ -11,26 +13,26 @@ type MockLogger struct {
 
 var _ domains.Logger = MockLogger{}
 
-func (m MockLogger) Debug(msg string) {
+func (m MockLogger) Debugf(_ context.Context, msg string, a ...interface{}) {
 	if m.T != nil {
-		m.T.Logf("[Debug] %s", msg)
+		m.T.Logf("[Debug] %s", fmt.Sprintf(msg, a...))
 	}
 }
 
-func (m MockLogger) Error(msg string) {
+func (m MockLogger) Errorf(_ context.Context, msg string, a ...interface{}) {
 	if m.T != nil {
-		m.T.Logf("[Error] %s", msg)
+		m.T.Logf("[Error] %s", fmt.Sprintf(msg, a...))
 	}
 }
 
-func (m MockLogger) Info(msg string) {
+func (m MockLogger) Infof(_ context.Context, msg string, a ...interface{}) {
 	if m.T != nil {
-		m.T.Logf("[Info] %s", msg)
+		m.T.Logf("[Info] %s", fmt.Sprintf(msg, a...))
 	}
 }
 
-func (m MockLogger) Warn(msg string) {
+func (m MockLogger) Warnf(_ context.Context, msg string, a ...interface{}) {
 	if m.T != nil {
-		m.T.Logf("[Warn] %s", msg)
+		m.T.Logf("[Warn] %s", fmt.Sprintf(msg, a...))
 	}
 }

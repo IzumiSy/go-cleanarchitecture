@@ -1,7 +1,7 @@
 package usecases
 
 import (
-	"fmt"
+	"context"
 	"time"
 
 	"go-cleanarchitecture/domains"
@@ -21,6 +21,7 @@ type AuthenticateParam struct {
 }
 
 type AuthenticateUsecase struct {
+	Ctx               context.Context
 	OutputPort        AuthenticateOutputPort
 	AuthenticationDao domains.AuthenticationRepository
 	SessionDao        domains.SessionRepository
@@ -41,14 +42,14 @@ func (uc AuthenticateUsecase) Build(params AuthenticateParam) domains.Unauthoriz
 
 		email, err := authentication.NewEmail(params.Email)
 		if err.NotNil() {
-			uc.Logger.Warn(err.Error())
+			uc.Logger.Warnf(uc.Ctx, err.Error())
 			uc.OutputPort.Raise(err)
 			return
 		}
 
 		auth, err, exists := uc.AuthenticationDao.GetByEmail(email)
 		if err.NotNil() {
-			uc.Logger.Error(err.Error())
+			uc.Logger.Errorf(uc.Ctx, err.Error())
 			uc.OutputPort.Raise(err)
 			return
 		}
@@ -66,7 +67,7 @@ func (uc AuthenticateUsecase) Build(params AuthenticateParam) domains.Unauthoriz
 
 		session := models.NewSession(auth.User())
 		if err := uc.SessionDao.Store(session); err.NotNil() {
-			uc.Logger.Error(err.Error())
+			uc.Logger.Errorf(uc.Ctx, err.Error())
 			uc.OutputPort.Raise(err)
 			return
 		}
@@ -76,10 +77,10 @@ func (uc AuthenticateUsecase) Build(params AuthenticateParam) domains.Unauthoriz
 			CreatedAt: time.Now(),
 		}
 		if err := uc.Publisher.Publish(event); err.NotNil() {
-			uc.Logger.Error(fmt.Sprintf("Failed publishing event: %s", err.Error()))
+			uc.Logger.Errorf(uc.Ctx, "Failed publishing event: %s", err.Error())
 		}
 
-		uc.Logger.Info(fmt.Sprintf("Event published: %s", event.ID()))
+		uc.Logger.Infof(uc.Ctx, "Event published: %s", event.ID())
 		uc.OutputPort.Write(session)
 	})
 }

@@ -1,6 +1,7 @@
 package usecases
 
 import (
+	"context"
 	"go-cleanarchitecture/domains"
 	"go-cleanarchitecture/domains/errors"
 	"go-cleanarchitecture/domains/models"
@@ -30,6 +31,7 @@ func TestCreateTodoUsecase(t *testing.T) {
 		op *mockCreateTodoOutputPort,
 	) CreateTodoUsecase {
 		return CreateTodoUsecase{
+			Ctx:        context.Background(),
 			OutputPort: op,
 			TodoDao:    todoDao,
 			TodosDao:   todosDao,
