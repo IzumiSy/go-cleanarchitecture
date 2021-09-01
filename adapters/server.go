@@ -2,11 +2,13 @@ package adapters
 
 import (
 	"context"
-	"github.com/labstack/echo/v4"
-	"github.com/labstack/echo/v4/middleware"
 	"go-cleanarchitecture/adapters/loggers"
 	"go-cleanarchitecture/adapters/pubsub"
 	"go-cleanarchitecture/domains"
+	"time"
+
+	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 )
 
 func RunHTTPServer(ctx context.Context) {
@@ -28,6 +30,9 @@ func RunHTTPServer(ctx context.Context) {
 	e := echo.New()
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
+	e.Use(middleware.TimeoutWithConfig(middleware.TimeoutConfig{
+		Timeout: 5 * time.Second,
+	}))
 
 	e.GET("/todos", getTodosHandler(logger))
 	e.POST("/todo", createTodoHandler(pa, logger))
