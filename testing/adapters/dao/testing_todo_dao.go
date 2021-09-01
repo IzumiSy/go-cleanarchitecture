@@ -22,7 +22,7 @@ func NewMockTodoDao() mockTodoDao {
 			return models.Todo{}, errors.None, false
 		},
 		GetByNameResult: func() (models.Todo, errors.Domain, bool) {
-			return models.Todo{}, errors.None, true
+			return models.Todo{}, errors.None, false
 		},
 		StoreResult: func() errors.Domain {
 			return errors.None
