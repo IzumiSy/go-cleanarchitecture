@@ -2,8 +2,13 @@ package category
 
 import (
 	"go-cleanarchitecture/domains/errors"
+	"go-cleanarchitecture/domains/models/entity"
 	"unicode/utf8"
 )
+
+type ID struct {
+	entity.ID_
+}
 
 type Name struct {
 	// [カテゴリの名前を表現する値オブジェクト]

@@ -2,22 +2,24 @@ package adapters
 
 import (
 	"errors"
-	"github.com/labstack/echo/v4"
 	"go-cleanarchitecture/adapters/dao"
 	"go-cleanarchitecture/domains"
 	"go-cleanarchitecture/domains/models"
+	"go-cleanarchitecture/domains/models/entity"
 	"go-cleanarchitecture/domains/models/session"
+	"net/http"
 	"strings"
 )
 
 type DBSessionAuthorizer struct {
-	Ctx echo.Context
+	Request *http.Request
+	Driver  dao.Driver
 }
 
 var _ domains.Authorizer = DBSessionAuthorizer{}
 
 func (da DBSessionAuthorizer) Run() (models.Session, error) {
-	sessionDao, err := dao.NewSQLSessionDao(dao.WITHOUT_TX())
+	sessionDao, err := da.Driver.NewSQLSessionDao(dao.WITHOUT_TX())
 	if err != nil {
 		return models.Session{}, err
 	}
@@ -28,10 +30,11 @@ func (da DBSessionAuthorizer) Run() (models.Session, error) {
 		return models.Session{}, err
 	}
 
-	sessionID, sErr := session.NewID(token)
+	sessionID_, sErr := entity.NewID(token)
 	if sErr.NotNil() {
 		return models.Session{}, sErr
 	}
+	sessionID := session.ID{ID_: sessionID_}
 
 	session, sErr, exists := sessionDao.Get(sessionID)
 	if sErr.NotNil() {
@@ -46,7 +49,7 @@ func (da DBSessionAuthorizer) Run() (models.Session, error) {
 }
 
 func (da DBSessionAuthorizer) extractBearerToken() (string, error) {
-	bearerToken := da.Ctx.Request().Header.Get("Authorization")
+	bearerToken := da.Request.Header.Get("Authorization")
 	token := strings.Split(bearerToken, "Bearer ")
 	if len(token) == 2 {
 		return token[1], nil

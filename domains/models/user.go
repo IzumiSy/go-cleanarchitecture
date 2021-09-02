@@ -1,6 +1,7 @@
 package models
 
 import (
+	"go-cleanarchitecture/domains/models/entity"
 	"go-cleanarchitecture/domains/models/user"
 )
 
@@ -13,7 +14,7 @@ type User struct {
 
 func NewUser(name user.Name) User {
 	return User{
-		id:   user.GenerateID(),
+		id:   user.ID{ID_: entity.GenerateID()},
 		name: name,
 	}
 }

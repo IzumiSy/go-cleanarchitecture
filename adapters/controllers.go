@@ -11,7 +11,7 @@ import (
 
 type Controller = func(ctx echo.Context) error
 
-func signupController(publisher domains.EventPublisher, logger domains.Logger) Controller {
+func signupController(publisher domains.EventPublisher, logger domains.Logger, db dao.Driver) Controller {
 	return func(e echo.Context) error {
 		jsonParam := new(struct {
 			Email    string `json:"email"`
@@ -23,8 +23,8 @@ func signupController(publisher domains.EventPublisher, logger domains.Logger) C
 			return err
 		}
 
-		return dao.WithTx(func(tx dao.TxSQLDao) error {
-			authenticationDao, err := dao.NewSQLAuthenticationDao(dao.WITH_TX(tx))
+		return db.WithTx(func(tx dao.TxSQLDao) error {
+			authenticationDao, err := db.NewSQLAuthenticationDao(dao.WITH_TX(tx))
 			if err != nil {
 				return err
 			}
@@ -48,7 +48,7 @@ func signupController(publisher domains.EventPublisher, logger domains.Logger) C
 	}
 }
 
-func authenticateController(publisher domains.EventPublisher, logger domains.Logger) Controller {
+func authenticateController(publisher domains.EventPublisher, logger domains.Logger, db dao.Driver) Controller {
 	return func(e echo.Context) error {
 		jsonParam := new(struct {
 			Email    string `json:"email"`
@@ -59,14 +59,14 @@ func authenticateController(publisher domains.EventPublisher, logger domains.Log
 			return err
 		}
 
-		return dao.WithTx(func(tx dao.TxSQLDao) error {
-			authenticationDao, err := dao.NewSQLAuthenticationDao(dao.WITH_TX(tx))
+		return db.WithTx(func(tx dao.TxSQLDao) error {
+			authenticationDao, err := db.NewSQLAuthenticationDao(dao.WITH_TX(tx))
 			if err != nil {
 				return err
 			}
 			// defer authenticationDao.Close()
 
-			sessionDao, err := dao.NewSQLSessionDao(dao.WITH_TX(tx))
+			sessionDao, err := db.NewSQLSessionDao(dao.WITH_TX(tx))
 			if err != nil {
 				return err
 			}
@@ -90,9 +90,9 @@ func authenticateController(publisher domains.EventPublisher, logger domains.Log
 	}
 }
 
-func getTodosController(logger domains.Logger) Controller {
+func getTodosController(logger domains.Logger, db dao.Driver) Controller {
 	return func(e echo.Context) error {
-		sqlDao, err := dao.NewSQLTodosDao(dao.WITHOUT_TX())
+		sqlDao, err := db.NewSQLTodosDao(dao.WITHOUT_TX())
 		if err != nil {
 			return err
 		}
@@ -104,13 +104,16 @@ func getTodosController(logger domains.Logger) Controller {
 			OutputPort: presenter,
 			TodosDao:   sqlDao,
 			Logger:     logger,
-		}.Build().Run(DBSessionAuthorizer{e})
+		}.Build().Run(DBSessionAuthorizer{
+			Request: e.Request(),
+			Driver:  db,
+		})
 
 		return presenter.Presenter.Result()
 	}
 }
 
-func createTodoController(publisher domains.EventPublisher, logger domains.Logger) Controller {
+func createTodoController(publisher domains.EventPublisher, logger domains.Logger, db dao.Driver) Controller {
 	return func(e echo.Context) error {
 		jsonParam := new(struct {
 			Name        string `json:"name"`
@@ -121,14 +124,14 @@ func createTodoController(publisher domains.EventPublisher, logger domains.Logge
 			return err
 		}
 
-		return dao.WithTx(func(tx dao.TxSQLDao) error {
-			sqlTodoDao, err := dao.NewSQLTodoDao(dao.WITH_TX(tx))
+		return db.WithTx(func(tx dao.TxSQLDao) error {
+			sqlTodoDao, err := db.NewSQLTodoDao(dao.WITH_TX(tx))
 			if err != nil {
 				return err
 			}
 			// defer sqlTodoDao.Close()
 
-			sqlTodosDao, err := dao.NewSQLTodosDao(dao.WITH_TX(tx))
+			sqlTodosDao, err := db.NewSQLTodosDao(dao.WITH_TX(tx))
 			if err != nil {
 				return err
 			}
@@ -145,7 +148,10 @@ func createTodoController(publisher domains.EventPublisher, logger domains.Logge
 			}.Build(usecases.CreateTodoParam{
 				Name:        jsonParam.Name,
 				Description: jsonParam.Description,
-			}).Run(DBSessionAuthorizer{e})
+			}).Run(DBSessionAuthorizer{
+				Request: e.Request(),
+				Driver:  db,
+			})
 
 			return presenter.Presenter.Result()
 		})

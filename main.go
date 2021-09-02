@@ -13,13 +13,13 @@ type Driver interface {
 }
 
 func main() {
-	migrationModePtr := flag.String("migrate", "", "migration mode")
+	migrationModePtr := flag.Bool("migrate", false, "migration mode")
 	httpPtr := flag.Bool("http", false, "http server mode")
 	flag.Parse()
 
 	var driver Driver
-	if migrationModePtr != nil && *migrationModePtr != "" {
-		driver = adapters.MigratorDriver{Mode: *migrationModePtr}
+	if migrationModePtr != nil && *migrationModePtr {
+		driver = adapters.MigratorDriver{}
 	} else if httpPtr != nil && *httpPtr {
 		driver = adapters.HttpDriver{}
 	} else {

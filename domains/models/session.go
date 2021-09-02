@@ -1,6 +1,7 @@
 package models
 
 import (
+	"go-cleanarchitecture/domains/models/entity"
 	"go-cleanarchitecture/domains/models/session"
 	"go-cleanarchitecture/domains/models/user"
 )
@@ -15,9 +16,9 @@ type Session struct {
 
 func NewSession(user User) Session {
 	return Session{
-		id:        session.GenerateID(),
+		id:        session.ID{ID_: entity.GenerateID()},
 		userID:    user.ID(),
-		createdAt: session.GenerateCreatedAt(),
+		createdAt: session.CreatedAt{Time_: entity.GenerateTime()},
 	}
 }
 

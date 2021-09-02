@@ -2,6 +2,7 @@ package models
 
 import (
 	"go-cleanarchitecture/domains/models/category"
+	"go-cleanarchitecture/domains/models/entity"
 )
 
 type Category struct {
@@ -13,7 +14,7 @@ type Category struct {
 
 func NewCategory(name category.Name) Category {
 	return Category{
-		id:   category.GenerateID(),
+		id:   category.ID{ID_: entity.GenerateID()},
 		name: name,
 	}
 }

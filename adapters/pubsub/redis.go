@@ -20,13 +20,13 @@ type RedisAdapter struct {
 
 var _ domains.EventPublisher = RedisAdapter{}
 
-func NewRedisAdapter(logger domains.Logger) (error, RedisAdapter) {
-	pubConn, err := redis.Dial("tcp", "redis:6379")
+func NewRedisAdapter(logger domains.Logger, address string) (error, RedisAdapter) {
+	pubConn, err := redis.Dial("tcp", address)
 	if err != nil {
 		return err, RedisAdapter{}
 	}
 
-	subConn, err := redis.Dial("tcp", "redis:6379")
+	subConn, err := redis.Dial("tcp", address)
 	if err != nil {
 		return err, RedisAdapter{}
 	}

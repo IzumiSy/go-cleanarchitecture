@@ -6,6 +6,7 @@ import (
 	"go-cleanarchitecture/domains/errors"
 	"go-cleanarchitecture/domains/models"
 	"go-cleanarchitecture/domains/models/authentication"
+	"go-cleanarchitecture/domains/models/entity"
 	"go-cleanarchitecture/domains/models/user"
 	"time"
 
@@ -16,8 +17,8 @@ type AuthentcationDao SQLDao
 
 var _ domains.AuthenticationRepository = AuthentcationDao{}
 
-func NewSQLAuthenticationDao(tt txType) (AuthentcationDao, error) {
-	dao, err := newSQLDao("authentication", tt)
+func (driver Driver) NewSQLAuthenticationDao(tt txType) (AuthentcationDao, error) {
+	dao, err := driver.newSQLDao("authentication", tt)
 	return AuthentcationDao(dao), err
 }
 
@@ -27,7 +28,7 @@ func (dao AuthentcationDao) Close() {
 
 type AuthenticationDto struct {
 	Email     string    `gorm:"column:email;primaryKey"`
-	UserID    string    `gorm:"column:user_id;not null;unique"`
+	UserID    string    `gorm:"column:user_id;not null;index"`
 	Hash      string    `gorm:"column:hash;not null"`
 	CreatedAt time.Time `gorm:"column:created_at;not null"`
 }
@@ -80,11 +81,11 @@ func (dao AuthentcationDao) GetByEmail(email authentication.Email) (models.Authe
 	// 永続化済みのデータの取り出しでバリデーションエラーはないはずなのでエラーは無視する
 	_email, _ := authentication.NewEmail(authDto.Email)
 	hash := authentication.NewHash(authDto.Hash)
-	createdAt := authentication.NewCreatedAt(authDto.CreatedAt)
-	userID, _ := user.NewID(userDto.ID)
+	createdAt := authentication.CreatedAt{Time_: entity.NewTime(authDto.CreatedAt)}
 	userName, _ := user.NewName(userDto.Name)
+	userID_, _ := entity.NewID(userDto.ID)
+	userID := user.ID{ID_: userID_}
 	user := models.BuildUser(userID, userName)
-
 	return models.BuildAuthentication(_email, hash, user, createdAt), errors.None, true
 }
 

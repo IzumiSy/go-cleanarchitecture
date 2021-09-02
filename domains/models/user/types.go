@@ -2,8 +2,13 @@ package user
 
 import (
 	"go-cleanarchitecture/domains/errors"
+	"go-cleanarchitecture/domains/models/entity"
 	"unicode/utf8"
 )
+
+type ID struct {
+	entity.ID_
+}
 
 type Name struct {
 	// Userの名前を表現する値オブジェクト

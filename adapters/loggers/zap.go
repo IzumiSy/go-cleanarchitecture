@@ -8,28 +8,18 @@ import (
 )
 
 type ZapLogger struct {
-	logger *zap.Logger
+	logger *zap.SugaredLogger
 }
 
 var _ domains.Logger = ZapLogger{}
 
-func NewZapLogger(configFilePath string) (ZapLogger, error) {
-	encoderConfig := zap.NewDevelopmentEncoderConfig()
-	encoderConfig.CallerKey = "file"
-	encoderConfig.MessageKey = "msg"
-	encoderConfig.LevelKey = "level"
-	encoderConfig.TimeKey = "time"
-
-	config := zap.NewDevelopmentConfig()
-	config.Encoding = "json"
-	config.EncoderConfig = encoderConfig
-
-	logger, err := config.Build()
+func NewZapLogger() (ZapLogger, error) {
+	logger, err := zap.NewDevelopment()
 	if err != nil {
 		return ZapLogger{}, err
 	}
 
-	return ZapLogger{logger}, nil
+	return ZapLogger{logger.Sugar()}, nil
 }
 
 func (logger ZapLogger) Debugf(_ context.Context, msg string, a ...interface{}) {
