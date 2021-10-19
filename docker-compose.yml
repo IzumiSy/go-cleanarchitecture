@@ -24,3 +24,11 @@ services:
     volumes:
       - "./tmp/data/redis:/data"
     command: --loglevel debug
+  migration:
+    image: "flyway/flyway:latest"
+    command: -configFiles=/flyway/config/flyway.conf -locations=filesystem:/flyway/sql -connectRetries=60 migrate
+    volumes:
+      - ${PWD}/schemas/sql:/flyway/sql
+      - ${PWD}/flyway.conf:/flyway/config/flyway.conf
+    depends_on:
+      - db
