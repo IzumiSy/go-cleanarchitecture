@@ -15,19 +15,19 @@ hooks.beforeAll(function(transaction) {
   console.log("Email:", session.email)
 })
 
-hooks.before('/signup > POST', function(transaction) {
+hooks.before('/v1/signup > POST', function(transaction) {
   var requestBody = JSON.parse(transaction.request.body);
   requestBody['email'] = session.email
   transaction.request.body = JSON.stringify(requestBody)
 })
 
-hooks.before('/login > POST', function(transaction) {
+hooks.before('/v1/login > POST', function(transaction) {
   var requestBody = JSON.parse(transaction.request.body);
   requestBody['email'] = session.email
   transaction.request.body = JSON.stringify(requestBody)
 })
 
-hooks.after('/login > POST', function(transaction) {
+hooks.after('/v1/login > POST', function(transaction) {
   session.token = JSON.parse(transaction.real.body).session_id
 })
 
@@ -37,7 +37,7 @@ hooks.beforeEach(function(transaction) {
   }
 })
 
-hooks.before('/todo > POST', function(transaction) {
+hooks.before('/v1/todo > POST', function(transaction) {
   var requestBody = JSON.parse(transaction.request.body);
   requestBody['name'] = session.todoName
   transaction.request.body = JSON.stringify(requestBody)
