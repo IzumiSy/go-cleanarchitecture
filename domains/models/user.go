@@ -13,8 +13,9 @@ type User struct {
 }
 
 func NewUser(name user.Name) User {
+	id, _ := user.NewID(entity.GenerateID{})
 	return User{
-		id:   user.ID{ID_: entity.GenerateID()},
+		id:   id,
 		name: name,
 	}
 }

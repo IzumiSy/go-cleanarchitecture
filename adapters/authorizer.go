@@ -30,11 +30,10 @@ func (da DBSessionAuthorizer) Run() (models.Session, error) {
 		return models.Session{}, err
 	}
 
-	sessionID_, sErr := entity.NewID(token)
+	sessionID, sErr := session.NewID(entity.ParseID{Src: token})
 	if sErr.NotNil() {
 		return models.Session{}, sErr
 	}
-	sessionID := session.ID{ID_: sessionID_}
 
 	session, sErr, exists := sessionDao.Get(sessionID)
 	if sErr.NotNil() {

@@ -49,10 +49,9 @@ func (dao TodosDao) GetByUserID(userID user.ID) (models.Todos, errors.Domain) {
 	todos := []models.Todo{}
 	for _, dto := range dtos {
 		// 永続化済みのデータの取り出しでバリデーションエラーはないはずなのでエラーは無視する
-		id_, _ := entity.NewID(dto.ID)
 		name, _ := todo.NewName(dto.Name)
 		description, _ := todo.NewDescription(dto.Description)
-		id := todo.ID{ID_: id_}
+		id, _ := todo.NewID(entity.ParseID{Src: dto.ID})
 		todos = append(todos, models.BuildTodo(id, userID, name, description))
 	}
 

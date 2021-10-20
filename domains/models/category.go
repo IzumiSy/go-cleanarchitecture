@@ -13,8 +13,9 @@ type Category struct {
 }
 
 func NewCategory(name category.Name) Category {
+	id, _ := category.NewID(entity.GenerateID{})
 	return Category{
-		id:   category.ID{ID_: entity.GenerateID()},
+		id:   id,
 		name: name,
 	}
 }

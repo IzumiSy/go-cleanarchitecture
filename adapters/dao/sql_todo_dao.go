@@ -84,12 +84,10 @@ func (dao TodoDao) Get(id todo.ID) (models.Todo, errors.Domain, bool) {
 		return empty, errors.Postconditional(query.Error), false
 	}
 
-	todoID_, _ := entity.NewID(dto.ID)
 	name, _ := todo.NewName(dto.Name)
 	description, _ := todo.NewDescription(dto.Description)
-	userID_, _ := entity.NewID(dto.UserID)
-	todoID := todo.ID{ID_: todoID_}
-	userID := user.ID{ID_: userID_}
+	todoID, _ := todo.NewID(entity.ParseID{Src: dto.ID})
+	userID, _ := user.NewID(entity.ParseID{Src: dto.UserID})
 	return models.BuildTodo(todoID, userID, name, description), errors.None, true
 }
 
@@ -113,9 +111,8 @@ func (dao TodoDao) GetByName(userID user.ID, name todo.Name) (models.Todo, error
 		return empty, errors.Postconditional(query.Error), false
 	}
 
-	todoID_, _ := entity.NewID(dto.ID)
 	description, _ := todo.NewDescription(dto.Description)
-	todoID := todo.ID{ID_: todoID_}
+	todoID, _ := todo.NewID(entity.ParseID{Src: dto.ID})
 	return models.BuildTodo(todoID, userID, name, description), errors.None, true
 }
 

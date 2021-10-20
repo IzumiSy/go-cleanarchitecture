@@ -14,19 +14,33 @@ type ID_ struct {
 	value uuid.UUID
 }
 
-func NewID(value string) (ID_, errors.Domain) {
-	id, err := uuid.Parse(value)
-	if err != nil {
-		return ID_{}, errors.Preconditional(fmt.Sprintf("Invalid ID: %s", err.Error()))
-	}
-
-	return ID_{id}, errors.None
-}
-
 func (id ID_) String() string {
 	return id.value.String()
 }
 
-func GenerateID() ID_ {
-	return ID_{uuid.New()}
+type IDBuilder interface {
+	Build() (ID_, errors.Domain)
+}
+
+var (
+	_ IDBuilder = ParseID{}
+	_ IDBuilder = GenerateID{}
+)
+
+type ParseID struct {
+	Src string
+}
+
+func (v ParseID) Build() (ID_, errors.Domain) {
+	if id, err := uuid.Parse(v.Src); err != nil {
+		return ID_{}, errors.Preconditional(fmt.Sprintf("IDBuilder: invalid ID: %s", err.Error()))
+	} else {
+		return ID_{value: id}, errors.None
+	}
+}
+
+type GenerateID struct{}
+
+func (GenerateID) Build() (ID_, errors.Domain) {
+	return ID_{value: uuid.New()}, errors.None
 }

@@ -83,8 +83,7 @@ func (dao AuthentcationDao) GetByEmail(email authentication.Email) (models.Authe
 	hash := authentication.NewHash(authDto.Hash)
 	createdAt := authentication.CreatedAt{Time_: entity.NewTime(authDto.CreatedAt)}
 	userName, _ := user.NewName(userDto.Name)
-	userID_, _ := entity.NewID(userDto.ID)
-	userID := user.ID{ID_: userID_}
+	userID, _ := user.NewID(entity.ParseID{Src: userDto.ID})
 	user := models.BuildUser(userID, userName)
 	return models.BuildAuthentication(_email, hash, user, createdAt), errors.None, true
 }

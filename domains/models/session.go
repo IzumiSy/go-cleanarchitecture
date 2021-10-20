@@ -15,8 +15,9 @@ type Session struct {
 }
 
 func NewSession(user User) Session {
+	id, _ := session.NewID(entity.GenerateID{})
 	return Session{
-		id:        session.ID{ID_: entity.GenerateID()},
+		id:        id,
 		userID:    user.ID(),
 		createdAt: session.CreatedAt{Time_: entity.GenerateTime()},
 	}

@@ -6,8 +6,14 @@ import (
 	"unicode/utf8"
 )
 
+// [UserエンティティのID]
 type ID struct {
 	entity.ID_
+}
+
+func NewID(builder entity.IDBuilder) (ID, errors.Domain) {
+	id, err := builder.Build()
+	return ID{ID_: id}, err
 }
 
 type Name struct {

@@ -75,8 +75,9 @@ func NewHistories(todoID ID) *Histories {
 func (h *Histories) AddHistory(historyType HistoryType, value valueable) {
 	previous := h.lastUpdatesByType[historyType]
 
+	id, _ := history.NewID(entity.GenerateID{})
 	h.value = append(h.value, History{
-		id:          history.ID{ID_: entity.GenerateID()},
+		id:          id,
 		todoID:      h.todoID,
 		historyType: historyType,
 		previous:    previous,

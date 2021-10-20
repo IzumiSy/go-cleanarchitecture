@@ -53,10 +53,8 @@ func (dao SessionDao) Get(id session.ID) (models.Session, errors.Domain, bool) {
 	}
 
 	// 永続化済みのデータの取り出しでバリデーションエラーはないはずなのでエラーは無視する
-	sessionID_, _ := entity.NewID(sessionDto.ID)
-	sessionID := session.ID{ID_: sessionID_}
-	userID_, _ := entity.NewID(sessionDto.UserID)
-	userID := user.ID{ID_: userID_}
+	sessionID, _ := session.NewID(entity.ParseID{Src: sessionDto.ID})
+	userID, _ := user.NewID(entity.ParseID{Src: sessionDto.UserID})
 	createdAt := session.CreatedAt{Time_: entity.NewTime(sessionDto.CreatedAt)}
 	return models.BuildSession(sessionID, userID, createdAt), errors.None, true
 }

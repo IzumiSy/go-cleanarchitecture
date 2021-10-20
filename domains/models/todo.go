@@ -22,8 +22,7 @@ type Todo struct {
 // アプリケーション上における新規のTODOを作成する関数
 // IDは内部で生成するためこの関数では外部から入力を受け付けない
 func NewTodo(name todo.Name, description todo.Description, userID user.ID) Todo {
-	todoID := todo.ID{ID_: entity.GenerateID()}
-
+	todoID, _ := todo.NewID(entity.GenerateID{})
 	return Todo{
 		id:          todoID,
 		userID:      userID,
