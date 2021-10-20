@@ -34,8 +34,8 @@ type TodoDto struct {
 	Name        string `gorm:"column:name;not null;index:idx_user_id_name"`
 	Description string `gorm:"column:description;not null"`
 
-	Categories []TodoCategoryDto `gorm:"many2many:todo_categories;"`
-	Histories  []TodoHistoryDto  `gorm:"foreignKey:todo_id;constraint:OnDelete:CASCADE"`
+	// Categories []TodoCategoryDto `gorm:"many2many:todo_categories;"`
+	Histories []TodoHistoryDto `gorm:"foreignKey:todo_id;constraint:OnDelete:CASCADE"`
 }
 
 func (TodoDto) TableName() string {
@@ -73,7 +73,6 @@ func (dao TodoDao) Get(id todo.ID) (models.Todo, errors.Domain, bool) {
 		conn.
 		WithContext(context.Background()).
 		Preload("Histories").
-		Preload("Categories").
 		Take(&dto, "id = ?", id.String())
 
 	empty := models.Todo{}
@@ -98,7 +97,6 @@ func (dao TodoDao) GetByName(userID user.ID, name todo.Name) (models.Todo, error
 		conn.
 		WithContext(context.Background()).
 		Preload("Histories").
-		Preload("Categories").
 		Where("user_id = ?", userID.String()).
 		Where("name = ?", name.Value()).
 		Take(&dto)
@@ -149,7 +147,6 @@ func (dao TodoDao) Store(todo models.Todo) errors.Domain {
 		UserID:      todo.UserID().String(),
 		Name:        todo.Name().Value(),
 		Description: todo.Description().Value(),
-		Categories:  []TodoCategoryDto{},
 		Histories:   histDtos,
 	}
 

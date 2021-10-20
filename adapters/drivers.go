@@ -91,7 +91,6 @@ func (driver MigratorDriver) Run(ctx context.Context) {
 	conn.AutoMigrate(
 		&dao.TodoDto{},
 		&dao.TodoHistoryDto{},
-		// &dao.TodoCategoryDto{},
 		&dao.AuthenticationDto{},
 		&dao.SessionDto{},
 		&dao.UserDto{},
