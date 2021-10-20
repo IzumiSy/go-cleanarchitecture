@@ -2,6 +2,7 @@ package models
 
 import (
 	"go-cleanarchitecture/domains/models/authentication"
+	"go-cleanarchitecture/domains/models/entity"
 	"go-cleanarchitecture/domains/models/user"
 )
 
@@ -29,7 +30,7 @@ func NewAuthentication(
 		email:     email,
 		hash:      hash,
 		user:      NewUser(userName),
-		createdAt: authentication.GenerateCreatedAt(),
+		createdAt: authentication.CreatedAt{Time_: entity.GenerateTime()},
 	}
 }
 

@@ -2,28 +2,55 @@ package adapters
 
 import (
 	"context"
-	"fmt"
-	"github.com/labstack/echo/v4"
-	"github.com/labstack/echo/v4/middleware"
 	"go-cleanarchitecture/adapters/dao"
 	"go-cleanarchitecture/adapters/loggers"
 	"go-cleanarchitecture/adapters/pubsub"
 	"go-cleanarchitecture/domains"
-	"gorm.io/gorm"
-	"gorm.io/gorm/logger"
 	"os"
 	"time"
+
+	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
+	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 )
+
+type driverConfigs struct {
+	Name  string
+	DB    dao.Driver
+	Redis string
+}
+
+// default: dev
+var currentDriver driverConfigs = driverConfigs{
+	Name:  "development",
+	DB:    dao.DevDriver,
+	Redis: "localhost:6379",
+}
+
+func loadConfigs() {
+	switch os.Getenv("APP_ENV") {
+	case "production":
+		currentDriver = driverConfigs{
+			Name:  "production",
+			DB:    dao.ProdDriver,
+			Redis: "redis:6379",
+		}
+	}
+}
 
 type HttpDriver struct{}
 
 func (driver HttpDriver) Run(ctx context.Context) {
-	logger, err := loggers.NewZapLogger("config/zap.json")
+	loadConfigs()
+
+	logger, err := loggers.NewZapLogger()
 	if err != nil {
 		panic(err)
 	}
+	logger.Infof(ctx, "Env: %s", currentDriver.Name)
 
-	err, pa := pubsub.NewRedisAdapter(logger)
+	err, pa := pubsub.NewRedisAdapter(logger, currentDriver.Redis)
 	if err != nil {
 		panic(err)
 	}
@@ -40,46 +67,32 @@ func (driver HttpDriver) Run(ctx context.Context) {
 		Timeout: 5 * time.Second,
 	}))
 
-	e.GET("/todos", getTodosController(logger))
-	e.POST("/todo", createTodoController(pa, logger))
-	e.POST("/signup", signupController(pa, logger))
-	e.POST("/login", authenticateController(pa, logger))
+	v1 := e.Group("v1")
+	v1.GET("/todos", getTodosController(logger, currentDriver.DB))
+	v1.POST("/todo", createTodoController(pa, logger, currentDriver.DB))
+	v1.POST("/signup", signupController(pa, logger, currentDriver.DB))
+	v1.POST("/login", authenticateController(pa, logger, currentDriver.DB))
 
 	e.Logger.Fatal(e.Start(":8080"))
 }
 
-type MigratorDriver struct {
-	Mode string
-}
+type MigratorDriver struct{}
 
 func (driver MigratorDriver) Run(ctx context.Context) {
-	conn, err := gorm.Open(dao.CurrentDriver().Dialector(), &gorm.Config{})
+	loadConfigs()
+
+	conn, err := gorm.Open(currentDriver.DB.Dialector, &gorm.Config{})
 	conn.Logger = logger.Default.LogMode(logger.Info)
 	if err != nil {
 		panic(err.Error())
 	}
 
-	switch driver.Mode {
-	case "down":
-		driver.Down(conn)
-	case "up":
-		driver.Up(conn)
-	default:
-		fmt.Println("Migration supports only `up` or `down`")
-		os.Exit(1)
-	}
-}
-
-func (driver MigratorDriver) Up(conn *gorm.DB) {
-	conn.Migrator().CreateTable(&dao.TodoDto{})
-	conn.Migrator().CreateTable(&dao.AuthenticationDto{})
-	conn.Migrator().CreateTable(&dao.SessionDto{})
-	conn.Migrator().CreateTable(&dao.UserDto{})
-}
-
-func (driver MigratorDriver) Down(conn *gorm.DB) {
-	conn.Migrator().DropTable(&dao.TodoDto{})
-	conn.Migrator().DropTable(&dao.AuthenticationDto{})
-	conn.Migrator().DropTable(&dao.SessionDto{})
-	conn.Migrator().DropTable(&dao.UserDto{})
+	conn.Logger.Info(ctx, "Env: %s", currentDriver.Name)
+	conn.AutoMigrate(
+		&dao.TodoDto{},
+		&dao.TodoHistoryDto{},
+		&dao.AuthenticationDto{},
+		&dao.SessionDto{},
+		&dao.UserDto{},
+	)
 }

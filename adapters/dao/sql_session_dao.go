@@ -5,6 +5,7 @@ import (
 	"go-cleanarchitecture/domains"
 	"go-cleanarchitecture/domains/errors"
 	"go-cleanarchitecture/domains/models"
+	"go-cleanarchitecture/domains/models/entity"
 	"go-cleanarchitecture/domains/models/session"
 	"go-cleanarchitecture/domains/models/user"
 	"time"
@@ -16,8 +17,8 @@ type SessionDao SQLDao
 
 var _ domains.SessionRepository = SessionDao{}
 
-func NewSQLSessionDao(tt txType) (SessionDao, error) {
-	dao, err := newSQLDao("session", tt)
+func (driver Driver) NewSQLSessionDao(tt txType) (SessionDao, error) {
+	dao, err := driver.newSQLDao("session", tt)
 	return SessionDao(dao), err
 }
 
@@ -27,7 +28,7 @@ func (dao SessionDao) Close() {
 
 type SessionDto struct {
 	ID        string    `gorm:"column:id"`
-	UserID    string    `gorm:"column:user_id;not null;unique"`
+	UserID    string    `gorm:"column:user_id;not null;index"`
 	CreatedAt time.Time `gorm:"column:created_at;not null"`
 }
 
@@ -52,11 +53,10 @@ func (dao SessionDao) Get(id session.ID) (models.Session, errors.Domain, bool) {
 	}
 
 	// 永続化済みのデータの取り出しでバリデーションエラーはないはずなのでエラーは無視する
-	_id, _ := session.NewID(sessionDto.ID)
-	userID, _ := user.NewID(sessionDto.UserID)
-	createdAt := session.NewCreatedAt(sessionDto.CreatedAt)
-
-	return models.BuildSession(_id, userID, createdAt), errors.None, true
+	sessionID, _ := session.NewID(entity.ParseID{Src: sessionDto.ID})
+	userID, _ := user.NewID(entity.ParseID{Src: sessionDto.UserID})
+	createdAt := session.CreatedAt{Time_: entity.NewTime(sessionDto.CreatedAt)}
+	return models.BuildSession(sessionID, userID, createdAt), errors.None, true
 }
 
 func (dao SessionDao) Store(session models.Session) errors.Domain {

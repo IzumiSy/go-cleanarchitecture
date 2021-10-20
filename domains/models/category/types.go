@@ -2,8 +2,18 @@ package category
 
 import (
 	"go-cleanarchitecture/domains/errors"
+	"go-cleanarchitecture/domains/models/entity"
 	"unicode/utf8"
 )
+
+type ID struct {
+	entity.ID_
+}
+
+func NewID(builder entity.IDBuilder) (ID, errors.Domain) {
+	id, err := builder.Build()
+	return ID{ID_: id}, err
+}
 
 type Name struct {
 	// [カテゴリの名前を表現する値オブジェクト]
