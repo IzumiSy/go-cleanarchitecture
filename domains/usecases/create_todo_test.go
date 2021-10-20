@@ -5,6 +5,7 @@ import (
 	"go-cleanarchitecture/domains"
 	"go-cleanarchitecture/domains/errors"
 	"go-cleanarchitecture/domains/models"
+	"go-cleanarchitecture/domains/models/entity"
 	"go-cleanarchitecture/domains/models/todo"
 	"go-cleanarchitecture/domains/models/user"
 	"go-cleanarchitecture/testing/adapters"
@@ -45,7 +46,7 @@ func TestCreateTodoUsecase(t *testing.T) {
 		todoDao.GetByNameResult = func() (models.Todo, errors.Domain, bool) {
 			name, _ := todo.NewName("testing todo")
 			description, _ := todo.NewDescription("this is a testing todo")
-			userID, _ := user.NewID("user_id")
+			userID, _ := user.NewID(entity.ParseID{Src: "user_id"})
 			todo := models.NewTodo(name, description, userID)
 			return todo, errors.None, true
 		}
