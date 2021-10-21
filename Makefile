@@ -13,7 +13,7 @@ test/unit:
 	go test -v ./...
 
 test/integration:
-	docker run --network host -it -v $$(pwd):/app -w /app apiaryio/dredd dredd \
+	docker run --net=go-cleanarchitecture_default -it -v $$(pwd):/app -w /app apiaryio/dredd dredd \
 		api-description.apib http://localhost:8080 --hookfiles=./dredd_hook.js
 
 db/migrate:
