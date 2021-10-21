@@ -9,8 +9,12 @@ run: main.go
 clean:
 	rm -rf go-cleanarchitecture
 
-test:
+test/unit:
 	go test -v ./...
+
+test/integration:
+	docker run --network host -it -v $$(pwd):/app -w /app apiaryio/dredd dredd \
+		api-description.apib http://localhost:8080 --hookfiles=./dredd_hook.js
 
 db/migrate:
 	docker run --net=go-cleanarchitecture_default --rm \ 
