@@ -6,9 +6,6 @@ build:
 run: main.go
 	go run main.go -http
 
-migrate:
-	go run main.go -migrate
-
 clean:
 	rm -rf go-cleanarchitecture
 
