@@ -55,7 +55,7 @@ create table `authentication` (
   `email` varchar(255) primary key,
   `user_id` varchar(255) not null,
   `hash` varchar(255) not null,
-  `created_at` varchar(255) not null,
+  `created_at` timestamp not null,
 
   constraint fk_authn_user_id foreign key (user_id)
     references user (id) on delete cascade

@@ -90,6 +90,14 @@ func (dao AuthentcationDao) GetByEmail(email authentication.Email) (models.Authe
 
 func (dao AuthentcationDao) Store(auth models.Authentication) errors.Domain {
 	user := auth.User()
+	userDto := UserDto{
+		ID:   user.ID().String(),
+		Name: user.Name().Value(),
+	}
+	if err := dao.conn.WithContext(context.Background()).Table("user").Create(&userDto).Error; err != nil {
+		return errors.Postconditional(err)
+	}
+
 	authDto := AuthenticationDto{
 		Email:     auth.Email().Value(),
 		Hash:      auth.Hash().Value(),
@@ -98,14 +106,6 @@ func (dao AuthentcationDao) Store(auth models.Authentication) errors.Domain {
 	}
 
 	if err := dao.conn.WithContext(context.Background()).Create(&authDto).Error; err != nil {
-		return errors.Postconditional(err)
-	}
-
-	userDto := UserDto{
-		ID:   user.ID().String(),
-		Name: user.Name().Value(),
-	}
-	if err := dao.conn.WithContext(context.Background()).Table("user").Create(&userDto).Error; err != nil {
 		return errors.Postconditional(err)
 	}
 
