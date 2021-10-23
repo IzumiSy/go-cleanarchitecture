@@ -2,6 +2,7 @@ package adapters
 
 import (
 	"context"
+	"fmt"
 	"go-cleanarchitecture/adapters/dao"
 	"go-cleanarchitecture/adapters/loggers"
 	"go-cleanarchitecture/adapters/pubsub"
@@ -79,20 +80,5 @@ func (driver HttpDriver) Run(ctx context.Context) {
 type MigratorDriver struct{}
 
 func (driver MigratorDriver) Run(ctx context.Context) {
-	loadConfigs()
-
-	conn, err := gorm.Open(currentDriver.DB.Dialector, &gorm.Config{})
-	conn.Logger = logger.Default.LogMode(logger.Info)
-	if err != nil {
-		panic(err.Error())
-	}
-
-	conn.Logger.Info(ctx, "Env: %s", currentDriver.Name)
-	conn.AutoMigrate(
-		&dao.TodoDto{},
-		&dao.TodoHistoryDto{},
-		&dao.AuthenticationDto{},
-		&dao.SessionDto{},
-		&dao.UserDto{},
-	)
+	fmt.Println("Deprecated driver")
 }
