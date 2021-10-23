@@ -12,8 +12,6 @@ import (
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
-	"gorm.io/gorm"
-	"gorm.io/gorm/logger"
 )
 
 type driverConfigs struct {
