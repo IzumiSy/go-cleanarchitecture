@@ -7,14 +7,14 @@ jobs:
       GO111MODULE: "on"
     steps:
       - checkout
-      - run: make test
+      - run: make test/unit
   integration_testing:
     machine: true
     steps:
       - run:
           name: install docker-compose
           command: |
-            curl -L https://github.com/docker/compose/releases/download/1.19.0/docker-compose-`uname -s`-`uname -m` > ~/docker-compose
+            curl -L https://github.com/docker/compose/releases/download/1.29.2/docker-compose-`uname -s`-`uname -m` > ~/docker-compose
             chmod +x ~/docker-compose
             sudo mv ~/docker-compose /usr/local/bin/docker-compose
       - checkout
@@ -22,11 +22,11 @@ jobs:
           name: build and run dredd
           command: |
             mkdir tmp
-            docker-compose up -d
-            sleep 15
-            docker-compose run app make migrate
-            docker run --network host -it -v $PWD:/api -w /api apiaryio/dredd dredd \
-              api-description.apib http://localhost:8080 --hookfiles=./dredd_hook.js
+            docker-compose up --build -d
+            sleep 20
+            make db/migrate
+            make test/integration
+
 
 workflows:
   unit_and_integration_testing:
