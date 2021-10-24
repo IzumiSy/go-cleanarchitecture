@@ -10,6 +10,8 @@ services:
       - redis
     networks:
       - app-network
+    profiles:
+      - app
   db:
     image: "mysql:5.7"
     environment:
@@ -22,6 +24,9 @@ services:
       - "./tmp/data/db:/var/lib/mysql"
     networks:
       - app-network
+    profiles:
+      - middleware
+      - app
   redis:
     image: "redis:latest"
     ports:
@@ -31,6 +36,9 @@ services:
     command: --loglevel debug
     networks:
       - app-network
+    profiles:
+      - middleware
+      - app
 
 networks:
   default:

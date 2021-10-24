@@ -30,8 +30,14 @@ Usage of ./go-cleanarchitecture:
 
 ## Run with Docker
 ```sh
-$ docker-compose up --build
+# Launches all (including app)
+$ docker-compose --profile app up --build
 $ make db/migrate
+
+# Launches only middlewares (for development)
+$ docker-compose up --profile middleware up --build -d
+$ make db/migrate
+$ make run # Runs app locally (not on Docker)
 ```
 
 ## Tests
