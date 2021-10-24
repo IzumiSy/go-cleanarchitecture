@@ -21,7 +21,7 @@ services:
     ports:
       - "3306:3306"
     volumes:
-      - "./tmp/data/db:/var/lib/mysql"
+      - "mysqlvolume:/var/lib/mysql"
     networks:
       - app-network
     profiles:
@@ -45,5 +45,11 @@ networks:
     external:
       name: bridge
   app-network:
+    # Specifies network name here in order to make it enable to get access through Flyway for migration.
     name: go-cleanarchitecture-network
     driver: bridge
+
+volumes:
+  # Creates data volume for MySQL here in order to "permission denied" error.
+  mysqlvolume:
+    driver: local
