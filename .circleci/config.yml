@@ -22,7 +22,7 @@ jobs:
           name: build and run dredd
           command: |
             mkdir tmp
-            docker-compose up --build -d
+            docker-compose --profile app up --build -d
             sleep 20
             make db/migrate
             make test/integration
