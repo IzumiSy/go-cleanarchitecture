@@ -10,6 +10,8 @@ services:
       - redis
     networks:
       - app-network
+    profiles:
+      - app
   db:
     image: "mysql:5.7"
     environment:
@@ -19,23 +21,37 @@ services:
     ports:
       - "3306:3306"
     volumes:
-      - "./tmp/data/db:/var/lib/mysql"
+      - "mysqlvolume:/var/lib/mysql"
     networks:
       - app-network
+    profiles:
+      - middleware
+      - app
   redis:
     image: "redis:latest"
     ports:
       - "6379:6379"
     volumes:
-      - "./tmp/data/redis:/data"
+      - "redisvolume:/data"
     command: --loglevel debug
     networks:
       - app-network
+    profiles:
+      - middleware
+      - app
 
 networks:
   default:
     external:
       name: bridge
   app-network:
+    # Specifies network name here in order to make it enable to get access through Flyway for migration.
     name: go-cleanarchitecture-network
     driver: bridge
+
+volumes:
+  # Creates data volume for persistence here in order to avoid "permission denied" error.
+  mysqlvolume:
+    driver: local
+  redisvolume:
+    driver: local
