@@ -38,7 +38,7 @@ integration-test:
     RUN sleep 15 && \
       docker run --net=go-cleanarchitecture-network --rm -v "$(pwd)/schemas/sql:/flyway/sql" -v "$(pwd)/config:/flyway/config" \
 		    flyway/flyway:7 -configFiles=/flyway/config/flyway.conf -locations=filesystem:/flyway/sql migrate && \
-        docker run --net=go-cleanarchitecture-network --env APP_ENV=production --rm app:latest -http
+      docker run --net=go-cleanarchitecture-network --env APP_ENV=production --rm app:latest -http
   END
 
 all:
