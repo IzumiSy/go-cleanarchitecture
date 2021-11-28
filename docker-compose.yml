@@ -1,17 +1,6 @@
 version: "3"
 
 services:
-  app:
-    build: .
-    ports:
-      - "8080:8080"
-    depends_on:
-      - db
-      - redis
-    networks:
-      - app-network
-    profiles:
-      - app
   db:
     image: "mysql:5.7"
     environment:
@@ -24,9 +13,6 @@ services:
       - "mysqlvolume:/var/lib/mysql"
     networks:
       - app-network
-    profiles:
-      - middleware
-      - app
   redis:
     image: "redis:latest"
     ports:
@@ -36,9 +22,6 @@ services:
     command: --loglevel debug
     networks:
       - app-network
-    profiles:
-      - middleware
-      - app
 
 networks:
   default:

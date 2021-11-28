@@ -1,16 +1,4 @@
-.PHONY: build run clean test db/migrate db/clean
-
-build:
-	go build
-
-run: main.go
-	go run main.go -http
-
-clean:
-	rm -rf go-cleanarchitecture
-
-test/unit:
-	go test -v ./...
+.PHONY: test/integration db/migrate db/clean
 
 test/integration:
 	docker run --net=go-cleanarchitecture-network --rm -it -v "$$(pwd):/app" -w /app apiaryio/dredd dredd \

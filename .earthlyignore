@@ -1,0 +1,5 @@
+Earthfile
+
+vendor/
+.git/
+.circleci/
