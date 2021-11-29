@@ -19,9 +19,16 @@ image:
   ENTRYPOINT ["/go-cleanarchitecture/go-cleanarchitecture"]
   SAVE IMAGE go-cleanarchitecture:latest
 
+run:
+  BUILD +image
+  COPY docker-compose.yml .
+  WITH DOCKER --compose docker-compose.yml --load app:latest=+image
+    docker run --net=go-cleanarchitecture-network --env APP_ENV=production --rm app:latest -http
+  END
+
 test:
-  FROM +unit-test
-  FROM +integration-test
+  BUILD +unit-test
+  BUILD +integration-test
 
 unit-test:
   FROM +deps
@@ -29,19 +36,17 @@ unit-test:
   RUN go test -v ./...
 
 integration-test:
-  FROM +image
-  COPY . .
+  BUILD +image
+  COPY docker-compose.yml .
+  COPY dredd_hook.js api-description.apib .
   WITH DOCKER \
       --compose docker-compose.yml \
       --load app:latest=+image \
-      --pull flyway/flyway:7 # for caching
+      --pull apiaryio/dredd \
+      --pull flyway/flyway:7
     RUN sleep 15 && \
-      docker run --net=go-cleanarchitecture-network --rm -v "$(pwd)/schemas/sql:/flyway/sql" -v "$(pwd)/config:/flyway/config" \
-		    flyway/flyway:7 -configFiles=/flyway/config/flyway.conf -locations=filesystem:/flyway/sql migrate && \
-      docker run --net=go-cleanarchitecture-network --env APP_ENV=production --rm app:latest -http
+      docker run --net=go-cleanarchitecture-network --rm -v "$(pwd)/schemas/sql:/flyway/sql" -v "$(pwd)/config:/flyway/conf" flyway/flyway:7 migrate && \
+      docker run --net=go-cleanarchitecture-network --env APP_ENV=production --rm app:latest -http & \
+      docker run --net=go-cleanarchitecture-network --rm -it -v "$(pwd):/app" -w /app apiaryio/dredd dredd \
+		    api-description.apib localhost:8080 --hookfiles=./dredd_hook.js
   END
-
-all:
-  FROM +deps
-  FROM +build
-  FROM +docker
