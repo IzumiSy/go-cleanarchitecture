@@ -48,6 +48,7 @@ integration-test:
   BUILD +image
   COPY docker-compose.yml .
   COPY dredd_hook.js api-description.apib .
+  COPY ./schemas ./config .
   WITH DOCKER \
       --compose docker-compose.yml \
       --load app:latest=+image \
@@ -56,7 +57,7 @@ integration-test:
     RUN sleep 15 && \
       docker run --net=go-cleanarchitecture-network \
         -v "$(pwd)/schemas/sql:/flyway/sql" -v "$(pwd)/config:/flyway/conf" --rm flyway/flyway:7 migrate && \
-      docker run --net=go-cleanarchitecture-network --env APP_ENV=production --rm app:latest -http & \
+      docker run -d --net=go-cleanarchitecture-network --env APP_ENV=production --rm app:latest -http && \
       docker run --net=go-cleanarchitecture-network -v "$(pwd):/app" -w /app --rm apiaryio/dredd dredd \
-		    api-description.apib http://app:8080 --hookfiles=./dredd_hook.js
+        api-description.apib http://app:8080 --hookfiles=./dredd_hook.js
   END
