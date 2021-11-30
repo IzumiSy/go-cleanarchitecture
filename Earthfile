@@ -17,7 +17,7 @@ image:
   COPY +build/go-cleanarchitecture .
   EXPOSE 8080
   ENTRYPOINT ["/go-cleanarchitecture/go-cleanarchitecture"]
-  SAVE IMAGE go-cleanarchitecture:latest
+  SAVE IMAGE --push go-cleanarchitecture:latest
 
 # Development
 
@@ -94,7 +94,7 @@ dredd:
   COPY . /app
   COPY api-description.apib dredd_hook.js .
   ENTRYPOINT dredd api-description.apib http://app:8080 --hookfiles=dredd_hook.js
-  SAVE IMAGE dredd:latest
+  SAVE IMAGE --push dredd:latest
 
 # Middlewares
 
@@ -104,15 +104,15 @@ db:
   ENV MYSQL_ROOT_PASSWORD=password
   ENV MYSQL_DATABASE=todoapp
   EXPOSE 3306
-  SAVE IMAGE db:latest
+  SAVE IMAGE --push db:latest
 
 pubsub:
   FROM redis:6.2.6-alpine3.15
   EXPOSE 6379
-  SAVE IMAGE pubsub:latest
+  SAVE IMAGE --push pubsub:latest
 
 migrater:
   FROM flyway/flyway:7
   COPY ./config /flyway/conf
   COPY ./schemas /flyway/sql
-  SAVE IMAGE migrater:latest
+  SAVE IMAGE --push migrater:latest
