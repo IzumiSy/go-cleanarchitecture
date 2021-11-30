@@ -30,12 +30,12 @@ workflows:
     jobs:
       - prepare
       - unit-test:
-        requires:
-          - prepare
+          requires:
+            - prepare
       - integration-test:
-        requires:
-          - prepare
-        filters:
-          branches:
-            only:
-              - master
+          requires:
+            - prepare
+          filters:
+            branches:
+              only:
+                - master
