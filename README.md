@@ -30,20 +30,19 @@ Usage of ./go-cleanarchitecture:
 
 ## Run with Docker
 ```sh
-# Launches all (including app)
-$ docker-compose --profile app up --build
-$ make db/migrate
-
-# Launches only middlewares (for development)
-$ docker-compose up --profile middleware up --build -d
-$ make db/migrate
-$ make run # Runs app locally (not on Docker)
+$ docker-compose up -d
+$ earthly +db-migrate
+$ earthly +run
 ```
 
 ## Tests
 ```sh
-$ make test/unit
-$ make test/integration # requires app running on Docker with docker-compose
+# Unit testing
+$ earthly +unit-test
+
+# Integration testing
+$ docker-compose up -d
+$ earthly +integration-test
 ```
 
 ## Architecture
