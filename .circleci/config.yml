@@ -1,14 +1,6 @@
 version: 2.1
 jobs:
-  unit_testing:
-    docker:
-      - image: circleci/golang:1.16
-    environment:
-      GO111MODULE: "on"
-    steps:
-      - checkout
-      - run: make test/unit
-  integration_testing:
+  tests:
     machine: true
     steps:
       - run:
@@ -30,13 +22,12 @@ jobs:
             # mkdir tmp
             docker-compose up
             sleep 15
-            earthly --ci +integration-test
+            earthly --ci +test
             # make db/migrate
             # make test/integration
 
 
 workflows:
-  unit_and_integration_testing:
+  tests:
     jobs:
-      - unit_testing
-      - integration_testing
+      - tests
