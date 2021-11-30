@@ -28,13 +28,17 @@ run:
 
 db-migrate:
   LOCALLY
-  RUN docker run --net=go-cleanarchitecture-network \
-    -v "$(pwd)/schemas/sql:/flyway/sql" -v "$(pwd)/config:/flyway/conf" --rm flyway/flyway:7 migrate
+  WITH DOCKER --pull flyway/flyway:7
+    RUN docker run --net=go-cleanarchitecture-network \
+      -v "$(pwd)/schemas/sql:/flyway/sql" -v "$(pwd)/config:/flyway/conf" --rm flyway/flyway:7 migrate
+  END
 
 db-clean:
   LOCALLY
-  RUN docker run --net=go-cleanarchitecture-network \
-    -v "$(pwd)/schemas/sql:/flyway/sql" -v "$(pwd)/config:/flyway/config" --rm flyway/flyway:7 clean
+  WITH DOCKER --pull flyway/flyway:7
+    RUN docker run --net=go-cleanarchitecture-network \
+      -v "$(pwd)/schemas/sql:/flyway/sql" -v "$(pwd)/config:/flyway/config" --rm flyway/flyway:7 clean
+  END
 
 test:
   BUILD +unit-test
@@ -49,7 +53,7 @@ unit-test:
 integration-test:
   LOCALLY
   BUILD +db-migrate
-  WITH DOCKER --load app:latest=+image
+  WITH DOCKER --load app:latest=+image --pull apiaryio/dredd
     RUN cid=`docker run -d --net=go-cleanarchitecture-network --net-alias=app --env APP_ENV=production --rm app:latest -http` && \
       docker run --net=go-cleanarchitecture-network -v "$(pwd):/app" -w /app --rm apiaryio/dredd dredd \
         api-description.apib http://app:8080 --hookfiles=./dredd_hook.js && \
