@@ -4,15 +4,15 @@ jobs:
     machine: true
     steps:
       - run:
-        name: Setup earthly
-        command: |
-          sudo wget https://github.com/earthly/earthly/releases/download/v0.6.1/earthly-linux-amd64 -O /usr/local/bin/earthly
-          sudo chmod +x /usr/local/bin/earthly
-          earthly bootstrap
-          earthly --version
+          name: Setup earthly
+          command: |
+            sudo wget https://github.com/earthly/earthly/releases/download/v0.6.1/earthly-linux-amd64 -O /usr/local/bin/earthly
+            sudo chmod +x /usr/local/bin/earthly
+            earthly bootstrap
+            earthly --version
       # - run:
-      #   name: "Docker login"
-      #   command: docker login --username "$DOCKERHUB_USERNAME" --password "$DOCKERHUB_TOKEN"
+      #     name: "Docker login"
+      #     command: docker login --username "$DOCKERHUB_USERNAME" --password "$DOCKERHUB_TOKEN"
       - checkout
 
   unit-test:
