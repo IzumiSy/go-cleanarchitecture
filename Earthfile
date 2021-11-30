@@ -104,18 +104,15 @@ db:
   ENV MYSQL_ROOT_PASSWORD=password
   ENV MYSQL_DATABASE=todoapp
   EXPOSE 3306
-  RUN --entrypoint
   SAVE IMAGE db:latest
 
 pubsub:
-  FROM redis:latest
+  FROM redis:6.2.6-alpine3.15
   EXPOSE 6379
-  RUN --entrypoint
   SAVE IMAGE pubsub:latest
 
 migrater:
   FROM flyway/flyway:7
   COPY ./config /flyway/conf
   COPY ./schemas /flyway/sql
-  RUN --entrypoint
   SAVE IMAGE migrater:latest

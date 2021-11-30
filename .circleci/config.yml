@@ -19,7 +19,7 @@ jobs:
       - checkout
       - run:
           name: Run tests
-          command: earthly --ci --push +test
+          command: earthly -P --ci --push +test
 
 workflows:
   tests:
