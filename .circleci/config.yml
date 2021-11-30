@@ -1,7 +1,9 @@
 version: 2.1
 jobs:
   tests:
-    machine: true
+    machine:
+      image: ubuntu:latest
+      docker_layer_caching: true
     steps:
       - run:
           name: Install docker-compose
