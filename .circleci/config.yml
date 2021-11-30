@@ -3,7 +3,7 @@ jobs:
   tests:
     machine:
       image: ubuntu-2004:202111-01
-      docker_layer_caching: trueteps:
+      docker_layer_caching: true
     steps:
       - run:
           name: Install docker-compose
