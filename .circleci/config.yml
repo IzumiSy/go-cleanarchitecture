@@ -14,6 +14,7 @@ jobs:
           command: |
             sudo wget https://github.com/earthly/earthly/releases/download/v0.6.1/earthly-linux-amd64 -O /usr/local/bin/earthly
             sudo chmod +x /usr/local/bin/earthly
+            earthly bootstrap
             earthly --version
       - checkout
       - run:
@@ -21,7 +22,7 @@ jobs:
           command: |
             docker-compose up -d
             sleep 15
-            earthly --ci +test
+            earthly --use-inline-cache --save-inline-cache +test
 
 workflows:
   tests:
