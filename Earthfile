@@ -71,6 +71,7 @@ unit-test:
   RUN go test -v ./...
 
 integration-test:
+  LOCALLY
   WITH DOCKER \
       --load db:latest=+db \
       --load redis:latest=+pubsub \
@@ -86,8 +87,7 @@ integration-test:
       while ! nc 127.0.0.1 8080; do sleep 1 && echo "wait..."; done && sleep 15 && \
       docker run --net=test-network -w /app --rm dredd:latest && \
       docker stop db redis app && \
-      docker network rm test-network && \
-      exit 0
+      docker network rm test-network
   END
 
 dredd:
