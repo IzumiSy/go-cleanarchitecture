@@ -1,7 +1,7 @@
 version: 2.1
 
 jobs:
-  prepare:
+  tests:
     machine: true
     steps:
       - run:
@@ -11,41 +11,10 @@ jobs:
             chmod +x /tmp/earthly
             /tmp/earthly bootstrap
             /tmp/earthly --version
-      - persist_to_workspace:
-          root: /tmp
-          paths:
-            - earthly
-
-  unit-test:
-    machine: true
-    steps:
-      - attach_workspace:
-          at: /tmp
       - checkout
-      - run: /tmp/earthly +unit-test
-
-  integration-test:
-    machine: true
-    steps:
-      - attach_workspace:
-          at: /tmp
-      - run:
-          name: "Docker login"
-          command: docker login --username "izumisy" --password "$DOCKERHUB_TOKEN"
-      - checkout
-      - run: /tmp/earthly -P --ci --push +integration-test
+      - run: /tmp/earthly -P +test
 
 workflows:
   tests:
     jobs:
-      - prepare
-      - unit-test:
-          requires:
-            - prepare
-      - integration-test:
-          requires:
-            - prepare
-          filters:
-            branches:
-              only:
-                - master
+      - tests

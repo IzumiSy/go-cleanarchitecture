@@ -71,6 +71,7 @@ unit-test:
   RUN go test -v ./...
 
 integration-test:
+  LOCALLY
   WITH DOCKER \
       --load db:latest=+db \
       --load redis:latest=+pubsub \
