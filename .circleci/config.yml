@@ -1,31 +1,50 @@
 version: 2.1
 jobs:
-  tests:
-    machine:
-      image: ubuntu-2004:202111-01
-      docker_layer_caching: true
+  prepare:
+    machine: true
     steps:
-      - run:
-          name: Install docker-compose
-          command: |
-            curl -L https://github.com/docker/compose/releases/download/1.29.2/docker-compose-`uname -s`-`uname -m` > ~/docker-compose
-            chmod +x ~/docker-compose
-            sudo mv ~/docker-compose /usr/local/bin/docker-compose
       - run:
           name: Setup earthly
           command: |
-            sudo wget https://github.com/earthly/earthly/releases/download/v0.6.1/earthly-linux-amd64 -O /usr/local/bin/earthly
-            sudo chmod +x /usr/local/bin/earthly
-            earthly bootstrap
-            earthly --version
-      - checkout
+            wget https://github.com/earthly/earthly/releases/download/v0.6.1/earthly-linux-amd64 -O /tmp/earthly
+            chmod +x /tmp/earthly
+            /tmp/earthly bootstrap
+            /tmp/earthly --version
       - run:
-          name: Run tests
-          command: |
-            docker-compose up -d
-            earthly --use-inline-cache --save-inline-cache --push +test
+          name: "Docker login"
+          command: docker login --username "izumisy" --password "$DOCKERHUB_TOKEN"
+      - persist_to_workspace:
+          root: /tmp
+          paths:
+            - earthly
+
+  unit-test:
+    machine: true
+    steps:
+      - attach_workspace:
+          at: /tmp
+      - checkout
+      - run: /tmp/earthly +unit-test
+
+  integration-test:
+    machine: true
+    steps:
+      - attach_workspace:
+          at: /tmp
+      - checkout
+      - run: /tmp/earthly -P --ci --push +integration-test
 
 workflows:
   tests:
     jobs:
-      - tests
+      - prepare
+      - unit-test:
+          requires:
+            - prepare
+      - integration-test:
+          requires:
+            - prepare
+          filters:
+            branches:
+              only:
+                - master
