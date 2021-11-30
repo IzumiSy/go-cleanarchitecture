@@ -18,6 +18,9 @@ jobs:
             sudo chmod +x /usr/local/bin/earthly
             earthly bootstrap
             earthly --version
+      - run:
+          name: "Docker login"
+          command: docker login --username "$DOCKERHUB_USERNAME" --password "$DOCKERHUB_TOKEN"
       - checkout
       - run:
           name: Run tests
