@@ -86,7 +86,8 @@ integration-test:
       while ! nc 127.0.0.1 8080; do sleep 1 && echo "wait..."; done && sleep 15 && \
       docker run --net=test-network -w /app --rm dredd:latest && \
       docker stop db redis app && \
-      docker network rm test-network
+      docker network rm test-network && \
+      exit 0
   END
 
 dredd:
