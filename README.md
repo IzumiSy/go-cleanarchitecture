@@ -12,6 +12,7 @@ This exploration project includes:
 - Multiple drivers (migration, web, CLI)
 - Testing (unit-testing, integration-testing with dredd)
 - CI integration (CircleCI)
+- Uses [earthly](https://github.com/earthly/earthly) for repeatable build
 
 ## Build
 ```sh
@@ -30,7 +31,7 @@ Usage of ./go-cleanarchitecture:
 
 ## Run with Docker
 ```sh
-$ docker-compose up -d
+$ earthly +middlewares-up
 $ earthly +db-migrate
 $ earthly +run
 ```
@@ -41,7 +42,6 @@ $ earthly +run
 $ earthly +unit-test
 
 # Integration testing
-$ docker-compose up -d
 $ earthly +integration-test
 ```
 

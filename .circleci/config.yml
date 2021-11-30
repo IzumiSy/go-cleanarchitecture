@@ -1,9 +1,7 @@
 version: 2.1
 jobs:
   tests:
-    machine:
-      image: ubuntu-2004:202111-01
-      docker_layer_caching: true
+    machine: true
     steps:
       - run:
           name: Install docker-compose
@@ -21,9 +19,7 @@ jobs:
       - checkout
       - run:
           name: Run tests
-          command: |
-            docker-compose up -d
-            earthly --use-inline-cache --save-inline-cache --push +test
+          command: earthly --ci --push +test
 
 workflows:
   tests:
