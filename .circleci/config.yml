@@ -23,8 +23,7 @@ jobs:
           name: Run tests
           command: |
             docker-compose up -d
-            sleep 15
-            earthly --use-inline-cache --save-inline-cache +test
+            earthly --use-inline-cache --save-inline-cache --push +test
 
 workflows:
   tests:
