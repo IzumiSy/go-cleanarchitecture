@@ -2,7 +2,7 @@ version: 2.1
 jobs:
   tests:
     machine:
-      image: ubuntu:latest
+      image: ubuntu-2004:202111-01
       docker_layer_caching: true
     steps:
       - run:
