@@ -35,3 +35,7 @@ workflows:
       - integration-test:
         requires:
           - prepare
+        filters:
+          branches:
+            only:
+              - master
