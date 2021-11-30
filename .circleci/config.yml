@@ -1,35 +1,31 @@
 version: 2.1
 jobs:
-  unit_testing:
-    docker:
-      - image: circleci/golang:1.16
-    environment:
-      GO111MODULE: "on"
-    steps:
-      - checkout
-      - run: make test/unit
-  integration_testing:
-    machine: true
+  tests:
+    machine:
+      image: ubuntu-2004:202111-01
+      docker_layer_caching: true
     steps:
       - run:
-          name: install docker-compose
+          name: Install docker-compose
           command: |
             curl -L https://github.com/docker/compose/releases/download/1.29.2/docker-compose-`uname -s`-`uname -m` > ~/docker-compose
             chmod +x ~/docker-compose
             sudo mv ~/docker-compose /usr/local/bin/docker-compose
+      - run:
+          name: Setup earthly
+          command: |
+            sudo wget https://github.com/earthly/earthly/releases/download/v0.6.1/earthly-linux-amd64 -O /usr/local/bin/earthly
+            sudo chmod +x /usr/local/bin/earthly
+            earthly bootstrap
+            earthly --version
       - checkout
       - run:
-          name: build and run dredd
+          name: Run tests
           command: |
-            mkdir tmp
-            docker-compose --profile app up --build -d
-            sleep 20
-            make db/migrate
-            make test/integration
-
+            docker-compose up -d
+            earthly --use-inline-cache --save-inline-cache --push +test
 
 workflows:
-  unit_and_integration_testing:
+  tests:
     jobs:
-      - unit_testing
-      - integration_testing
+      - tests
