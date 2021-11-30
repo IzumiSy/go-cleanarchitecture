@@ -22,7 +22,8 @@ image:
 run:
   LOCALLY
   WITH DOCKER --load app:latest=+image
-    RUN docker run --net=go-cleanarchitecture-network -p 8080:8080 --env APP_ENV=production --rm app:latest -http
+    RUN docker run --net=go-cleanarchitecture-network --net-alias=app \
+      -p 8080:8080 --env APP_ENV=production --rm app:latest -http
   END
 
 db-migrate:
@@ -44,20 +45,13 @@ unit-test:
   COPY . .
   RUN go test -v ./...
 
+# Requires middlwares up with docker-compose
 integration-test:
-  BUILD +image
-  COPY docker-compose.yml .
-  COPY dredd_hook.js api-description.apib .
-  COPY ./schemas ./config .
-  WITH DOCKER \
-      --compose docker-compose.yml \
-      --load app:latest=+image \
-      --pull apiaryio/dredd \
-      --pull flyway/flyway:7
-    RUN sleep 15 && \
-      docker run --net=go-cleanarchitecture-network \
-        -v "$(pwd)/schemas/sql:/flyway/sql" -v "$(pwd)/config:/flyway/conf" --rm flyway/flyway:7 migrate && \
-      docker run -d --net=go-cleanarchitecture-network --env APP_ENV=production --rm app:latest -http && \
+  LOCALLY
+  BUILD +db-migrate
+  WITH DOCKER --load app:latest=+image
+    RUN cid=`docker run -d --net=go-cleanarchitecture-network --net-alias=app --env APP_ENV=production --rm app:latest -http` && \
       docker run --net=go-cleanarchitecture-network -v "$(pwd):/app" -w /app --rm apiaryio/dredd dredd \
-        api-description.apib http://app:8080 --hookfiles=./dredd_hook.js
+        api-description.apib http://app:8080 --hookfiles=./dredd_hook.js && \
+      docker stop $cid
   END
