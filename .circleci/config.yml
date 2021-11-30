@@ -6,15 +6,15 @@ jobs:
       - run:
           name: Setup earthly
           command: |
-            sudo wget https://github.com/earthly/earthly/releases/download/v0.6.1/earthly-linux-amd64 -O /usr/local/bin/earthly
-            sudo chmod +x /usr/local/bin/earthly
-            earthly bootstrap
-            earthly --version
+            wget https://github.com/earthly/earthly/releases/download/v0.6.1/earthly-linux-amd64 -O /tmp/earthly
+            chmod +x /tmp/earthly
+            /tmp/earthly bootstrap
+            /tmp/earthly --version
       - run:
           name: "Docker login"
           command: docker login --username "izumisy" --password "$DOCKERHUB_TOKEN"
       - persist_to_workspace:
-          root: /usr/local/bin
+          root: /tmp
           paths:
             - earthly
 
@@ -22,17 +22,17 @@ jobs:
     machine: true
     steps:
       - attach_workspace:
-          at: /usr/local/bin
+          at: /tmp
       - checkout
-      - run: earthly +unit-test
+      - run: /tmp/earthly +unit-test
 
   integration-test:
     machine: true
     steps:
       - attach_workspace:
-          at: /usr/local/bin
+          at: /tmp
       - checkout
-      - run: earthly -P --ci --push +integration-test
+      - run: /tmp/earthly -P --ci --push +integration-test
 
 workflows:
   tests:
