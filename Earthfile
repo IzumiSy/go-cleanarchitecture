@@ -32,7 +32,7 @@ db-migrate:
 
 db-clean:
   LOCALLY
-	RUN docker run --net=go-cleanarchitecture-network \
+  RUN docker run --net=go-cleanarchitecture-network \
     -v "$(pwd)/schemas/sql:/flyway/sql" -v "$(pwd)/config:/flyway/config" --rm flyway/flyway:7 clean
 
 test:
