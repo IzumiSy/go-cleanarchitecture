@@ -69,10 +69,6 @@ db-clean:
 
 # Tests
 
-test:
-  BUILD +unit-test
-  BUILD +integration-test
-
 unit-test:
   FROM +deps
   COPY . .
