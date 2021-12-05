@@ -22,7 +22,7 @@ images:
   BUILD +migrater
   BUILD +dredd
 
-# Development
+# Development (local)
 
 run:
   LOCALLY
@@ -65,7 +65,6 @@ db-clean:
 # Tests
 
 test:
-  LOCALLY
   WITH DOCKER \
       --load db:latest=+db \
       --load redis:latest=+pubsub \
