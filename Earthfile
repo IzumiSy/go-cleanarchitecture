@@ -6,6 +6,7 @@ deps:
   COPY go.mod go.sum .
   RUN apk add --no-cache build-base
   RUN go mod download
+  SAVE IMAGE --cache-hint
 
 build:
   FROM +deps
