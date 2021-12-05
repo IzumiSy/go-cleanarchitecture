@@ -65,6 +65,7 @@ db-clean:
 # Tests
 
 test:
+  LOCALLY
   WITH DOCKER \
       --load db:latest=+db \
       --load redis:latest=+pubsub \
