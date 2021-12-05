@@ -19,6 +19,14 @@ image:
   ENTRYPOINT ["/go-cleanarchitecture/go-cleanarchitecture"]
   SAVE IMAGE --push ghcr.io/izumisy/go-cleanarchitecture:cache
 
+images:
+  BUILD +image
+  BUILD +db
+  BUILD +pubsub
+  BUILD +migrater
+  BUILD +dredd
+
+
 # Development
 
 run:
