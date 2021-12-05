@@ -3,6 +3,7 @@ version: 2.1
 jobs:
   integration-test:
     machine: true
+    resource_class: large
     steps:
       - run:
           name: Setup docker with ghcr.io
