@@ -2,11 +2,16 @@ VERSION 0.6
 FROM golang:1.17-alpine3.14
 WORKDIR /go-cleanarchitecture
 
-build:
+deps:
   RUN apk add --no-cache build-base
+  COPY go.mod go.sum .
+  RUN go mod download
+  SAVE IMAGE --cache-hint
+
+build:
+  FROM +deps
   COPY . .
   RUN go build -o build/go-cleanarchitecture main.go
-  SAVE IMAGE --cache-hint
   SAVE ARTIFACT build/go-cleanarchitecture AS LOCAL build/go-cleanarchitecture
 
 image:
