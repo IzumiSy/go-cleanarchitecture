@@ -70,6 +70,15 @@ db-clean:
 # Tests
 
 test:
+  BUILD +unit-test
+  BUILD +integration-test
+
+unit-test:
+  FROM +deps
+  COPY . .
+  RUN go test ./...
+
+integration-test:
   LOCALLY
   WITH DOCKER \
       --load db:latest=+db \
