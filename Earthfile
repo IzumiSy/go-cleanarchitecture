@@ -74,9 +74,8 @@ test:
   BUILD +integration-test
 
 unit-test:
-  FROM +deps
-  COPY . .
-  RUN go test -v ./...
+  FROM +build
+  RUN go test ./...
 
 integration-test:
   LOCALLY
