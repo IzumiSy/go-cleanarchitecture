@@ -6,8 +6,8 @@ build:
   RUN apk add --no-cache build-base
   COPY . .
   RUN go build -o build/go-cleanarchitecture main.go
-  SAVE ARTIFACT build/go-cleanarchitecture AS LOCAL build/go-cleanarchitecture
   SAVE IMAGE --cache-hint
+  SAVE ARTIFACT build/go-cleanarchitecture AS LOCAL build/go-cleanarchitecture
 
 image:
   COPY +build/go-cleanarchitecture .
