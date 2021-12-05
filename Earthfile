@@ -2,17 +2,12 @@ VERSION 0.6
 FROM golang:1.17-alpine3.14
 WORKDIR /go-cleanarchitecture
 
-deps:
-  COPY go.mod go.sum .
-  RUN apk add --no-cache build-base
-  RUN go mod download
-  SAVE IMAGE --cache-hint
-
 build:
-  FROM +deps
+  RUN apk add --no-cache build-base
   COPY . .
   RUN go build -o build/go-cleanarchitecture main.go
   SAVE ARTIFACT build/go-cleanarchitecture AS LOCAL build/go-cleanarchitecture
+  SAVE IMAGE --cache-hint
 
 image:
   COPY +build/go-cleanarchitecture .
@@ -71,15 +66,6 @@ db-clean:
 # Tests
 
 test:
-  BUILD +unit-test
-  BUILD +integration-test
-
-unit-test:
-  FROM +deps
-  COPY . .
-  RUN go test ./...
-
-integration-test:
   LOCALLY
   WITH DOCKER \
       --load db:latest=+db \

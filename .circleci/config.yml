@@ -1,7 +1,7 @@
 version: 2.1
 
 jobs:
-  tests:
+  integration-test:
     machine: true
     steps:
       - run:
@@ -17,8 +17,15 @@ jobs:
             /tmp/earthly --version
       - checkout
       - run: /tmp/earthly --use-inline-cache +test
+  unit-test:
+    docker:
+      - image: golang:1.17-alpine3.14
+    steps:
+      - checkout
+      - run: go test ./...
 
 workflows:
   tests:
     jobs:
-      - tests
+      - integration-test
+      - unit-test
