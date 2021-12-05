@@ -22,6 +22,7 @@ jobs:
       - image: golang:latest
     steps:
       - checkout
+      - run: go mod download
       - run: go test ./...
 
 workflows:
