@@ -5,6 +5,10 @@ jobs:
     machine: true
     steps:
       - run:
+          name: Setup docker with ghcr.io
+          command: |
+            docker login ghcr.io --username "izumisy" --password "$DOCKERHUB_TOKEN"
+      - run:
           name: Setup earthly
           command: |
             wget https://github.com/earthly/earthly/releases/download/v0.6.1/earthly-linux-amd64 -O /tmp/earthly
