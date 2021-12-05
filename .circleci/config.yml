@@ -19,7 +19,7 @@ jobs:
       - run: /tmp/earthly --use-inline-cache +test
   unit-test:
     docker:
-      - image: golang:1.17-alpine3.14
+      - image: golang:latest
     steps:
       - checkout
       - run: go test ./...

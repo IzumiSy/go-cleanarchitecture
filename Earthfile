@@ -3,7 +3,6 @@ FROM golang:1.17-alpine3.14
 WORKDIR /go-cleanarchitecture
 
 build:
-  RUN apk add --no-cache build-base
   COPY . .
   RUN go build -o build/go-cleanarchitecture main.go
   SAVE ARTIFACT build/go-cleanarchitecture AS LOCAL build/go-cleanarchitecture
