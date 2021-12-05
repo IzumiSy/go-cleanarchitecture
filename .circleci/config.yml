@@ -16,7 +16,13 @@ jobs:
             /tmp/earthly bootstrap
             /tmp/earthly --version
       - checkout
-      - run: /tmp/earthly --use-inline-cache --remote-cache=izumisy/go-cleanarchitecture-explicit:cache --push +test
+      - run:
+          name: Run earthly
+          command: |
+            /tmp/earthly --remote-cache=ghcr.io/izumisy/go-cleanarchitecture-explicit:cache \
+              --save-inline-cache \
+              --use-inline-cache \
+              --push +test
   unit-test:
     docker:
       - image: golang:latest
