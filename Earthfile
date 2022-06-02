@@ -1,5 +1,5 @@
 VERSION 0.6
-FROM golang:1.17-alpine3.14
+FROM golang:1.18-bullseye
 WORKDIR /go-cleanarchitecture
 
 deps:
