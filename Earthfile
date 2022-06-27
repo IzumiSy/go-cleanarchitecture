@@ -3,7 +3,6 @@ FROM golang:1.18-bullseye
 WORKDIR /go-cleanarchitecture
 
 deps:
-  RUN apk add --no-cache build-base
   COPY go.mod go.sum .
   RUN go mod download
   SAVE IMAGE --cache-hint
