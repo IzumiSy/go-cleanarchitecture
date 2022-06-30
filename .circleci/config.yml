@@ -12,7 +12,7 @@ jobs:
       - run:
           name: Setup earthly
           command: |
-            wget https://github.com/earthly/earthly/releases/download/v0.6.1/earthly-linux-amd64 -O /tmp/earthly
+            wget https://github.com/earthly/earthly/releases/download/v0.6.19/earthly-linux-amd64 -O /tmp/earthly
             chmod +x /tmp/earthly
             /tmp/earthly bootstrap
             /tmp/earthly --version
