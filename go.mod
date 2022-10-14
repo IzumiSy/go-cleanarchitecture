@@ -1,6 +1,6 @@
 module go-cleanarchitecture
 
-go 1.13
+go 1.18
 
 require (
 	github.com/gomodule/redigo v1.8.5
