@@ -1,7 +1,4 @@
 # go-cleanarchitecture
-
-[![CircleCI](https://circleci.com/gh/IzumiSy/go-cleanarchitecture/tree/master.svg?style=svg)](https://circleci.com/gh/IzumiSy/go-cleanarchitecture/tree/master)
-
 This exploration project includes:
 
 - Authorization flow
