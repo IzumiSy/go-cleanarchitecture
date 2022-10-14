@@ -16,24 +16,22 @@ This exploration project includes:
 
 ## Build
 ```sh
-$ make build
+# Builds a binary
+$ earthly +build
+
+# Builds an image
+$ earthly +image
 ```
 
-## Run
-```
-$ ./go-cleanarchitecture -help
-Usage of ./go-cleanarchitecture:
-  -http
-    	http server mode
-  -migrate
-    	migration mode
-```
-
-## Run with Docker
+## Run with middlewares
 ```sh
+# Runs an application with middlewares up
 $ earthly +middlewares-up
 $ earthly +db-migrate
 $ earthly +run
+
+# Shuts down middlewares
+$ earthly +middlewares-down
 ```
 
 ## Tests
