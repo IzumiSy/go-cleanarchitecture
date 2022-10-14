@@ -1,4 +1,6 @@
 # go-cleanarchitecture
+![ci](https://github.com/IzumiSy/go-cleanarchitecture/actions/workflows/ci.yml/badge.svg)
+
 This exploration project includes:
 
 - Authorization flow
