@@ -1,6 +1,5 @@
 # go-cleanarchitecture
-
-[![CircleCI](https://circleci.com/gh/IzumiSy/go-cleanarchitecture/tree/master.svg?style=svg)](https://circleci.com/gh/IzumiSy/go-cleanarchitecture/tree/master)
+![ci](https://github.com/IzumiSy/go-cleanarchitecture/actions/workflows/ci.yaml/badge.svg)
 
 This exploration project includes:
 
