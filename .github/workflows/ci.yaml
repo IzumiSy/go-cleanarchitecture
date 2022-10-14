@@ -6,7 +6,7 @@ jobs:
   unit-testing:
     name: unit testing
     runs-on: ubuntu-latest
-    container: 1.19.2-buster
+    container: golang:1.19.2-buster
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v3
