@@ -1,5 +1,5 @@
 # go-cleanarchitecture
-![ci](https://github.com/IzumiSy/go-cleanarchitecture/actions/workflows/ci.yml/badge.svg)
+![ci](https://github.com/IzumiSy/go-cleanarchitecture/actions/workflows/ci.yaml/badge.svg)
 
 This exploration project includes:
 
