@@ -26,11 +26,14 @@ jobs:
           chmod +x /tmp/earthly
           /tmp/earthly bootstrap
           /tmp/earthly --version
-
       - uses: docker/login-action@v2
         with:
           registry: gchr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-
       - uses: actions/checkout@v3
+      - name: Run tests
+        run: |
+          /tmp/earthly --use-inline-cache --push \
+            --remote-cache=ghcr.io/izumisy/go-cleanarchitecture-explicit:cache \
+            +integration-test
