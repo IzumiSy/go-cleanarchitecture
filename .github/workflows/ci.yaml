@@ -19,6 +19,9 @@ jobs:
     name: integration testing
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    permissions:
+      contents: read
+      packages: write
     steps:
       - name: Setup earthly
         run: |
