@@ -37,5 +37,4 @@ jobs:
           /tmp/earthly --version
       - uses: actions/checkout@v3
       - name: Run tests
-        run: |
-          /tmp/earthly --ci --push +integration-test
+        run: /tmp/earthly --use-inline-cache --push +integration-test
