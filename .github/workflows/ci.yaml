@@ -17,4 +17,11 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
+      - name: Setup earthly
+        run: |
+          wget https://github.com/earthly/earthly/releases/download/v0.6.26/earthly-linux-amd64 -O /tmp/earthly
+          chmod +x /tmp/earthly
+          /tmp/earthly bootstrap
+          /tmp/earthly --version
+
       - uses: actions/checkout@v3
